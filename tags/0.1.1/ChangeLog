@@ -1,0 +1,6 @@
+2008-11-26	Morgan Lokhorst-Blight	<chaos95@users.sourceforge.net>
+	* Initial import, project setup, svn structure.
+
+	* README: Added simple README with install/modification instructions.
+	* ChangeLog: Added this change log.
+
