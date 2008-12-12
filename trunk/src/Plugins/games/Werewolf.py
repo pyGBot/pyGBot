@@ -139,7 +139,7 @@ class Werewolf(BasePlugin):
         self._reset_gamedata()
         #self.start()
 
-    def user_nickchange(self, old, new):
+    def user_nickchange(self, channel, old, new):
         for list_ in (self.live_players, self.dead_players, self.wolves,
                 self.villagers, self.originalwolves):
             if old in list_:
