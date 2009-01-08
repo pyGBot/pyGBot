@@ -23,7 +23,19 @@ from ..Auth import AuthLevels as AL
 class StatsRoll(BaseCommand):
     level = AL.User
     def __init__(self, bot, channel, user, args):
-        rolls,stats = self.rollStats()
+        args = " " + args.lstrip(" ")
+        args = [tuple(x.split(" ")) for x in args.split(" -")[1:]]
+
+        for arg in args:
+            if arg[0] == 'sort':
+                if len(arg[0]) > 1 and (arg[0][1] == 'asc' or arg[0][1] == 'desc'):
+                    sortdir = args[0][1]
+                else:
+                    sortdir = 'asc'
+            elif arg[0] == 'verbose':
+                verbose = True
+
+        rolls,stats = self.rollStats(sortdir)
 
         if channel is None:
             out = bot.privout
@@ -31,17 +43,24 @@ class StatsRoll(BaseCommand):
         else:
             out = bot.pubout
             target = channel
-        
-        if args.lower().startswith("verbose"):
+
+
+        if verbose:
             out(target,str(rolls))
+
         out(target,"Stats are: %s." % ', '.join(map(str, stats)))
 
 
-    def rollStats(self):
+    def rollStats(self, sortdir):
         """ Roll up a standard 6x4d6 (drop lowest) D&D Stats roll."""
         rolls = [[random.randint(1,6) for i in range(0,4)] for j in range(0,6)]
 
         # Drop lowest of each 4d6 set and sum to produce 6 stat values
-        stats = [sum(sorted(x)[1:]) for x in rolls] 
+        stats = [sum(sorted(x)[1:]) for x in rolls]
+
+        if sortdir == 'asc':
+            stats.sort()
+        elif sortdir == 'desc':
+            stats.sort(None,None,True)
  
         return rolls, stats
