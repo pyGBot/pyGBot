@@ -66,7 +66,7 @@ class Auth(BasePlugin):
         if self.users.has_key(user):
             del self.users[user]
 
-    def user_nickchange(self, channel, username, newname):
+    def user_nickchange(self, username, newname):
         if self.users.has_key(username):
             self.users[newname] = self.users[username]
             del self.users[username]

@@ -51,7 +51,7 @@ class BasePlugin:
     def user_quit(self, username, reason=""):
         pass
 
-    def user_nickchange(self, channel, username, newname):
+    def user_nickchange(self, username, newname):
         pass
 
     # Event handlers for this bot

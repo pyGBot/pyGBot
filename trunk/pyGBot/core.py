@@ -364,7 +364,7 @@ class GBot(irc.IRCClient):
         log.chatlog.info('%s is now known as %s' % (oldname, newname))
 
         # Call Event Handler
-        self.events.user_nickchange(channel, oldname, newname)
+        self.events.user_nickchange(oldname, newname)
 
     def cprivmsg(self, chan, user, message):
 
