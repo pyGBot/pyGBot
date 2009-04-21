@@ -79,7 +79,7 @@ class Uno(BasePlugin):
         if channel == self.channel and user in self.players:
             self.player_leave(channel, user)
 
-    def user_nickchange(self, channel, username, newname):
+    def user_nickchange(self, username, newname):
         if username in self.players:
             index = self.players.index(username)
             self.players.remove(username)
