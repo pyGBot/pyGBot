@@ -25,6 +25,8 @@ from pyGBot.Plugins.system.Auth import AuthLevels as AL
 class StatsRoll(BaseCommand):
     level = AL.User
     def __init__(self, bot, channel, user, args):
+        sortdir = None
+        verbose = None
         args = " " + args.lstrip(" ")
         args = [tuple(x.split(" ")) for x in args.split(" -")[1:]]
 

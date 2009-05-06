@@ -31,7 +31,6 @@ from twisted.internet import reactor, protocol
 import sys
 import time
 import threading
-from Queue import Queue
 
 from contrib.configobj import ConfigObj, ConfigObjError
 
@@ -41,35 +40,26 @@ from pyGBot.PluginEvents import PluginEvents
 class GBot(irc.IRCClient):
     ''' An IRC Texas Holdem tournament  dealer'''
 
-    def dispatchMessages(self):
-        while True:
-            message = self.MessageQueue.get(True)
-
-            message[0](**message[1])
-            self.MessageQueue.task_done()
-
-            time.sleep(self.flooddelay)
-
     def pubout(self, channel, msg):
-        self.MessageQueue.put((self.say, {'channel': channel, 'message': msg}))
+        self.say(channel=channel, message=msg)
         
         # strip color codes
         log.chatlog.info('[PUB->%s]%s' % (channel, stripcolors(msg)))
 
     def privout(self, user, msg):
-        self.MessageQueue.put((self.msg, {'user': user, 'message': msg}))
+        self.msg(user=user, message=msg)
         
         # strip color codes
         log.chatlog.info('[PRV->%s]%s' % (user, stripcolors(msg)))
 
     def noteout(self, user, msg):
-        self.MessageQueue.put((self.notice, {'user': user, 'message': msg}))
+        self.notice(user=user, message=msg)
 
         # strip color codes
         log.chatlog.info('[NTE->%s]%s' % (user, stripcolors(msg)))
 
     def actout(self,channel, msg):
-        self.MessageQueue.put((self.me, {'channel': channel, 'action': msg}))
+        self.me(channel=channel, action=msg)
 
         # strip color codes
         log.chatlog.info('[ACT->%s]%s' % (channel, stripcolors(msg)))
@@ -142,12 +132,6 @@ class GBot(irc.IRCClient):
             return True
 
     def __init__(self):
-        self.MessageQueue = Queue()
-
-        t = threading.Thread(target=self.dispatchMessages)
-        t.setDaemon(True)
-        t.start()
-
         try:
             conf = ConfigObj('pyGBot.ini')
         except IOError, msg:
@@ -202,7 +186,7 @@ class GBot(irc.IRCClient):
             self.plusmodes = conf['IRC']['plusmodes']
 
         if conf['IRC'].has_key('flooddelay'):
-            self.flooddelay = float(conf['IRC']['flooddelay'])
+            self.lineRate = float(conf['IRC']['flooddelay'])
 
         if conf.has_key('version'):
             if conf['version'].has_key('name'):
