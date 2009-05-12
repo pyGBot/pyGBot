@@ -32,8 +32,8 @@ class StatsRoll(BaseCommand):
 
         for arg in args:
             if arg[0] == 'sort':
-                if len(arg[0]) > 1 and (arg[0][1] == 'asc' or arg[0][1] == 'desc'):
-                    sortdir = args[0][1]
+                if len(arg) > 1 and (arg[1] == 'asc' or arg[1] == 'desc'):
+                    sortdir = arg[1]
                 else:
                     sortdir = 'asc'
             elif arg[0] == 'verbose':
@@ -48,9 +48,11 @@ class StatsRoll(BaseCommand):
             out = bot.pubout
             target = channel
 
-
         if verbose:
-            out(target,str(rolls))
+            if sortdir == 'asc':
+                rolls.sort(key=sum)
+            elif sortdir == 'desc':
+                rolls.sort(key=sum, reverse=True)
 
         out(target,"Stats are: %s." % ', '.join(map(str, stats)))
 
@@ -65,6 +67,6 @@ class StatsRoll(BaseCommand):
         if sortdir == 'asc':
             stats.sort()
         elif sortdir == 'desc':
-            stats.sort(None,None,True)
+            stats.sort(reverse=True)
  
         return rolls, stats
