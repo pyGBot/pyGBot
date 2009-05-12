@@ -54,6 +54,8 @@ class StatsRoll(BaseCommand):
             elif sortdir == 'desc':
                 rolls.sort(key=sum, reverse=True)
 
+            out(target,str(rolls))
+
         out(target,"Stats are: %s." % ', '.join(map(str, stats)))
 
 
