@@ -23,7 +23,7 @@
 ################################################################################
 
 class BasePlugin:
-    def __init__(self, bot, options):
+    def __init__(self, bot, options, channel=None):
         self.bot = bot
 
     def activate(self, channel=None):

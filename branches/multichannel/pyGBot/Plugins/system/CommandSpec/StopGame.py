@@ -22,7 +22,7 @@ from pyGBot.Plugins.system.Auth import AuthLevels as AL
 class StopGame(BaseCommand):
     level = AL.User
     def __init__(self, bot, channel, user, args):
-        for p in bot.activeplugins:
+        for p in bot.activeplugins[channel]:
             if p.startswith('games.'):
-                if bot.deactivatePlugin(p, channel):
+                if bot.unloadPlugin(p, channel):
                     bot.pubout(channel, "%s stopped." % p.split('.')[1])

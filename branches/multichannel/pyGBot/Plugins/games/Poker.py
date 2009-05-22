@@ -23,8 +23,8 @@ from pyGBot.Plugins.games.pokerfiles.tourney import Tourney
 from pyGBot.Plugins.games.pokerfiles.command import Command
 
 class Poker(BasePlugin):
-    def __init__(self, bot, options):
-        BasePlugin.__init__(self, bot, options)
+    def __init__(self, bot, options, channel=None):
+        BasePlugin.__init__(self, bot, options, channel)
         self.tourney = []
 
     def pubout(self, msg):
@@ -74,7 +74,7 @@ class Poker(BasePlugin):
 
     # Event handlers for incoming messages
     def msg_channel(self, channel, user, message):
-        self.processmessage(user, message)
+        self.processmessage(user, message, channel)
 
     def msg_action(self, channel, user, message):
         pass
@@ -88,13 +88,25 @@ class Poker(BasePlugin):
     def channel_names(self, channel, nameslist):
         pass
 
-    def processmessage(self, user, message):
+    def processmessage(self, user, message, channel=None):
+        l = message.strip().split()
+
         fulluser = user
         user = user.split('!', 1)[0]
         
-        l = message.strip().split()
-
         if len(l) > 1 and l[0] == 'p':
+
+            if channel == None:
+                # Got a privmsg
+                channel = l[1]
+                if not channel.startswith('#'):
+                    bot.noteout(user,"Please specify a channel for your poker commands")
+                    return
+
+                del l[1]                
+  
+            if channel != self.channel:
+                return
 
             cmd = Command(user, l, fulluser)
             if cmd.arg == 'ERROR':
