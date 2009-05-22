@@ -37,7 +37,7 @@ class Uno(BasePlugin):
     handsize = 7
     maxplayers = 10 #108 / (handsize + 1)
 
-    def __init__(self, bot, options):
+    def __init__(self, bot, options, channel=None):
         BasePlugin.__init__(self, bot, options)
         self.game_running = False
 

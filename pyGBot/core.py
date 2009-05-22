@@ -64,63 +64,78 @@ class GBot(irc.IRCClient):
         # strip color codes
         log.chatlog.info('[ACT->%s]%s' % (channel, stripcolors(msg)))
 
-    def loadPlugins(self, conf):
-        if conf.has_key('Plugins') == False:
-            return
+    def getLoadedPlugin(self, name, channel=None):
+        if (name, channel) in self.plugins:
+            return self.plugins[(name, channel)]
+        else:
+            return None
 
-        pluginnames = conf['Plugins'].keys()
-        for name in pluginnames:
-            modname, classname = name.split('.')
-            plugin = self.loadPluginFromFile(modname, classname, conf)
+    def loadPlugin(self, name, channel = None):
+        log.logger.info("Loading plugin " + name)
+        modname, classname = name.split('.')
 
-            self.plugins[name] = plugin
-
-    def loadPluginFromFile(self, pluginmodule, pluginname, conf):
-        log.logger.info("Loading plugin " + pluginname)
-
-        if conf.has_key('Plugins.' + pluginmodule + '.' + pluginname):
-            options = conf['Plugins.' + pluginmodule + '.' + pluginname]
+        if self.conf.has_key('Plugins.' + modname + '.' + classname):
+            options = self.conf['Plugins.' + modname + '.' + classname]
         else:
             options = []
 
-        exec "from Plugins." + pluginmodule + "." + pluginname + " import " + pluginname
-        exec "plugin = " + pluginname + "(self, options)"
+        plugin = self.loadPluginFromFile(modname, classname)
+        if plugin == None:
+            return False
+
+        plugin = plugin(self, options, channel)
+        self.plugins[(name, channel)] = plugin
+        return True
+
+    def unloadPlugin(self, name, channel = None):
+        if name in self.activeplugins[channel]:
+            self.deactivatePlugin(name, channel)
+        del self.plugins[(name, channel)]
+
+    def loadPluginFromFile(self, pluginmodule, pluginname):
+        pluginpath = "pyGBot.Plugins." + pluginmodule + "." + pluginname
+        try:
+            _temp = __import__(pluginpath, globals(), locals(), [pluginname], 0)
+            plugin = getattr(_temp, pluginname)
+        except:
+            return None
+
         return plugin
 
     def activatePlugin(self, pluginname, channel=None):
-        if self.plugins.has_key(pluginname) == False:
-            log.logger.info('Error: Unable to activate plugin ' + pluginname)
+        if self.plugins.has_key((pluginname, channel)) == False:
+            log.logger.info("Error: Unable to activate plugin %s" % pluginname)
             return
 
         log.logger.info("Activating %s" % pluginname)
-        plugin = self.plugins[pluginname]
+        plugin = self.plugins[(pluginname, channel)]
 
         if plugin.activate(channel) == False:
             log.logger.info('Error: Plugin %s returned false on activation.' % pluginname)
             return False
 
         for eventname in self.events.__events__:
-            log.logger.debug("Testing for event handler " + eventname)
+            log.logger.debug("Testing for event handler %s" % eventname)
             if hasattr(plugin, eventname) == True:
-                log.logger.debug("Adding event handler " + eventname + " from plugin " + pluginname)
+                log.logger.debug("Adding event handler %s from plugin %s" % (eventname, pluginname))
                 event = getattr(self.events, eventname)
                 event += getattr(plugin, eventname)
 
-        self.activeplugins.append(pluginname)
+        self.activeplugins[channel].append(pluginname)
         return True
 
     def deactivatePlugin(self, pluginname, channel=None):
-        if self.plugins.has_key(pluginname) == False:
-            log.logger.info('Error: Unable to deactivate plugin ' + pluginname)
+        if self.plugins.has_key((pluginname, channel)) == False:
+            log.logger.info("Error: Unable to deactivate plugin %s" % pluginname)
             return        
 
         log.logger.info("Deactivating %s" % pluginname)
-        plugin = self.plugins[pluginname]
+        plugin = self.plugins[(pluginname, channel)]
 
         for eventname in self.events.__events__:
             log.logger.debug("Testing for event handler " + eventname)
             if hasattr(plugin, eventname) == True:
-                log.logger.debug("Removing event handler " + eventname + " from plugin " + pluginname)
+                log.logger.debug("Removing event handler %s from plugin %s for channel %s" % (eventname, pluginname, channel))
                 event = getattr(self.events, eventname)
                 event -= getattr(plugin, eventname)
 
@@ -128,12 +143,12 @@ class GBot(irc.IRCClient):
             log.logger.info('Error: Plugin %s returned false on deactivation.' % pluginname)
             return False
         else:
-            self.activeplugins.remove(pluginname)
+            self.activeplugins[channel].remove(pluginname)
             return True
 
     def __init__(self):
         try:
-            conf = ConfigObj('pyGBot.ini')
+            self.conf = ConfigObj('pyGBot.ini')
         except IOError, msg:
             print "Cant open config file: ", msg
             sys.exit(1)
@@ -141,7 +156,7 @@ class GBot(irc.IRCClient):
         try:
             print "Opening log file..."
             log.addScreenHandler(log.logger, log.formatter)
-            log.addLogFileHandler(log.logger,conf['IRC']['logfile'],log.formatter)
+            log.addLogFileHandler(log.logger,self.conf['IRC']['logfile'],log.formatter)
         except IOError, msg:
             print "Unable to open log file: ", msg
             print "Defaulting to local."
@@ -152,7 +167,7 @@ class GBot(irc.IRCClient):
 
         try:
             print "Opening log file..."
-            log.addLogFileHandler(log.chatlog,conf['IRC']['chatlogfile'],log.cformat)
+            log.addLogFileHandler(log.chatlog,self.conf['IRC']['chatlogfile'],log.cformat)
         except IOError, msg:
             print "Unable to open log file: ", msg
             print "Defaulting to local."
@@ -161,38 +176,38 @@ class GBot(irc.IRCClient):
             print "No log file config found. Defaulting to local."
             log.addLogFileHandler(log.chatlog,'chat.log',log.cformat)
 
-        if conf.has_key('IRC') == False:
+        if self.conf.has_key('IRC') == False:
             print "Config file does not contain IRC connection information"
             sys.exit(1)
 
 
-        if conf['IRC'].has_key('nick'):
-            self.nickname = conf['IRC']['nick']
-        if conf['IRC'].has_key('idpass'):
-            self.idpass = conf['IRC']['idpass']
-        if conf['IRC'].has_key('idnick'):
-            self.idnick = conf['IRC']['idnick']
+        if self.conf['IRC'].has_key('nick'):
+            self.nickname = self.conf['IRC']['nick']
+        if self.conf['IRC'].has_key('idpass'):
+            self.idpass = self.conf['IRC']['idpass']
+        if self.conf['IRC'].has_key('idnick'):
+            self.idnick = self.conf['IRC']['idnick']
 
-        if conf['IRC'].has_key('opernick'):
-            self.opernick = conf['IRC']['opernick']
-        if conf['IRC'].has_key('operpass'):
-            self.operpass = conf['IRC']['operpass']
+        if self.conf['IRC'].has_key('opernick'):
+            self.opernick = self.conf['IRC']['opernick']
+        if self.conf['IRC'].has_key('operpass'):
+            self.operpass = self.conf['IRC']['operpass']
 
-        if conf['IRC'].has_key('ircpass'):
-            self.password = conf['IRC']['ircpass']
-        if conf['IRC'].has_key('minusmodes'):
-            self.minusmodes = conf['IRC']['minusmodes']
-        if conf['IRC'].has_key('plusmodes'):
-            self.plusmodes = conf['IRC']['plusmodes']
+        if self.conf['IRC'].has_key('ircpass'):
+            self.password = self.conf['IRC']['ircpass']
+        if self.conf['IRC'].has_key('minusmodes'):
+            self.minusmodes = self.conf['IRC']['minusmodes']
+        if self.conf['IRC'].has_key('plusmodes'):
+            self.plusmodes = self.conf['IRC']['plusmodes']
 
-        if conf['IRC'].has_key('flooddelay'):
-            self.lineRate = float(conf['IRC']['flooddelay'])
+        if self.conf['IRC'].has_key('flooddelay'):
+            self.lineRate = float(self.conf['IRC']['flooddelay'])
 
-        if conf.has_key('version'):
-            if conf['version'].has_key('name'):
-                self.versionName = conf['version']['name']
-            if conf['version'].has_key('number'):
-                self.versionNum = conf['version']['number']
+        if self.conf.has_key('version'):
+            if self.conf['version'].has_key('name'):
+                self.versionName = self.conf['version']['name']
+            if self.conf['version'].has_key('number'):
+                self.versionNum = self.conf['version']['number']
 
         self.whois = []
 
@@ -202,8 +217,8 @@ class GBot(irc.IRCClient):
         self.events = PluginEvents()
 
         self.plugins = {}
-        self.activeplugins = []
-        self.loadPlugins(conf)
+        self.activeplugins = {None: []}
+        self.loadPlugin('system.Startup')
         self.activatePlugin('system.Startup')
 
         self.versionEnv = sys.platform
@@ -246,6 +261,7 @@ class GBot(irc.IRCClient):
         """
         log.logger.info('[I have joined %s]' % (channel,))
         self.channels.append(channel)
+        self.activeplugins[channel] = []
 
         # Set modes
         if hasattr(self, 'plusmodes'):

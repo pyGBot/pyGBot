@@ -32,9 +32,9 @@ class BaseCommand:
 class Commands(BasePlugin):
     __plugintype__ = "active"
 
-    def __init__(self, bot, options):
+    def __init__(self, bot, options, channel=None):
         BasePlugin.__init__(self, bot, options)
-        if self.bot.plugins.has_key('system.Auth') == False:
+        if self.bot.getLoadedPlugin('system.Auth') == None:
             raise StandardError('Unable to load Auth plugin. Please ensure it is loaded first.')
 
         if options.has_key('prefix'):
@@ -103,7 +103,7 @@ class Commands(BasePlugin):
         else:
             arg = ""
 
-        get_userlevel = self.bot.plugins['system.Auth'].get_userlevel
+        get_userlevel = self.bot.getLoadedPlugin('system.Auth').get_userlevel
 
         if self.commands.has_key(command) == False:
             self.bot.noteout(user, 'Command not recognised: %s' % command)

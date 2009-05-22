@@ -31,20 +31,18 @@ class PlayGame(BaseCommand):
             bot.pubout(channel, 'Please specify a game. use the list command to see what I can play.')
             return
             
-        for p in bot.activeplugins:
+        for p in bot.activeplugins[channel]:
             if p.startswith('games.'):
                 bot.pubout(channel, 'There is a game already active. Use the stop command to deactivate it.')
                 return
 
-        actname = ""
+        pluginname = 'games.' + args[0].capitalize()
 
-        for pn in bot.plugins.iterkeys():
-            if pn.startswith('games.') and pn.lower() == ('games.%s' % args[0].lower()):
-                actname = pn
+        if not bot.loadPlugin(pluginname, channel):
+            bot.pubout(channel, "Error loading %s" % args[0].capitalize())
+            return
 
-        if actname == "":
-            bot.pubout(channel, "That game is not in my databanks.")
-        elif bot.activatePlugin(actname, channel):
-            bot.pubout(channel, "%s started." % actname.split('.')[1])
+        if bot.activatePlugin(pluginname, channel):
+            bot.pubout(channel, "%s started." % args[0].capitalize())
         else:
-            bot.pubout(channel, "Error activating %s" % actname.split('.')[1])
+            bot.pubout(channel, "Error activating %s" % args[0].capitalize())

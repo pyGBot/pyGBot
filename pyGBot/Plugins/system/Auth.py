@@ -34,7 +34,7 @@ class User:
         self.level = level
 
 class Auth(BasePlugin):
-    def __init__(self, bot, options):
+    def __init__(self, bot, options, channel=None):
         BasePlugin.__init__(self, bot, options)
         self.users = {}
         self.conf = ConfigObj("users.ini")
@@ -115,10 +115,12 @@ class Auth(BasePlugin):
         log.logger.info("Users on #" + channel + ": " + ', '.join(nameslist))
 
     def get_passhash(self, uname):
+        self.conf.reload()
         if self.conf.has_key(uname) and self.conf[uname].has_key('passhash'):
             return self.conf[uname]['passhash']
     
     def get_authlevel(self, uname):
+        self.conf.reload()
         if self.conf.has_key(uname) and self.conf[uname].has_key('userlevel'):
             if hasattr(AuthLevels, self.conf[uname]['userlevel']):
                 return getattr(AuthLevels, self.conf[uname]['userlevel'])

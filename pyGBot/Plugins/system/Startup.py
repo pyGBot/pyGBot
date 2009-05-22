@@ -20,12 +20,13 @@ from pyGBot import log
 from pyGBot.BasePlugin import BasePlugin
 
 class Startup(BasePlugin):
-    def __init__(self, bot, options):
-        BasePlugin.__init__(self, bot, options)
+    def __init__(self, bot, options, channel=None):
+        BasePlugin.__init__(self, bot, options, channel)
         self.plugins = options.keys()
 
     def activate(self, channel=None):
         for pluginname in self.plugins:
+            self.bot.loadPlugin(pluginname, channel)
             self.bot.activatePlugin(pluginname, channel)
 
     # Event handlers for other users
