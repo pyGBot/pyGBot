@@ -163,8 +163,6 @@ class Mafia(BasePlugin):
 
         channel = self.channel
 
-        if nick == self.game_starter:
-            self.game_starter = None
         if nick in self.live_players:
             self.bot.pubout(channel, "%s disappeared in some sort of strange wormhole." % nick)
             self.live_players.remove(nick)
@@ -174,12 +172,12 @@ class Mafia(BasePlugin):
             self.dead_players.append(nick)
             if nick in self.Mafia:
                 self.Mafia.remove(nick)
-                self.bot.pubout(channel, "%nick was in the Mafia. Apparently someone made them an offer they couldn't refuse." % (nick,nick))
+                self.bot.pubout(channel, "%s was in the Mafia. Apparently someone made them an offer they couldn't refuse." % nick)
             if nick in self.citizens:
                 self.citizens.remove(nick)
                 self.bot.pubout(channel, "%s had a boring position in the game, that of a citizen. Hopefully death will be more interesting." % nick)
             if nick in self.doctor:
-                self.bot.pubout(channel, "%s was a doctor. The hospitals are baffled at this unexpected erasure from reality.")
+                self.bot.pubout(channel, "%s was a doctor. The hospitals are baffled at this unexpected erasure from reality. % nick")
             if nick == self.doctor_target:
                 self.bot.noteout(self.doctor, "Due to %s's unexpected erasure from reality, you may Save once again this night." % nick)
                 self.doctor_target = None
@@ -200,6 +198,9 @@ class Mafia(BasePlugin):
                     if v == nick:
                         del map_[k]
             self.check_game_over()
+        if nick == self.game_starter:
+            self.game_starter = None
+            self.bot.pubout(channel, "Game start is now open to anyone. Type !start to start the game.")
 
 
     def msg_notice(self, c, e):
@@ -230,8 +231,11 @@ class Mafia(BasePlugin):
     def user_part(self, channel, user):
         self._removeUser(user)
 
-    #def user_kick(self, channel, user):
-    #    self._removeUser(user)
+    def user_quit(self, user, reason):
+        self._removeUser(user)
+
+    def user_kicked(self, channel, username, kicker, message=""):
+        self._removeUser(user)
 
     def msg_channel(self, channel, user, message):
         self.check_game_control(user, message)
@@ -316,12 +320,12 @@ class Mafia(BasePlugin):
                 users = self.live_players[:]
                 self.bot.pubout(channel, "A new game has begun! Please wait, assigning roles...")
                 self.Mafia.append(users.pop(random.randrange(len(users))))
-	if len(self.live_players) > 12:
+	if len(self.live_players) > 16:
 	    self.Mafia.append(users.pop(random.randrange(len(users))))
 	    self.Mafia.append(users.pop(random.randrange(len(users))))
 	    self.Mafia.append(users.pop(random.randrange(len(users))))
 	    self.bot.pubout(channel, "There are four Mafia.")
-	elif len(self.live_players) > 8:
+	elif len(self.live_players) > 10:
 	    self.Mafia.append(users.pop(random.randrange(len(users))))
 	    self.Mafia.append(users.pop(random.randrange(len(users))))
 	    self.bot.pubout(channel, "There are three Mafia.")
@@ -704,7 +708,14 @@ class Mafia(BasePlugin):
     def match_name(self, nick):
         """Match NICK to a username in users(), insensitively.    Return
         matching nick, or None if no match."""
-        return nick
+
+        nick_lower = nick.lower()
+
+        for name in self.live_players:
+            if nick_lower == name.lower():
+                return name
+
+        return None
 
 #        chname, chobj = self.channels.items()[0]
 #        users = chobj.users()
@@ -867,6 +878,11 @@ class Mafia(BasePlugin):
             self.live_players.append(user)
             self.reply(channel, user, 'You are now in the game.')
             #self.fix_modes()
+
+    def cmd_mchat(self, args, channel, user):
+        if user in self.Mafia:
+            for mafioso in self.Mafia:
+                self.bot.noteout(mafioso, "Mafia - %s: %s" % (user, " ".join(args)))
 
     def cmd_aboutbot(self, args, channel, user):
         self.reply(channel, user, "This module is heavily modified from a bot written in Python "
