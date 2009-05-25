@@ -389,9 +389,9 @@ class Mafia(BasePlugin):
                 "Everyone else was a normal citizen"
                 % (self.originalMafia[0], self.originalMafia[1], self.sheriff, self.doctor)))
         else:
-            self.bot.pubout(channel, ("*** The mafia was %s, the sheriff was %s, the doctor was %s. "
+            self.bot.pubout(channel, ("*** The mafia were %s, the sheriff was %s, the doctor was %s. "
                 "Everyone else was a normal citizen"
-	% (self.originalMafia[0], self.sheriff, self.doctor)))
+	% (", ".join(self.originalMafia), self.sheriff, self.doctor)))
 
     def check_game_over(self):
         """End the game if either citizens or Mafia have won.
@@ -475,12 +475,9 @@ class Mafia(BasePlugin):
             for mafia in self.Mafia:
                 self.bot.noteout(mafia, text)
         if len(self.Mafia) >= 2:
-            self.bot.noteout(self.Mafia[0],\
-                                             ("The other Mafia is %s.    Confer privately."\
-                                                % self.Mafia[1]))
-            self.bot.noteout(self.Mafia[1],\
-                                             ("The other Mafia is %s.    Confer privately."\
-                                                % self.Mafia[0]))
+            for mafioso in self.Mafia:
+                self.bot.noteout(mafioso,("The Mafia are %s.    Confer privately."
+                                                % ", ".join(self.Mafia)))
 
         # ... bot is now in 'night' mode;    goes back to doing nothing but
         # waiting for commands.
