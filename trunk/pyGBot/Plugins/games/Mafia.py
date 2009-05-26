@@ -808,12 +808,8 @@ class Mafia(BasePlugin):
             if non_voters:
                 self.bot.pubout(channel, "The following have no votes registered: %s"
                         % (non_voters))
-	        self.bot.pubout(channel, "The votes are as follows: %s"
-	                % (self.citizen_votes))
             else:
                 self.bot.pubout(channel, "Everyone has voted.")
-	    self.bot.pubout(channel, "The votes are as follows: %s"
-	        % (self.citizen_votes))
         else:
             self.bot.pubout(channel, "Nobody has voted yet.")
 
@@ -822,12 +818,6 @@ class Mafia(BasePlugin):
             if nick not in self.live_players + self.dead_players:
                 self.reply(channel, user, "There's nobody playing by the name %s" % nick)
             self._removeUser(nick)
-
-    def cmd_renick(self, args, channel, user):
-        if len(args) != 1:
-            self.reply(channel, user, "Usage: renick <nick>")
-        else:
-            self.connection.nick(args[0])
 
     def cmd_check(self, args, channel, user):
         if len(args) == 1:
