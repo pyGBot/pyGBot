@@ -198,13 +198,16 @@ class Mafia(BasePlugin):
                     if v == nick:
                         del map_[k]
             self.check_game_over()
+            if self.check_night_done():
+                day()
+
         if nick == self.game_starter:
             self.game_starter = None
             self.bot.pubout(channel, "Game start is now open to anyone. Type !start to start the game.")
 
 
-    def msg_notice(self, c, e):
-        source = u
+#    def msg_notice(self, c, e):
+#        source = u
 
 
     GAME_STARTER_TIMEOUT_MINS = 4
