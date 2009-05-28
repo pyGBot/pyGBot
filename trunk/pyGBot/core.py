@@ -64,6 +64,11 @@ class GBot(irc.IRCClient):
         # strip color codes
         log.chatlog.info('[ACT->%s]%s' % (channel, stripcolors(msg)))
 
+    def modestring(self, target, modestring):
+        self.sendLine("MODE %s %s" % (target, modestring))
+
+        log.chatlog.info('[MODE] %s %s' % (target, modestring))
+
     def loadPlugins(self, conf):
         if conf.has_key('Plugins') == False:
             return
