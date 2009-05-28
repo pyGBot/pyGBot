@@ -115,7 +115,7 @@ night_Mafia_texts = \
 # Printed when day begins.
 
 day_game_texts = \
-["Paranoia runs through the city!  Who is a Mafia in disguise? The citizens *must* decide to lynch one player. When each player is ready, send me the command:  'lynch <nickname>', and I will keep track of votes, until the majority agrees."]
+["The citizens *must* decide to lynch one player. When each player is ready, send me the command:  'lynch <nickname>', and I will keep track of votes, until the majority agrees."]
 
 
 
@@ -133,12 +133,18 @@ class Mafia(BasePlugin):
         BasePlugin.__init__(self, bot, options)
         self.output = True
         self.moderation = True
+        if self.bot.plugins.has_key("system.Modes"):
+            self.modeplugin = self.bot.plugins["system.Modes"]
+        else:
+            self.modeplugin = None
 
     def activate(self, channel=None):
         if channel == None:
             return False
         self.channel = channel
         self._reset_gamedata()
+        self.c9_setup = False
+        self.anon_voting = True
         #self.start()
 
     def user_nickchange(self, old, new):
@@ -176,16 +182,18 @@ class Mafia(BasePlugin):
             if nick in self.citizens:
                 self.citizens.remove(nick)
                 self.bot.pubout(channel, "%s had a boring position in the game, that of a citizen. Hopefully death will be more interesting." % nick)
-            if nick in self.doctor:
+            if nick == self.doctor:
                 self.bot.pubout(channel, "%s was a doctor. The hospitals are baffled at this unexpected erasure from reality. % nick")
             if nick == self.doctor_target:
-                self.bot.noteout(self.doctor, "Due to %s's unexpected erasure from reality, you may Save once again this night." % nick)
-                self.doctor_target = None
+                if self.has_doctor:
+                    self.bot.noteout(self.doctor, "Due to %s's unexpected erasure from reality, you may Save once again this night." % nick)
+                    self.doctor_target = None
             if nick == self.sheriff:
                 self.bot.pubout(channel, "%s was a sheriff. The police force is mad that all their sheriffs get destroyed by timespace anomalies." % nick)
             if nick == self.sheriff_target:
-                self.bot.noteout(self.sheriff, "Due to %s's unexpected erasure from reality, you may Check once again this night." % nick)
-                self.sheriff_target = None
+                if self.has_sheriff:
+                    self.bot.noteout(self.sheriff, "Due to %s's unexpected erasure from reality, you may Check once again this night." % nick)
+                    self.sheriff_target = None
             if nick == self.mafia_target:
                 for mafia in self.Mafia:
                     self.bot.noteout(mafia, "Due to %s's unexpected erasure from reality, you can choose someone else to kill tonight." % nick)
@@ -258,7 +266,9 @@ class Mafia(BasePlugin):
         self.dead_players = []
         self.Mafia = []
         self.citizens = []
+        self.has_sheriff = False
         self.sheriff = None
+        self.has_doctor = False
         self.doctor = None
         self.originalMafia = []
         # Night round variables
@@ -292,6 +302,7 @@ class Mafia(BasePlugin):
 
         if self.gamestate == self.GAMESTATE_NONE:
             self._reset_gamedata()
+            random.seed()
             self.gamestate = self.GAMESTATE_STARTING
             self.game_starter = game_starter
             self.game_starter_last_checkn = time.time()
@@ -301,7 +312,6 @@ class Mafia(BasePlugin):
                     % (self.game_starter, self.bot.nickname))
             self.bot.pubout(channel, "%s: Say '%s: start' when everyone has joined."
                     % (self.game_starter, self.bot.nickname))
-            #self.fix_modes()
             return
 
         if self.gamestate == self.GAMESTATE_STARTING:
@@ -322,47 +332,46 @@ class Mafia(BasePlugin):
                 # Randomly select two Mafia and a sheriff and a doctor. Everyone else is a citizen.
                 users = self.live_players[:]
                 self.bot.pubout(channel, "A new game has begun! Please wait, assigning roles...")
+
                 self.Mafia.append(users.pop(random.randrange(len(users))))
-	if len(self.live_players) > 16:
-	    self.Mafia.append(users.pop(random.randrange(len(users))))
-	    self.Mafia.append(users.pop(random.randrange(len(users))))
-	    self.Mafia.append(users.pop(random.randrange(len(users))))
-	    self.bot.pubout(channel, "There are four Mafia.")
-	elif len(self.live_players) > 10:
-	    self.Mafia.append(users.pop(random.randrange(len(users))))
-	    self.Mafia.append(users.pop(random.randrange(len(users))))
-	    self.bot.pubout(channel, "There are three Mafia.")
-	elif len(self.live_players) > 6:
-	    self.Mafia.append(users.pop(random.randrange(len(users))))
-	    self.bot.pubout(channel, "There are two Mafia.")
-	else:
-	    self.bot.pubout(channel, "There is only one Mafia.")
-        self.originalMafia = self.Mafia[:]
-        self.sheriff = users.pop(random.randrange(len(users)))
-        self.doctor = users.pop(random.randrange(len(users)))
+                if len(self.live_players) > 6:
+                    self.Mafia.append(users.pop(random.randrange(len(users))))
+                if len(self.live_players) > 10:
+                    self.Mafia.append(users.pop(random.randrange(len(users))))
+                if len(self.live_players) > 16:
+                    self.Mafia.append(users.pop(random.randrange(len(users))))
+
+                if len(self.Mafia) == 1:
+                    self.bot.pubout(channel, "There is only one Mafia.")
+                else:
+                    self.bot.pubout(channel, "There are %d Mafia." % len(self.Mafia))
+
+                self.originalMafia = self.Mafia[:]
+                if self.c9_setup == False or (self.c9_setup == True and random.randint(0,1) == 1):
+                    self.has_sheriff = True
+                    self.sheriff = users.pop(random.randrange(len(users)))
+                if self.c9_setup == False or (self.c9_setup == True and random.randint(0,1) == 1):
+                    self.has_doctor == True
+                    self.doctor = users.pop(random.randrange(len(users)))
         
-        for user in users:
-            self.citizens.append(user)
+                for user in users:
+                    self.citizens.append(user)
 
-        # Private message each user, tell them their role.
-        self.bot.noteout(self.sheriff, sheriff_intro_text)
-        self.bot.noteout(self.doctor, doctor_intro_text)
-        for mafia in self.Mafia:
-            self.bot.noteout(mafia, mafia_intro_text)
-        for citizen in self.citizens:
-            self.bot.noteout(citizen, citizen_intro_text)
+                # Private message each user, tell them their role.
+                if self.has_sheriff:
+                    self.bot.noteout(self.sheriff, sheriff_intro_text)
+                if self.has_doctor:
+                    self.bot.noteout(self.doctor, doctor_intro_text)
+                for mafia in self.Mafia:
+                    self.bot.noteout(mafia, mafia_intro_text)
+                for citizen in self.citizens:
+                    self.bot.noteout(citizen, citizen_intro_text)
 
-        #self.debug = True
-        #if self.debug:
-        #    print "SHERIFF: %s, MAFIA: %s, doctor %s" % (self.sheriff, self.Mafia, self.doctor)
+                self.bot.pubout(channel, "Assigning roles now... To learn how to play, say 'Siobhan: rules'.")
+                self.gamestate = self.GAMESTATE_RUNNING
 
-        self.bot.pubout(channel, "Assigning roles now... To learn how to play, say 'Siobhan: rules'.")
-        self.gamestate = self.GAMESTATE_RUNNING
-
-        #self.fix_modes()
-
-        # Start game by putting bot into "night" mode.
-        self.night()
+                # Start game by putting bot into "night" mode.
+                self.night()
 
 
     def end_game(self, game_ender):
@@ -381,9 +390,10 @@ class Mafia(BasePlugin):
             self.bot.pubout(channel, "The game has ended.")
             if self.gamestate == self.GAMESTATE_RUNNING:
                 self.reveal_all_identities()
-            self._reset_gamedata()
+
             self.gamestate = self.GAMESTATE_NONE
-            #self.fix_modes()
+            self.fix_modes()
+            self._reset_gamedata()
 
 
     def reveal_all_identities(self):
@@ -391,14 +401,14 @@ class Mafia(BasePlugin):
 
         channel = self.channel
 
-        if len(self.originalMafia)==2:
-            self.bot.pubout(channel, ("*** The two Mafia were %s and %s, the sheriff was %s, the doctor was %s. "
-                "Everyone else was a normal citizen"
-                % (self.originalMafia[0], self.originalMafia[1], self.sheriff, self.doctor)))
-        else:
-            self.bot.pubout(channel, ("*** The mafia were %s, the sheriff was %s, the doctor was %s. "
-                "Everyone else was a normal citizen"
-	% (", ".join(self.originalMafia), self.sheriff, self.doctor)))
+        message = "*** The mafia were %s" % ", ".join(self.originalMafia)
+        if self.has_sheriff:
+            message += ", the sheriff was %s" % self.sheriff
+        if self.has_doctor:
+            message += ", the doctor was %s" % self.doctor
+        message += ". Everyone else was a normal citizen"
+
+        self.bot.pubout(channel, message)
 
     def check_game_over(self):
         """End the game if either citizens or Mafia have won.
@@ -431,7 +441,7 @@ class Mafia(BasePlugin):
         "Check if nighttime is over.    Return 1 if night is done, 0 otherwise."
 
         # Is the sheriff done checking?
-        if self.sheriff not in self.live_players:
+        if self.has_sheriff == False or self.sheriff not in self.live_players:
             sheriff_done = 1
         else:
             if self.sheriff_target is None:
@@ -440,7 +450,7 @@ class Mafia(BasePlugin):
                 sheriff_done = 1
                 
         # Is the doctor done checking?
-        if self.doctor not in self.live_players:
+        if self.has_doctor == False or self.doctor not in self.live_players:
             doctor_done = 1
         else:
             if self.doctor_chosen == False:
@@ -462,6 +472,8 @@ class Mafia(BasePlugin):
         
         self.time = "night"
 
+        self.fix_modes()
+
         # Clear any daytime variables
         self.citizen_votes = {}
         self.tally = {}
@@ -472,10 +484,10 @@ class Mafia(BasePlugin):
             self.bot.pubout(channel, text)
 
         # Give private instructions to Mafia and sheriff and doctor.
-        if self.sheriff in self.live_players:
+        if self.has_sheriff and self.sheriff in self.live_players:
             for text in night_sheriff_texts:
                 self.bot.noteout(self.sheriff, text)
-        if self.doctor in self.live_players:
+        if self.has_doctor and self.doctor in self.live_players:
             for text in night_doctor_texts:
                 self.bot.noteout(self.doctor, text)
         for text in night_Mafia_texts:
@@ -496,13 +508,17 @@ class Mafia(BasePlugin):
         channel = self.channel
 
         self.time = "day"
+        self.fix_modes()
 
         # Discover the dead mafia victim.
-        self.bot.pubout(channel, "\x034Day\x0f\x02 Breaks!    Sunlight pierces the sky.")
+        message = "\x034Day\x0f\x02 Breaks!    Sunlight pierces the sky.\x0f "
         if self.doctor_target != self.mafia_target:
-            self.bot.pubout(channel, ("The city awakes in horror..." + \
-                                         "to find the mutilated body of \x034%s\x0f\x02!!"\
-                                         % self.mafia_target))
+            message += "The city awakes in horror... to find the mutilated body of \x034%s\x0f!!"\
+                                         % self.mafia_target
+        else:
+            message += "No one was killed."
+
+        self.bot.pubout(channel, message)
 
         if not self.kill_player(self.mafia_target):
             # Clear all the nighttime voting variables:
@@ -528,7 +544,7 @@ class Mafia(BasePlugin):
         if self.time != "night":
             self.reply(channel, user, "Are you a sheriff?    In any case, it's not nighttime.")
         else:
-            if user  != self.sheriff:
+            if self.has_sheriff == False or user  != self.sheriff:
                 self.reply(channel, user, "Huh?")
             else:
                 if who not in self.live_players:
@@ -553,7 +569,7 @@ class Mafia(BasePlugin):
         if self.time != "night":
             self.reply(channel, user, "Are you a doctor?    In any case, it's not nighttime.")
         else:
-            if user  != self.doctor:
+            if self.has_doctor == False or user != self.doctor:
                 self.reply(channel, user, "Huh?")
             else:
                 if who not in self.live_players:
@@ -576,7 +592,7 @@ class Mafia(BasePlugin):
         if self.time != "night":
             self.reply(channel, user, "Are you a doctor?    In any case, it's not nighttime.")
         else:
-            if user != self.doctor:
+            if self.has_doctor == False or user != self.doctor:
                 self.reply(channel, user, "Huh?")
             else:
                 self.doctor_target = None
@@ -629,13 +645,12 @@ class Mafia(BasePlugin):
         channel = self.channel
 
 	if self.doctor_chosen == True and self.doctor_target == player:
-	    self.bot.pubout(channel, "No one was killed.")
 	    self.bot.noteout(player, "You were saved by the doctor!")
 	    return 0
 	else:
 	    self.live_players.remove(player)
             self.dead_players.append(player)
-            #self.fix_modes()
+            self.fix_modes()
 
             if player in self.Mafia:
                 id = "a \x034mafia\x0f\x02!"
@@ -707,6 +722,21 @@ class Mafia(BasePlugin):
             msg = "The following players are dead : %s"%', '.join(self.dead_players)
             self.bot.pubout(channel, msg)
 
+    def fix_modes(self):
+        if self.modeplugin != None:
+            if self.gamestate == self.GAMESTATE_RUNNING:
+                self.modeplugin.moderate(self.channel)
+
+                if self.time == "night":
+                    self.modeplugin.devoice(self.channel, self.live_players)
+                    self.modeplugin.devoice(self.channel, self.dead_players)
+                elif self.time == "day":
+                    self.modeplugin.voice(self.channel, self.live_players)
+                    self.modeplugin.devoice(self.channel, self.dead_players)
+            else:
+                self.modeplugin.unmoderate(self.channel)
+                self.modeplugin.devoice(self.channel, self.live_players)
+                self.modeplugin.devoice(self.channel, self.dead_players)
 
     def match_name(self, nick):
         """Match NICK to a username in users(), insensitively.    Return
@@ -747,7 +777,8 @@ class Mafia(BasePlugin):
 
         else:
             self.citizen_votes[lyncher] = lynchee
-            self.bot.pubout(channel, ("%s has voted to lynch %s!" % (lyncher, lynchee)))
+            if self.anon_voting == False:
+                self.bot.pubout(self.channel, ("%s has voted to lynch %s!" % (lyncher, lynchee)))
             self.tally_votes()
             victim = self.check_for_majority()
             if victim is None:
@@ -758,6 +789,23 @@ class Mafia(BasePlugin):
                 if not self.kill_player(victim):
                     # Day is done;    flip bot back into night-mode.
                     self.night()
+
+    def cmd_setup(self, args, channel, user):
+        if len(args) > 0:
+            if args[0].lower() == 'c9':
+                self.c9_setup = True
+            else:
+                self.c9_setup = False
+        self.bot.pubout(self.channel, "Current setup: %s" % ("c9" if self.c9_setup else "original"))
+
+    def cmd_anon(self, args, channel, user):
+        if len(args) > 0:
+            if args[0].lower() == 'on':
+                self.anon_voting = True
+            elif args[0].lower() == 'off':
+                self.anon_voting = False
+
+        self.bot.pubout(self.channel, "Anonymous voting is %s" % ("on" if self.anon_voting else "off"))
 
     def cmd_opmode(self, args, channel, user):
         get_userlevel = self.bot.plugins['system.Auth'].get_userlevel
@@ -870,7 +918,6 @@ class Mafia(BasePlugin):
         else:
             self.live_players.append(user)
             self.reply(channel, user, 'You are now in the game.')
-            #self.fix_modes()
 
     def cmd_mchat(self, args, channel, user):
         if user in self.Mafia:
@@ -884,7 +931,7 @@ class Mafia(BasePlugin):
        
     def cmd_rules(self, args, channel, user):
         for text in new_game_texts:
-            self.bot.pubout(channel, text)
+            self.reply(channel, user, text)
 
     def cmd_moderation(self, args, channel, user):
         if self.game_starter and self.game_starter != user:
@@ -903,7 +950,7 @@ class Mafia(BasePlugin):
             return
         self.bot.pubout(channel, 'Moderation turned %s by %s'
                 % (args[0], user))
-        #self.fix_modes()
+        self.fix_modes()
 
     def do_command(self, channel, user, cmd):
         """This is the function called whenever someone sends a public or
