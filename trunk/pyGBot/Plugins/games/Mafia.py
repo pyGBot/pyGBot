@@ -351,7 +351,7 @@ class Mafia(BasePlugin):
                     self.has_sheriff = True
                     self.sheriff = users.pop(random.randrange(len(users)))
                 if self.c9_setup == False or (self.c9_setup == True and random.randint(0,1) == 1):
-                    self.has_doctor == True
+                    self.has_doctor = True
                     self.doctor = users.pop(random.randrange(len(users)))
         
                 for user in users:
