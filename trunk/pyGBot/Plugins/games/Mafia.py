@@ -57,7 +57,7 @@ from pyGBot.BasePlugin import BasePlugin
 # however you wish, without having to muck with the core logic!
 
 minUsers=3
-
+GAME_STARTER_TIMEOUT_MINS = 4
 svn_url = \
 "$URL: http://ircbot-collection.googlecode.com/svn/trunk/mafiabot.py $"
 svn_url = svn_url[svn_url.find(' ')+1:svn_url.rfind('/')+1]
@@ -83,7 +83,7 @@ sheriff_intro_text = \
 "You're a citizen, but also a \x034sheriff\x0f\x02.  Later on, you'll get chances to learn whether someone is or isn't a Mafia.  Keep your identity secret, or the Mafia may kill you!"
 
 doctor_intro_text= \
-"You're a citizen, but also a \x034doctor\x0f\x02.  Later on, you'll get chances to save people who are targetted by the Mafia.  Keep your identity secret, or the Mafia may kill you!"
+"You're a citizen, but also a \x034doctor\x0f\x02.  Later on, you'll get chances to save people who are targeted by the Mafia.  Keep your identity secret, or the Mafia may kill you!"
 
 citizen_intro_text = \
 "You're an ordinary citizen."
@@ -173,7 +173,10 @@ class Mafia(BasePlugin):
             self.bot.pubout(channel, "%s disappeared in some sort of strange wormhole." % nick)
             self.live_players.remove(nick)
             if self.gamestate == self.GAMESTATE_STARTING:
-                # No more to do
+                # Check if 
+                if len(self.live_players) == 0:
+                    self.bot.pubout(channel, "There are no more users in this game. Ending.")
+                    self.end_game(self.game_starter)
                 return
             self.dead_players.append(nick)
             if nick in self.Mafia:
@@ -214,11 +217,6 @@ class Mafia(BasePlugin):
             self.bot.pubout(channel, "Game start is now open to anyone. Type !start to start the game.")
 
 
-#    def msg_notice(self, c, e):
-#        source = u
-
-
-    GAME_STARTER_TIMEOUT_MINS = 4
     def check_game_control(self, u, e):
         "Implement a timeout for game controller."
         if self.game_starter is None:
@@ -324,7 +322,7 @@ class Mafia(BasePlugin):
 
             if len(self.live_players) < minUsers:
                 self.bot.pubout(channel, "Sorry, to start a game, there must be " + \
-                                                "at least active %d players."%(minUsers))
+                                                "at least %d active players."%(minUsers))
                 self.bot.pubout(channel, ("I count only %d active players right now: %s."
                     % (len(self.live_players), self.live_players)))
 
@@ -495,7 +493,7 @@ class Mafia(BasePlugin):
                 self.bot.noteout(mafia, text)
         if len(self.Mafia) >= 2:
             for mafioso in self.Mafia:
-                self.bot.noteout(mafioso,("The Mafia are %s.    Confer privately."
+                self.bot.noteout(mafioso,("The Mafia are %s. You can confer with them privately using the 'mchat' command."
                                                 % ", ".join(self.Mafia)))
 
         # ... bot is now in 'night' mode;    goes back to doing nothing but
@@ -515,6 +513,7 @@ class Mafia(BasePlugin):
         if self.doctor_target != self.mafia_target:
             message += "The city awakes in horror... to find the mutilated body of \x034%s\x0f!!"\
                                          % self.mafia_target
+            self.bot.noteout(nick, "You are now dead! Feel free to talk to other ghosts in the graveyard using the 'dchat' command.")
         else:
             message += "No one was killed."
 
@@ -868,7 +867,14 @@ class Mafia(BasePlugin):
         for nick in args:
             if nick not in self.live_players + self.dead_players:
                 self.reply(channel, user, "There's nobody playing by the name %s" % nick)
-            self._removeUser(nick)
+            else:
+                self._removeUser(nick)
+			
+    def cmd_quit(self, args, channel, user):
+        if user not in self.live_players + self.dead_players:
+            self.reply(channel, user, "%s: You aren't currently playing." % user)
+        else:
+            self._removeUser(user)
 
     def cmd_check(self, args, channel, user):
         if len(args) == 1:
@@ -923,6 +929,15 @@ class Mafia(BasePlugin):
         if user in self.Mafia:
             for mafioso in self.Mafia:
                 self.bot.noteout(mafioso, "Mafia - %s: %s" % (user, " ".join(args)))
+        else:
+            self.bot.noteout(user, "You are not a Mafia!")
+				
+    def cmd_dchat(self, args, channel, user):
+        if user in self.dead_players:
+            for ghosts in self.dead_players:
+                self.bot.noteout(ghosts, "Graveyard - %s: %s" % (user, " ".join(args)))
+        else:
+            self.bot.noteout(user, "You are not dead!")
 
     def cmd_aboutbot(self, args, channel, user):
         self.reply(channel, user, "This module is heavily modified from a bot written in Python "
@@ -968,7 +983,7 @@ class Mafia(BasePlugin):
 
         # Dead players should not speak.
         if user in self.dead_players:
-            if (cmd != "stats") and (cmd != "status") and (cmd != "help"):
+            if (cmd != "stats") and (cmd != "status") and (cmd != "help") and (cmd != "dchat"):
                 self.reply(channel, user, "Please -- dead players should keep quiet.")
                 return 0
 
