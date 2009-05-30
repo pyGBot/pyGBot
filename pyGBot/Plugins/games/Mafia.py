@@ -57,7 +57,7 @@ from pyGBot.BasePlugin import BasePlugin
 # however you wish, without having to muck with the core logic!
 
 minUsers=3
-GAME_STARTER_TIMEOUT_MINS = 4
+
 svn_url = \
 "$URL: http://ircbot-collection.googlecode.com/svn/trunk/mafiabot.py $"
 svn_url = svn_url[svn_url.find(' ')+1:svn_url.rfind('/')+1]
@@ -164,6 +164,15 @@ class Mafia(BasePlugin):
         for var in ('game_starter', 'sheriff', 'sheriff_target', 'mafia_target', 'doctor', 'doctor_target'):
             if getattr(self, var) == old:
                 setattr(self, var, new)
+                
+    def user_part(self, channel, username):
+        self._removeUser(username)
+
+    def user_quit(self, username, reason=""):
+        self._removeUser(username)
+        
+    def user_kicked(self, channel, username, kicker, message=""):
+        self._removeUser(username)
 
     def _removeUser(self, nick):
 
@@ -216,7 +225,7 @@ class Mafia(BasePlugin):
             self.game_starter = None
             self.bot.pubout(channel, "Game start is now open to anyone. Type !start to start the game.")
 
-
+    GAME_STARTER_TIMEOUT_MINS = 4
     def check_game_control(self, u, e):
         "Implement a timeout for game controller."
         if self.game_starter is None:
@@ -235,16 +244,6 @@ class Mafia(BasePlugin):
     def msg_private(self, user, message):
         self.check_game_control(user, message)
         self.do_command(user, user, message)
-
-
-    def user_part(self, channel, user):
-        self._removeUser(user)
-
-    def user_quit(self, user, reason):
-        self._removeUser(user)
-
-    def user_kicked(self, channel, username, kicker, message=""):
-        self._removeUser(user)
 
     def msg_channel(self, channel, user, message):
         self.check_game_control(user, message)
