@@ -512,7 +512,7 @@ class Mafia(BasePlugin):
         if self.doctor_target != self.mafia_target:
             message += "The city awakes in horror... to find the mutilated body of \x034%s\x0f!!"\
                                          % self.mafia_target
-            self.bot.noteout(nick, "You are now dead! Feel free to talk to other ghosts in the graveyard using the 'dchat' command.")
+            self.bot.noteout(self.mafia_target, "You are now dead! Feel free to talk to other ghosts in the graveyard using the 'dchat' command.")
         else:
             message += "No one was killed."
 
@@ -666,8 +666,7 @@ class Mafia(BasePlugin):
                 return 1
             else:
                 self.bot.pubout(channel, ("(%s is now dead, and should stay quiet.)") % player)
-                self.bot.noteout(player, "You are now \x034dead\x0f\x02.    You may observe the game,")
-                self.bot.noteout(player, "but please stay quiet until the game is over.")
+                self.bot.noteout(player, "You are now \x034dead\x0f\x02. You may observe the game, but please stay quiet until the game is over. However, you may converse with other dead players using the \x034'dchat'\x0f\x02 command.")
                 return 0
 
 
@@ -982,7 +981,7 @@ class Mafia(BasePlugin):
 
         # Dead players should not speak.
         if user in self.dead_players:
-            if (cmd != "stats") and (cmd != "status") and (cmd != "help") and (cmd != "dchat"):
+             if cmds[0] not in ("stats", "status", "help", "dchat"):
                 self.reply(channel, user, "Please -- dead players should keep quiet.")
                 return 0
 
