@@ -512,7 +512,6 @@ class Mafia(BasePlugin):
         if self.doctor_target != self.mafia_target:
             message += "The city awakes in horror... to find the mutilated body of \x034%s\x0f!!"\
                                          % self.mafia_target
-            self.bot.noteout(self.mafia_target, "You are now dead! Feel free to talk to other ghosts in the graveyard using the 'dchat' command.")
         else:
             message += "No one was killed."
 
@@ -830,8 +829,8 @@ class Mafia(BasePlugin):
                 self.tally_votes()
                 self.print_tally()
         elif self.gamestate == self.GAMESTATE_STARTING:
-            self.reply(channel, user, "A new game is starting, current players are %s"
-                    % (self.live_players,))
+            self.reply(channel, user, "A new game is starting. Currently %d player(s): %s"
+                    % (len(self.live_players),self.live_players,))
         else:
             self.reply(channel, user, "No game is in progress.")
 
@@ -926,14 +925,20 @@ class Mafia(BasePlugin):
     def cmd_mchat(self, args, channel, user):
         if user in self.Mafia:
             for mafioso in self.Mafia:
-                self.bot.noteout(mafioso, "Mafia - %s: %s" % (user, " ".join(args)))
+                if user != mafioso:
+                    self.bot.noteout(mafioso, "Mafia - %s: %s" % (user, " ".join(args)))
+                else:
+                    self.bot.noteout(mafioso, "Mafia - %s: %s" % ("You", " ".join (args)))
         else:
             self.bot.noteout(user, "You are not a Mafia!")
 				
     def cmd_dchat(self, args, channel, user):
         if user in self.dead_players:
             for ghosts in self.dead_players:
-                self.bot.noteout(ghosts, "Graveyard - %s: %s" % (user, " ".join(args)))
+                if user != ghosts:
+                    self.bot.noteout(ghosts, "Graveyard - %s: %s" % (user, " ".join(args)))
+                else:
+                    self.bot.noteout(ghosts, "Graveyard - %s: %s" % ("You", " ".join(args)))
         else:
             self.bot.noteout(user, "You are not dead!")
 
