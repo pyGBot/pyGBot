@@ -926,9 +926,9 @@ class Mafia(BasePlugin):
         if user in self.Mafia:
             for mafioso in self.Mafia:
                 if user != mafioso:
-                    self.bot.noteout(mafioso, "Mafia - %s: %s" % (user, " ".join(args)))
+                    self.bot.noteout(mafioso, "Mafia - <%s> %s" % (user, " ".join(args)))
                 else:
-                    self.bot.noteout(mafioso, "Mafia - %s: %s" % ("You", " ".join (args)))
+                    self.bot.noteout(mafioso, "Mafia - You: %s" % (" ".join (args)))
         else:
             self.bot.noteout(user, "You are not a Mafia!")
 				
@@ -936,9 +936,9 @@ class Mafia(BasePlugin):
         if user in self.dead_players:
             for ghosts in self.dead_players:
                 if user != ghosts:
-                    self.bot.noteout(ghosts, "Graveyard - %s: %s" % (user, " ".join(args)))
+                    self.bot.noteout(ghosts, "Graveyard - <%s> %s" % (user, " ".join(args)))
                 else:
-                    self.bot.noteout(ghosts, "Graveyard - %s: %s" % ("You", " ".join(args)))
+                    self.bot.noteout(ghosts, "Graveyard - You: %s" % (" ".join(args)))
         else:
             self.bot.noteout(user, "You are not dead!")
 
