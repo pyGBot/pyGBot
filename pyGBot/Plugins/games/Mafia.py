@@ -822,13 +822,14 @@ class Mafia(BasePlugin):
                     # Day is done;    flip bot back into night-mode.
                     self.night()
 
-    def cmd_setup(self, args, channel, user):
-        if len(args) > 0:
-            if args[0].lower() == 'c9':
-                self.c9_setup = True
-            else:
-                self.c9_setup = False
-        self.bot.pubout(self.channel, "Current setup: %s" % ("c9" if self.c9_setup else "original"))
+#Broken anyway.
+#    def cmd_setup(self, args, channel, user):
+#        if len(args) > 0:
+#            if args[0].lower() == 'c9':
+#                self.c9_setup = True
+#            else:
+#                self.c9_setup = False
+#        self.bot.pubout(self.channel, "Current setup: %s" % ("c9" if self.c9_setup else "original"))
 
     def cmd_anon(self, args, channel, user):
         if self.gamestate != self.GAMESTATE_RUNNING:
