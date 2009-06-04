@@ -89,7 +89,7 @@ doctor_intro_text= \
 "You're a citizen, but also a \x034doctor\x0f\x02.  Later on, you'll get chances to save people who are targeted by the Mafia.  Keep your identity secret, or the Mafia may kill you!"
 
 detective_intro_text = \
-"You're a citizen, but also a \x034Detective\x0f\x02. Later on, you'll learn the roles of the players killed by the Mafia. Keep your idendity secret, or the Mafia may kill you!"
+"You're a citizen, but also a \x034Detective\x0f\x02. Later on, you'll learn the roles of the players killed by the Mafia. Keep your identity secret, or the Mafia may kill you!"
 
 citizen_intro_text = \
 "You're an ordinary citizen."
@@ -244,9 +244,10 @@ class Mafia(BasePlugin):
         else:
             if self.game_starter_last_checkn < (
                     time.time() - self.GAME_STARTER_TIMEOUT_MINS * 60):
-                self.bot.pubout(self.channel, "Game starter '%s' has been silent for %d minutes. "
-                        "Game control is now open to all." % (self.game_starter,
-                            self.GAME_STARTER_TIMEOUT_MINS))
+                if self.gamestate != self.GAMESTATE_RUNNING:
+                    self.bot.pubout(self.channel, "Game starter '%s' has been silent for %d minutes. "
+                            "Game control is now open to all." % (self.game_starter,
+                                self.GAME_STARTER_TIMEOUT_MINS))
                 self.game_starter = None
 
     def msg_private(self, user, message):
@@ -271,6 +272,7 @@ class Mafia(BasePlugin):
         self.dead_players = []
         self.Mafia = []
         self.citizens = []
+        self.police = []
         self.has_sheriff = False
         self.sheriff = None
         self.has_doctor = False
@@ -375,9 +377,11 @@ class Mafia(BasePlugin):
                 if len(self.live_players) >= 6:
                     self.has_detective = True
                     self.detective = users.pop(random.randrange(len(users)))
+                    self.police.append(self.detective)
                 if len(self.live_players) >= 5:
                     self.has_sheriff = True
                     self.sheriff = users.pop(random.randrange(len(users)))
+                    self.police.append(self.sheriff)
         
                 for user in users:
                     self.citizens.append(user)
@@ -389,6 +393,8 @@ class Mafia(BasePlugin):
                     self.bot.noteout(self.doctor, doctor_intro_text)
                 if self.has_detective:
                     self.bot.noteout(self.detective, detective_intro_text)
+                    for cops in self.police:
+                        self.bot.noteout(cops, "The police force is: %s. You can talk to them using pchat." % ", ".join(self.police))
                 for mafia in self.Mafia:
                     self.bot.noteout(mafia, mafia_intro_text)
                 for citizen in self.citizens:
@@ -431,10 +437,10 @@ class Mafia(BasePlugin):
         message = "*** The mafia were %s" % ", ".join(self.originalMafia)
         if self.has_sheriff:
             message += ", the sheriff was %s" % self.sheriff
-        if self.has_doctor:
-            message += ", the doctor was %s" % self.doctor
         if self.has_detective:
             message += ", the detective was %s" % self.detective
+        if self.has_doctor:
+            message += ", the doctor was %s" % self.doctor
         message += ". Everyone else was a normal citizen"
 
         self.bot.pubout(channel, message)
@@ -584,9 +590,9 @@ class Mafia(BasePlugin):
                     else:
                         self.sheriff_target = who
                         if who in self.Mafia:
-                            self.reply(channel, user, "You're sure that player is a Mafia!")
+                            self.reply(channel, user, "Your files say that player is a Mafia!")
                         else:
-                            self.reply(channel, user, "You're sure that player is a normal citizen.")
+                            self.reply(channel, user, "Your files say that player is not in the Mafia.")
                             
                         if self.check_night_done():
                             self.day()
@@ -901,6 +907,9 @@ class Mafia(BasePlugin):
                 self.bot.pubout(channel, "Nobody has voted yet.")
         else:
             self.bot.pubout(channel, "Anonymous voting is on. Not showing registered votes.")
+            if self.time == "day":
+                self.tally_votes()
+                self.print_tally()
 
     def cmd_del(self, args, channel, user):
         for nick in args:
@@ -981,8 +990,16 @@ class Mafia(BasePlugin):
                     self.bot.noteout(ghosts, "Graveyard - <%s> %s" % (user, " ".join(args)))
                 else:
                     self.bot.noteout(ghosts, "Graveyard - You: %s" % (" ".join(args)))
+                    
+    def cmd_pchat(self, args, channel, user):
+        if user in self.police:
+            for cops in self.police:
+                if user != cops:
+                    self.bot.noteout(cops, "Police - <%s> %s" % (user, " ".join(args)))
+                else:
+                    self.bot.noteout(cops, "Police - You: %s" % (" ".join(args)))
         else:
-            self.bot.noteout(user, "You are not dead!")
+            self.bot.noteout(user, "You are not a police officer!")
 
     def cmd_aboutbot(self, args, channel, user):
         self.reply(channel, user, "This module is heavily modified from a bot written in Python "
