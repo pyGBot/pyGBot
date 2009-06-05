@@ -135,6 +135,7 @@ IRC_BOLD = "\x02"
 
 class Mafia(BasePlugin):
     GAMESTATE_NONE, GAMESTATE_STARTING, GAMESTATE_RUNNING = range(3)
+    NOLYNCH = 0
     def __init__(self, bot, options):
         BasePlugin.__init__(self, bot, options)
         self.output = True
@@ -592,7 +593,7 @@ class Mafia(BasePlugin):
                         if who in self.Mafia:
                             self.reply(channel, user, "Your files say that player is a Mafia!")
                         else:
-                            self.reply(channel, user, "Your files say that player is not in the Mafia.")
+                            self.reply(channel, user, "Your files say that player is innocent.")
                             
                         if self.check_night_done():
                             self.day()
@@ -687,18 +688,21 @@ class Mafia(BasePlugin):
         self.dead_players.append(player)
         self.fix_modes()
 
-        if self.has_detective:
-            if player in self.Mafia:
-                id = "a \x034mafia\x0f\x02!"
-            elif player == self.sheriff:
-                id = "the \x034sheriff\x0f\x02!"
-            elif player == self.doctor:
-                id = "the \x034doctor\x0f\x02!"
-            else:
-                id = "a normal citizen."
+        if player in self.Mafia:
+            id = "a \x034mafia\x0f\x02!"
+        elif player == self.sheriff:
+            id = "the \x034sheriff\x0f\x02!"
+        elif player == self.doctor:
+            id = "the \x034doctor\x0f\x02!"
+        else:
+            id = "a normal citizen."
 
-            self.bot.noteout(self.detective, \
-                    ("*** Examining the body, you notice that this player was %s" % id))
+        examine_msg = "*** Examining the body, you notice that this player was %s" % id
+
+        if self.has_detective:
+            self.bot.noteout(self.detective, examine_msg)
+        else:
+            self.bot.pubout(self.channel, examine_msg)
         
         if player in self.Mafia:
             self.Mafia.remove(player)
@@ -744,10 +748,11 @@ class Mafia(BasePlugin):
         msg = ("%d votes needed for a majority.    Current vote tally: " \
                      % majority_needed)
         for lynchee in self.tally.keys():
+            lynchee_name = "No Lynch" if lynchee == self.NOLYNCH else lynchee
             if self.tally[lynchee] > 1:
-                msg = msg + ("(%s : %d votes) " % (lynchee, self.tally[lynchee]))
+                msg = msg + ("(%s : %d votes) " % (lynchee_name, self.tally[lynchee]))
             else:
-                msg = msg + ("(%s : 1 vote) " % lynchee)
+                msg = msg + ("(%s : 1 vote) " % lynchee_name)
         self.bot.pubout(channel, msg)
 
 
@@ -808,7 +813,7 @@ class Mafia(BasePlugin):
             self.reply(channel, user, "Sorry, lynching only happens during the day.")
         elif lyncher not in self.live_players:
             self.reply(channel, user, "Um, only living players can vote to lynch someone.")
-        elif lynchee not in self.live_players:
+        elif lynchee not in self.live_players and lynchee != self.NOLYNCH:
             self.reply(channel, user, "Um, only living players can be lynched.")
         elif lynchee == lyncher:
             self.reply(channel, user, "Um, you can't lynch yourself.")
@@ -821,12 +826,35 @@ class Mafia(BasePlugin):
             victim = self.check_for_majority()
             if victim is None:
                 self.print_tally()
+            elif victim == self.NOLYNCH:
+                self.bot.pubout(self.channel, "The majority has voted not to lynch. No one will be lynched today.")
+                self.night()
             else:
                 self.bot.pubout(self.channel, ("The majority has voted to lynch %s!! "
                     "Mob violence ensues.    This player is now \x034dead\x0f\x02." % victim))
                 if not self.kill_player(victim):
                     # Day is done;    flip bot back into night-mode.
                     self.night()
+
+    def lynch_unvote(self, channel, user):
+        # sanity checks
+        if self.time != "day":
+            self.reply(channel, user, "Sorry, lynching only happens during the day.")
+        elif user not in self.live_players:
+            self.reply(channel, user, "Um, only living players can vote on lynchings.")
+
+        else:
+            if user in self.citizen_votes:
+                oldlynchee = self.citizen_votes[user]
+                del self.citizen_votes[user]
+                if self.anon_voting == False:
+                    self.bot.pubout(self.channel, "%s has retracted a lynch vote for %s!" % (user, oldlynchee))
+                self.tally_votes()
+                self.print_tally()
+            else:
+                self.reply(channel, user, "You don't have a lynch vote registered.")
+
+        
 
 #Broken anyway.
 #    def cmd_setup(self, args, channel, user):
@@ -962,6 +990,12 @@ class Mafia(BasePlugin):
                 self.lynch_vote(channel, user, lynchee.strip())
                 return
         self.reply(channel, user, "Lynch whom?")
+
+    def cmd_unlynch(self, args, channel, user):
+        self.lynch_unvote(channel, user)
+
+    def cmd_nolynch(self, args, channel, user):
+        self.lynch_vote(channel, user, self.NOLYNCH)
 
     def cmd_join(self, args, channel, user):
         if self.gamestate == self.GAMESTATE_NONE:
