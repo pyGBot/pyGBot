@@ -180,6 +180,10 @@ class Mafia(BasePlugin):
     def user_kicked(self, channel, username, kicker, message=""):
         self._removeUser(username)
 
+    def notify_mafia(self, msg):
+        for mafia in self.Mafia:
+            self.bot.noteout(mafia, msg)
+
     def _removeUser(self, nick):
 
         channel = self.channel
@@ -215,8 +219,7 @@ class Mafia(BasePlugin):
                     self.bot.noteout(self.sheriff, "Due to %s's unexpected erasure from reality, you may Check once again this night." % nick)
                     self.sheriff_target = None
             if nick == self.mafia_target:
-                for mafia in self.Mafia:
-                    self.bot.noteout(mafia, "Due to %s's unexpected erasure from reality, you can choose someone else to kill tonight." % nick)
+                self.notify_mafia("Due to %s's unexpected erasure from reality, you can choose someone else to kill tonight." % nick)
                 self.mafia_target = None
             for map_ in (self.mafia_votes, self.citizen_votes, self.tally):
                 if map_.has_key(nick):
@@ -227,7 +230,7 @@ class Mafia(BasePlugin):
                         del map_[k]
             self.check_game_over()
             if self.check_night_done():
-                day()
+                self.day()
 
         if nick == self.game_starter:
             self.game_starter = None
@@ -393,10 +396,9 @@ class Mafia(BasePlugin):
                     self.bot.noteout(self.doctor, doctor_intro_text)
                 if self.has_detective:
                     self.bot.noteout(self.detective, detective_intro_text)
-                    for cops in self.police:
+                for cops in self.police:
                         self.bot.noteout(cops, "The police force is: %s. You can talk to them using pchat." % ", ".join(self.police))
-                for mafia in self.Mafia:
-                    self.bot.noteout(mafia, mafia_intro_text)
+                self.notify_mafia(mafia_intro_text)
                 for citizen in self.citizens:
                     self.bot.noteout(citizen, citizen_intro_text)
 
@@ -526,12 +528,10 @@ class Mafia(BasePlugin):
             for text in night_doctor_texts:
                 self.bot.noteout(self.doctor, text)
         for text in night_Mafia_texts:
-            for mafia in self.Mafia:
-                self.bot.noteout(mafia, text)
+            self.notify_mafia(text)
         if len(self.Mafia) >= 2:
-            for mafioso in self.Mafia:
-                self.bot.noteout(mafioso,("The Mafia are %s. You can confer with them privately using the 'mchat' command."
-                                                % ", ".join(self.Mafia)))
+            self.notify_mafia("The Mafia are %s. You can confer with them privately using the 'mchat' command."
+                                                % ", ".join(self.Mafia))
 
         # ... bot is now in 'night' mode;    goes back to doing nothing but
         # waiting for commands.
@@ -660,12 +660,11 @@ class Mafia(BasePlugin):
                         break
                 else:
                     self.mafia_target = who
-                    self.reply(channel, user, "It is done. The Mafia agree.")
+                    self.notify_mafia("It is done. The Mafia agree.")
                     if self.check_night_done():
                         self.day()
                     return
-                self.reply(channel, user, "Hm, I sense disagreement or ambivalence.")
-                self.reply(channel, user, "You Mafia should decide on one target.")
+                self.notify_mafia("Hm, I sense disagreement or ambivalence. You Mafia should decide on one target.")
         else:
             # only one mafia alive, no need to agree with anyone.
             self.mafia_target = who
@@ -675,6 +674,7 @@ class Mafia(BasePlugin):
 
 
     def kill_player(self, player):
+
         "Make a player dead.    Return 1 if game is over, 0 otherwise."
 
         channel = self.channel
@@ -838,15 +838,17 @@ class Mafia(BasePlugin):
 #        self.bot.pubout(self.channel, "Current setup: %s" % ("c9" if self.c9_setup else "original"))
 
     def cmd_anon(self, args, channel, user):
-        if self.gamestate != self.GAMESTATE_RUNNING:
-            if len(args) > 0:
+        if len(args) > 0:
+            if self.gamestate == self.GAMESTATE_RUNNING:
+                self.bot.pubout(self.channel, "You cannot change anonymous voting while a game is in progress.")
+            elif self.gamestate == self.GAMESTATE_STARTING and user != self.game_starter:
+                self.bot.pubout(self.channel, "A game is starting. Only game starter %s can change anonymous voting." % self.game_starter)
+            else:
                 if args[0].lower() == 'on':
                     self.anon_voting = True
                 elif args[0].lower() == 'off':
                     self.anon_voting = False
-            self.bot.pubout(self.channel, "Anonymous voting is %s" % ("on" if self.anon_voting else "off"))
-        else:
-            self.bot.pubout(self.channel, "You cannot change anonymous voting while a game is in progress.")
+        self.bot.pubout(self.channel, "Anonymous voting is %s" % ("on" if self.anon_voting else "off"))
 
     def cmd_opmode(self, args, channel, user):
         get_userlevel = self.bot.plugins['system.Auth'].get_userlevel
@@ -889,24 +891,25 @@ class Mafia(BasePlugin):
         self.end_game(user)
 
     def cmd_votes(self, args, channel, user):
-        if self.anon_voting == False:
-            non_voters = []
-            voters = []
-            if self.citizen_votes.keys():
-                for n in self.live_players:
-                    if not self.citizen_votes.has_key(n):
-                        non_voters.append(n)
-                    else:
-                        voters.append(n)
-                if non_voters:
-                    self.bot.pubout(channel, "The following have no votes registered: %s"
-                            % (non_voters))
-                else:
-                    self.bot.pubout(channel, "Everyone has voted.")
-            else:
-                self.bot.pubout(channel, "Nobody has voted yet.")
-        else:
+        if self.anon_voting:
             self.bot.pubout(channel, "Anonymous voting is on. Not showing registered votes.")
+            return
+
+        non_voters = []
+        voters = []
+        if self.citizen_votes.keys():
+            for n in self.live_players:
+                if not self.citizen_votes.has_key(n):
+                    non_voters.append(n)
+                else:
+                    voters.append(n)
+            if non_voters:
+                self.bot.pubout(channel, "The following have no votes registered: %s"
+                            % (non_voters))
+            else:
+                self.bot.pubout(channel, "Everyone has voted.")
+        else:
+            self.bot.pubout(channel, "Nobody has voted yet.")
             if self.time == "day":
                 self.tally_votes()
                 self.print_tally()

@@ -18,7 +18,7 @@ import logging
 import sys
 
 formatter = logging.Formatter('%(asctime)s:%(name)s[%(process)d] %(levelname)s %(message)s')
-cformat = logging.Formatter('%(message)s')
+cformat = logging.Formatter('%(asctime)s:%(message)s')
 
 def addScreenHandler(logobj, format):
     hdlr = logging.StreamHandler(sys.stdout)
