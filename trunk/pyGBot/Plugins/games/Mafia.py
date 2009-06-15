@@ -397,8 +397,8 @@ class Mafia(BasePlugin):
                     self.bot.noteout(self.doctor, doctor_intro_text)
                 if self.has_detective:
                     self.bot.noteout(self.detective, detective_intro_text)
-                for cops in self.police:
-                        self.bot.noteout(cops, "The police force is: %s. You can talk to them using pchat." % ", ".join(self.police))
+#                for cops in self.police:
+#                        self.bot.noteout(cops, "The police force is: %s. You can talk to them using pchat." % ", ".join(self.police))
                 self.notify_mafia(mafia_intro_text)
                 for citizen in self.citizens:
                     self.bot.noteout(citizen, citizen_intro_text)
@@ -1028,15 +1028,15 @@ class Mafia(BasePlugin):
                 else:
                     self.bot.noteout(ghosts, "Graveyard - You: %s" % (" ".join(args)))
                     
-    def cmd_pchat(self, args, channel, user):
-        if user in self.police:
-            for cops in self.police:
-                if user != cops:
-                    self.bot.noteout(cops, "Police - <%s> %s" % (user, " ".join(args)))
-                else:
-                    self.bot.noteout(cops, "Police - You: %s" % (" ".join(args)))
-        else:
-            self.bot.noteout(user, "You are not a police officer!")
+#    def cmd_pchat(self, args, channel, user):
+#        if user in self.police:
+#            for cops in self.police:
+#                if user != cops:
+#                    self.bot.noteout(cops, "Police - <%s> %s" % (user, " ".join(args)))
+#                else:
+#                    self.bot.noteout(cops, "Police - You: %s" % (" ".join(args)))
+#        else:
+#            self.bot.noteout(user, "You are not a police officer!")
 
     def cmd_aboutbot(self, args, channel, user):
         self.reply(channel, user, "This module is heavily modified from a bot written in Python "
