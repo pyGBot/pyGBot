@@ -869,7 +869,7 @@ class Mafia(BasePlugin):
         if len(args) > 0:
             if self.gamestate == self.GAMESTATE_RUNNING:
                 self.bot.pubout(self.channel, "You cannot change anonymous voting while a game is in progress.")
-            elif self.gamestate == self.GAMESTATE_STARTING and user != self.game_starter:
+            elif self.gamestate == self.GAMESTATE_STARTING and self.game_starter != None and user != self.game_starter:
                 self.bot.pubout(self.channel, "A game is starting. Only game starter %s can change anonymous voting." % self.game_starter)
             else:
                 if args[0].lower() == 'on':
