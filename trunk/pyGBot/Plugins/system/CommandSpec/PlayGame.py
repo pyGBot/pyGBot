@@ -20,7 +20,7 @@ from pyGBot.Plugins.system.Commands import BaseCommand
 from pyGBot.Plugins.system.Auth import AuthLevels as AL
 
 class PlayGame(BaseCommand):
-    level = AL.User
+    level = AL.Mod
     def __init__(self, bot, channel, user, args):
         args = args.split()
         if channel == user or channel == None:
