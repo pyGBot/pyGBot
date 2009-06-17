@@ -20,7 +20,7 @@ from pyGBot.Plugins.system.Commands import BaseCommand
 from pyGBot.Plugins.system.Auth import AuthLevels as AL
 
 class StopGame(BaseCommand):
-    level = AL.User
+    level = AL.Mod
     def __init__(self, bot, channel, user, args):
         for p in bot.activeplugins:
             if p.startswith('games.'):
