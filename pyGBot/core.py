@@ -26,7 +26,7 @@ except ImportError:
 if int(twistedversion[0]) >= 2:
     from twisted.words.protocols import irc
 
-from twisted.internet import reactor, protocol
+from twisted.internet import reactor, protocol, task
 
 import sys
 import time
@@ -211,6 +211,8 @@ class GBot(irc.IRCClient):
         self.loadPlugins(conf)
         self.activatePlugin('system.Startup')
 
+        self.timertask = task.LoopingCall(self.events.timer_tick)
+
         self.versionEnv = sys.platform
 
     #### connection callbacks
@@ -219,6 +221,8 @@ class GBot(irc.IRCClient):
         log.logger.info("[connected at %s]" %\
                         time.asctime(time.localtime(time.time())))
 
+        self.timertask.start(1.0) # 1-second timer granularity
+
         # Call Event Handler
         self.events.bot_connect()
 
@@ -226,6 +230,8 @@ class GBot(irc.IRCClient):
         irc.IRCClient.connectionLost(self, reason)
         log.logger.info("[disconnected at %s:%s]" %\
               (time.asctime(time.localtime(time.time())), reason))
+
+        self.timertask.stop()
 
         # Call Event Handler
         self.events.bot_disconnect()

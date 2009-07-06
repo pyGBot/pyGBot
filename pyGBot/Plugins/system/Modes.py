@@ -61,6 +61,12 @@ class Modes(BasePlugin):
     def unmoderate(self, channel):
         self.bot.modestring(channel, "-m")
 
+    def protect_nickchange(self, channel):
+        self.bot.modestring(channel, "+N")
+
+    def unprotect_nickchange(self, channel):
+        self.bot.modestring(channel, "-N")
+
     # Event handlers for other users
     def user_join(self, channel, username):
         pass

@@ -237,6 +237,9 @@ class Mafia(BasePlugin):
             self.game_starter = None
             self.bot.pubout(channel, "Game start is now open to anyone. Type !start to start the game.")
 
+    def timer_tick(self):
+        pass
+
     GAME_STARTER_TIMEOUT_MINS = 4
     def check_game_control(self, u, e):
         "Implement a timeout for game controller."
@@ -769,6 +772,7 @@ class Mafia(BasePlugin):
         if self.modeplugin != None:
             if self.gamestate == self.GAMESTATE_RUNNING:
                 self.modeplugin.moderate(self.channel)
+                self.modeplugin.protect_nickchange(self.channel)
 
                 if self.time == "night":
                     self.modeplugin.devoice(self.channel, self.live_players)
@@ -778,6 +782,7 @@ class Mafia(BasePlugin):
                     self.modeplugin.devoice(self.channel, self.dead_players)
             else:
                 self.modeplugin.unmoderate(self.channel)
+                self.modeplugin.unprotect_nickchange(self.channel)
                 self.modeplugin.devoice(self.channel, self.live_players)
                 self.modeplugin.devoice(self.channel, self.dead_players)
 
