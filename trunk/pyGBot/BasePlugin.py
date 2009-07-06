@@ -86,3 +86,6 @@ class BasePlugin:
 
     def channel_names(self, channel, nameslist):
         pass
+
+    def timer_tick(self):
+        pass
