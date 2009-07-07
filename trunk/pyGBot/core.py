@@ -295,7 +295,8 @@ class GBot(irc.IRCClient):
         if channel.upper() == self.nickname.upper():
             if msg.startswith('auth'):
                 outmsg = msg.split(' ')
-                outmsg[2] = '*' * 8
+                if len(outmsg) > 2:
+                    outmsg[2] = '*' * 8
                 outmsg = ' '.join(outmsg)
                 log.chatlog.info('[PRV<-]<%s> %s' % (user, outmsg))
             else:
