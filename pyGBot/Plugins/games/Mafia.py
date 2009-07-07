@@ -50,7 +50,7 @@ from pyGBot.BasePlugin import BasePlugin
 #    chanops = self.bot.plugins["ChanOp"]
 #    self.chanoppowers = True
 #else:
-#	self.chanoppowers = False
+#    self.chanoppowers = False
 
 #---------------------------------------------------------------------
 # General texts for narrating the game.  Change these global strings
@@ -238,7 +238,57 @@ class Mafia(BasePlugin):
             self.bot.pubout(channel, "Game start is now open to anyone. Type !start to start the game.")
 
     def timer_tick(self):
-        pass
+        if self.time is None:
+            pass
+        elif self.time == "night":
+            self.timer += 1
+            if self.timer == (self.nighttimeout - 60):
+                # One minute remaining before night times out.
+                if self.mafia_target == None:
+                    self.notify_mafia("Please hurry, you have less than one minute before the night ends! (If no choice is made, a random voted-for target (or if no votes, a random non-mafia target) will be selected.)")
+                if self.has_doctor and self.doctor_target == None and self.doctor in self.live_players:
+                    self.bot.noteout(self.doctor, "Please hurry, you have less than one minute before the night ends! (If no choice is made, a random target will be selected.)")
+                if self.has_sheriff and self.sheriff_target == None and self.sheriff in self.live_players:
+                    self.bot.noteout(self.sheriff, "Please hurry, you have less than one minute before the night ends! (If no choice is made, a random target will be selected.)")
+            if self.timer == self.nighttimeout:
+                # Some power role is taking too long at night. Doctor and sheriff get random live non-self targets.
+                # Mafia get a target randomly chosen from the votes list, or just random non-mafia if no votes list.
+                if self.mafia_target == None:
+                    if len(self.mafia_votes) > 0:
+                        self.mafia_target = random.choice(self.mafia_votes.values())
+                        self.notify_mafia("Because the Mafia took too long to decide, the player %s was randomly selected for killing this night." % self.mafia_target)
+                    else:
+                        while self.mafia_target == None or self.mafia_target in self.Mafia:
+                            self.mafia_target = random.choice(self.live_players)
+                            if self.mafia_target in self.Mafia:
+                                self.mafia_target = None
+                        self.notify_mafia("Because the Mafia took too long to decide, the player %s was randomly selected for killing this night." % self.mafia_target)
+                if self.has_doctor and self.doctor in self.live_players:
+                    print "Checking doc target"
+                    if self.doctor_target == None:
+                        print "Selecting doc target"
+                        while self.doctor_target == None or self.doctor_target == self.doctor:
+                            self.doctor_target = random.choice(self.live_players)
+                            if self.doctor_target == self.doctor:
+                                self.doctor_target = None
+                        self.doctor_chosen = True
+                        print self.doctor_chosen
+                        self.bot.noteout(self.doctor, "Because the doctor took too long to decide, the player %s was randomly selected for saving this night." % self.doctor_target)
+                if self.has_sheriff and self.sheriff in self.live_players:
+                    if self.sheriff_target == None:
+                        while self.sheriff_target == None or self.sheriff_target == self.sheriff:
+                            self.sheriff_target = random.choice(self.live_players)
+                            if self.sheriff_target == self.sheriff:
+                                self.sheriff_target = None
+                        self.sheriff_chosen = True
+                        self.bot.noteout(self.sheriff, "Because the sheriff took too long to decide, the player %s was randomly selected for checking this night." % self.sheriff_target)
+                self.check_game_over()
+                if self.check_night_done():
+                    self.day()
+            pass
+        elif self.time == "day":
+            pass
+        
 
     GAME_STARTER_TIMEOUT_MINS = 4
     def check_game_control(self, u, e):
@@ -293,6 +343,7 @@ class Mafia(BasePlugin):
         self.doctor_chosen = False
         self.mafia_target = None
         self.mafia_votes = {}
+        self.timer = 0
         # Day round variables
         self.citizen_votes = {}
         self.tally = {}
@@ -367,6 +418,9 @@ class Mafia(BasePlugin):
                     self.bot.pubout(channel, "There is only one Mafia.")
                 else:
                     self.bot.pubout(channel, "There are %d Mafia." % len(self.Mafia))
+                    
+                # Set night timer to two minutes plus one minute for each Mafia.
+                self.nighttimeout = 120 + (60 * len(self.Mafia))
 
                 self.originalMafia = self.Mafia[:]
                 
@@ -512,6 +566,10 @@ class Mafia(BasePlugin):
         channel = self.channel
         
         self.time = "night"
+        
+        #Reset timer.
+        
+        self.timer = 0
 
         self.fix_modes()
 
@@ -683,39 +741,39 @@ class Mafia(BasePlugin):
 
         channel = self.channel
 
-	if self.doctor_chosen == True and self.doctor_target == player:
-	    self.bot.noteout(player, "You were saved by the doctor!")
-	    return 0
-	else:
-	    self.live_players.remove(player)
-        self.dead_players.append(player)
-        self.fix_modes()
-
-        if player in self.Mafia:
-            id = "a \x034mafia\x0f\x02!"
-        elif player == self.sheriff:
-            id = "the \x034sheriff\x0f\x02!"
-        elif player == self.doctor:
-            id = "the \x034doctor\x0f\x02!"
-        else:
-            id = "a normal citizen."
-
-        examine_msg = "*** Examining the body, you notice that this player was %s" % id
-
-        if self.has_detective:
-            self.bot.noteout(self.detective, examine_msg)
-        else:
-            self.bot.pubout(self.channel, examine_msg)
-        
-        if player in self.Mafia:
-            self.Mafia.remove(player)
-            
-        if self.check_game_over():
-            return 1
-        else:
-            self.bot.pubout(channel, ("(%s is now dead, and should stay quiet.)") % player)
-            self.bot.noteout(player, "You are now \x034dead\x0f\x02. You may observe the game, but please stay quiet until the game is over. However, you may converse with other dead players using the \x034'dchat'\x0f\x02 command.")
+        if self.doctor_chosen == True and self.doctor_target == player:
+            self.bot.noteout(player, "You were saved by the doctor!")
             return 0
+        else:
+            self.live_players.remove(player)
+            self.dead_players.append(player)
+            self.fix_modes()
+
+            if player in self.Mafia:
+                id = "a \x034mafia\x0f\x02!"
+            elif player == self.sheriff:
+                id = "the \x034sheriff\x0f\x02!"
+            elif player == self.doctor:
+                id = "the \x034doctor\x0f\x02!"
+            else:
+                id = "a normal citizen."
+
+            examine_msg = "*** Examining the body, you notice that this player was %s" % id
+
+            if self.has_detective:
+                self.bot.noteout(self.detective, examine_msg)
+            else:
+                self.bot.pubout(self.channel, examine_msg)
+            
+            if player in self.Mafia:
+                self.Mafia.remove(player)
+                
+            if self.check_game_over():
+                return 1
+            else:
+                self.bot.pubout(channel, ("(%s is now dead, and should stay quiet.)") % player)
+                self.bot.noteout(player, "You are now \x034dead\x0f\x02. You may observe the game, but please stay quiet until the game is over. However, you may converse with other dead players using the \x034'dchat'\x0f\x02 command.")
+                return 0
 
 
     def tally_votes(self):
@@ -839,6 +897,7 @@ class Mafia(BasePlugin):
                     "Mob violence ensues.    This player is now \x034dead\x0f\x02." % victim))
                 if not self.kill_player(victim):
                     # Day is done;    flip bot back into night-mode.
+                    self.timer = 0
                     self.night()
 
     def lynch_unvote(self, channel, user):
@@ -953,7 +1012,7 @@ class Mafia(BasePlugin):
                 self.reply(channel, user, "There's nobody playing by the name %s" % nick)
             else:
                 self._removeUser(nick)
-			
+            
     def cmd_quit(self, args, channel, user):
         if user not in self.live_players + self.dead_players:
             self.reply(channel, user, "%s: You aren't currently playing." % user)
@@ -1024,7 +1083,7 @@ class Mafia(BasePlugin):
                     self.bot.noteout(mafioso, "Mafia - You: %s" % (" ".join (args)))
         else:
             self.bot.noteout(user, "You are not a Mafia!")
-				
+                
     def cmd_dchat(self, args, channel, user):
         if user in self.dead_players:
             for ghosts in self.dead_players:
