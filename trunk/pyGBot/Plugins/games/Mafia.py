@@ -264,15 +264,12 @@ class Mafia(BasePlugin):
                                 self.mafia_target = None
                         self.notify_mafia("Because the Mafia took too long to decide, the player %s was randomly selected for killing this night." % self.mafia_target)
                 if self.has_doctor and self.doctor in self.live_players:
-                    print "Checking doc target"
                     if self.doctor_target == None:
-                        print "Selecting doc target"
                         while self.doctor_target == None or self.doctor_target == self.doctor:
                             self.doctor_target = random.choice(self.live_players)
                             if self.doctor_target == self.doctor:
                                 self.doctor_target = None
                         self.doctor_chosen = True
-                        print self.doctor_chosen
                         self.bot.noteout(self.doctor, "Because the doctor took too long to decide, the player %s was randomly selected for saving this night." % self.doctor_target)
                 if self.has_sheriff and self.sheriff in self.live_players:
                     if self.sheriff_target == None:
@@ -419,8 +416,9 @@ class Mafia(BasePlugin):
                 else:
                     self.bot.pubout(channel, "There are %d Mafia." % len(self.Mafia))
                     
-                # Set night timer to two minutes plus one minute for each Mafia.
-                self.nighttimeout = 120 + (60 * len(self.Mafia))
+                # Set night timer to two and a half minutes plus one minute for each Mafia.
+                # (Arbitrary values, may update later based on player feedback)
+                self.nighttimeout = 150 + (60 * len(self.Mafia))
 
                 self.originalMafia = self.Mafia[:]
                 
@@ -460,7 +458,7 @@ class Mafia(BasePlugin):
                 for citizen in self.citizens:
                     self.bot.noteout(citizen, citizen_intro_text)
 
-                self.bot.pubout(channel, "Assigning roles now... To learn how to play, say 'Siobhan: rules'.")
+                self.bot.pubout(channel, "Assigning roles now... To learn how to play, say '%s: rules'." % self.bot.nickname)
                 self.gamestate = self.GAMESTATE_RUNNING
 
                 # Start game by putting bot into "night" mode.
@@ -967,6 +965,8 @@ class Mafia(BasePlugin):
             if self.time == "day":
                 self.tally_votes()
                 self.print_tally()
+            if self.time == "night":
+                self.bot.pubout(channel, "There are about %d seconds left before dawn." % int(round(self.nighttimeout - self.timer, -1)))
         elif self.gamestate == self.GAMESTATE_STARTING:
             self.reply(channel, user, "A new game is starting. Currently %d players: %s"
                     % (len(self.live_players),self.live_players,))
