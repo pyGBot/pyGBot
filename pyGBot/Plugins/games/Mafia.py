@@ -458,7 +458,7 @@ class Mafia(BasePlugin):
                 for citizen in self.citizens:
                     self.bot.noteout(citizen, citizen_intro_text)
 
-                self.bot.pubout(channel, "Assigning roles now... To learn how to play, say '%s: rules'." % self.bot.nickname)
+                self.bot.pubout(channel, "Roles assigned. To learn how to play, say '%s: rules'." % self.bot.nickname)
                 self.gamestate = self.GAMESTATE_RUNNING
 
                 # Start game by putting bot into "night" mode.
@@ -758,9 +758,9 @@ class Mafia(BasePlugin):
 
             examine_msg = "*** Examining the body, you notice that this player was %s" % id
 
-            if self.has_detective:
+            if self.has_detective and self.detective in self.live_players:
                 self.bot.noteout(self.detective, examine_msg)
-            else:
+            elif not self.has_detective:
                 self.bot.pubout(self.channel, examine_msg)
             
             if player in self.Mafia:
