@@ -173,10 +173,12 @@ class Mafia(BasePlugin):
                 setattr(self, var, new)
                 
     def user_part(self, channel, username):
-        self._removeUser(username)
+        #self._removeUser(username)
+        pass
 
     def user_quit(self, username, reason=""):
-        self._removeUser(username)
+        #self._removeUser(username)
+        pass
         
     def user_kicked(self, channel, username, kicker, message=""):
         self._removeUser(username)
@@ -211,6 +213,7 @@ class Mafia(BasePlugin):
                 if self.has_doctor:
                     self.bot.noteout(self.doctor, "Due to %s's unexpected erasure from reality, you may Save once again this night." % nick)
                     self.doctor_target = None
+                    self.doctor_chosen = False
             if nick == self.detective:
                 self.bot.pubout(channel, "%s was a detective. Interpol is investigating their mysterious disappearance with the assistance of Agents Mulder and Scully." % nick)
             if nick == self.sheriff:
@@ -219,6 +222,7 @@ class Mafia(BasePlugin):
                 if self.has_sheriff:
                     self.bot.noteout(self.sheriff, "Due to %s's unexpected erasure from reality, you may Check once again this night." % nick)
                     self.sheriff_target = None
+                    self.sheriff_chosen = False
             if nick == self.mafia_target:
                 self.notify_mafia("Due to %s's unexpected erasure from reality, you can choose someone else to kill tonight." % nick)
                 self.mafia_target = None
@@ -244,12 +248,13 @@ class Mafia(BasePlugin):
             self.timer += 1
             if self.timer == (self.nighttimeout - 60):
                 # One minute remaining before night times out.
+                self.bot.pubout(self.channel, "There is one minute remaining before dawn.")
                 if self.mafia_target == None:
-                    self.notify_mafia("Please hurry, you have less than one minute before the night ends! (If no choice is made, a random voted-for target (or if no votes, a random non-mafia target) will be selected.)")
+                    self.notify_mafia("Please hurry, %s, you have less than one minute before the night ends! (If no choice is made, a random voted-for target (or if no votes, a random non-mafia target) will be selected.)" % ", ".join(self.Mafia))
                 if self.has_doctor and self.doctor_target == None and self.doctor in self.live_players:
-                    self.bot.noteout(self.doctor, "Please hurry, you have less than one minute before the night ends! (If no choice is made, a random target will be selected.)")
+                    self.bot.noteout(self.doctor, "Please hurry, %s, you have less than one minute before the night ends! (If no choice is made, a random target will be selected.)" % self.doctor)
                 if self.has_sheriff and self.sheriff_target == None and self.sheriff in self.live_players:
-                    self.bot.noteout(self.sheriff, "Please hurry, you have less than one minute before the night ends! (If no choice is made, a random target will be selected.)")
+                    self.bot.noteout(self.sheriff, "Please hurry, %s, you have less than one minute before the night ends! (If no choice is made, a random target will be selected.)" % self.sheriff)
             if self.timer == self.nighttimeout:
                 # Some power role is taking too long at night. Doctor and sheriff get random live non-self targets.
                 # Mafia get a target randomly chosen from the votes list, or just random non-mafia if no votes list.
@@ -646,7 +651,7 @@ class Mafia(BasePlugin):
                     self.reply(channel, user, "That player either doesn't exist, or is dead.")
                 else:
                     if self.sheriff_target is not None:
-                        self.reply(channel, user, "You've already had your vision for tonight.")
+                        self.reply(channel, user, "You've already checked your files for tonight.")
                     else:
                         self.sheriff_target = who
                         if who in self.Mafia:
