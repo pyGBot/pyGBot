@@ -237,6 +237,10 @@ class Mafia(BasePlugin):
             if self.check_night_done():
                 self.day()
 
+        if nick in self.spectators:
+            self.spectators.remove(nick)
+            self.reply(channel, nick, "You are no longer spectating.")
+        
         if nick == self.game_starter:
             self.game_starter = None
             self.bot.pubout(channel, "Game start is now open to anyone. Type !start to start the game.")
@@ -339,6 +343,7 @@ class Mafia(BasePlugin):
         self.has_detective = False
         self.detective = None
         self.originalMafia = []
+        self.spectators = []
         # Night round variables
         self.sheriff_target = None
         self.doctor_target = None
@@ -887,7 +892,10 @@ class Mafia(BasePlugin):
         else:
             self.citizen_votes[lyncher] = lynchee
             if self.anon_voting == False:
-                self.bot.pubout(self.channel, ("%s has voted to lynch %s!" % (lyncher, lynchee)))
+                if lynchee != 0:
+                    self.bot.pubout(self.channel, "%s has voted to lynch %s!" % (lyncher, lynchee))
+                else:
+                    self.bot.pubout(self.channel, "%s has voted not to lynch." % lyncher)
             self.tally_votes()
             victim = self.check_for_majority()
             if victim is None:
@@ -1019,10 +1027,11 @@ class Mafia(BasePlugin):
                 self._removeUser(nick)
             
     def cmd_quit(self, args, channel, user):
-        if user not in self.live_players + self.dead_players:
-            self.reply(channel, user, "%s: You aren't currently playing." % user)
+        if user not in self.live_players + self.dead_players + self.spectators:
+                self.reply(channel, user, "You aren't currently playing.")
         else:
             self._removeUser(user)
+            
 
     def cmd_check(self, args, channel, user):
         if len(args) == 1:
@@ -1075,6 +1084,8 @@ class Mafia(BasePlugin):
             return
         if user in self.live_players:
             self.reply(channel, user, 'You were already in the game!')
+        elif user in self.spectators:
+            self.reply(channel, user, 'You are currently spectating! Please quit first.')
         else:
             self.live_players.append(user)
             self.reply(channel, user, 'You are now in the game.')
@@ -1090,8 +1101,8 @@ class Mafia(BasePlugin):
             self.bot.noteout(user, "You are not a Mafia!")
                 
     def cmd_dchat(self, args, channel, user):
-        if user in self.dead_players:
-            for ghosts in self.dead_players:
+        if user in (self.dead_players + self.spectators):
+            for ghosts in (self.dead_players + self.spectators):
                 if user != ghosts:
                     self.bot.noteout(ghosts, "Graveyard - <%s> %s" % (user, " ".join(args)))
                 else:
@@ -1115,6 +1126,13 @@ class Mafia(BasePlugin):
     def cmd_rules(self, args, channel, user):
         for text in new_game_texts:
             self.reply(channel, user, text)
+            
+    def cmd_resetstarter(self, args, channel, user):
+        if user == self.game_starter:
+            self.game_starter = None
+            self.bot.pubout(channel, user, "Game control is now open to all.")
+        else:
+            self.bot.pubout(channel, user, "You are not the game starter.")
 
     def cmd_moderation(self, args, channel, user):
         if self.game_starter and self.game_starter != user:
@@ -1134,6 +1152,19 @@ class Mafia(BasePlugin):
         self.bot.pubout(channel, 'Moderation turned %s by %s'
                 % (args[0], user))
         self.fix_modes()
+        
+    def cmd_spectate(self, args, channel, user):
+        if self.gamestate == self.GAMESTATE_RUNNING or self.gamestate == self.GAMESTATE_STARTING:
+            if user not in self.live_players and user not in self.dead_players:
+                if user not in self.spectators:
+                    self.spectators.append(user)
+                    self.reply(channel, user, "You are now spectating the game.")
+                else:
+                    self.reply(channel, user, "You were already spectating!")
+            else:
+                self.reply(channel, user, "You are in the game, you can't spectate!")
+        else:
+            self.reply(channel, user, "There is no game in progress.")
 
     def do_command(self, channel, user, cmd):
         """This is the function called whenever someone sends a public or
