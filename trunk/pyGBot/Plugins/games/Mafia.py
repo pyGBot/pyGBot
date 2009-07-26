@@ -77,28 +77,28 @@ new_game_texts = \
 # Printed when informing players of their initial roles:
 
 mafia_intro_text = \
-"You are a \x034Mafia\x0f\x02.  You want to kill everyone while they sleep. Whatever happens, keep your identity secret.  Act natural!"
+"You're a \x02\x034Mafia\x0f.  You want to \x02kill\x0f everyone while they sleep. Whatever happens, keep your identity secret.  Act natural!"
 
 agent_intro_text = \
-"You are a Mafia, but also an \x034agent\x0f\x02. Later on, you'll get chances to change the 'files' the Sheriff checks to keep the Mafia a secret, or put suspicion on a villager. Act natural!"
+"You're a \x02\x034Mafia\x0f, but also an \x02\x034agent\x0f. Later on, you'll get chances to change the 'files' the Sheriff checks to keep the Mafia a secret, or put suspicion on a villager. Act natural!"
 
 sheriff_intro_text = \
-"You're a citizen, but also a \x034sheriff\x0f\x02.  Later on, you'll get chances to learn whether someone is or isn't a Mafia.  Keep your identity secret, or the Mafia may kill you!"
+"You're a \x02citizen\x0f, but also a \x02\x034sheriff\x0f.  Later on, you'll get chances to \x02check\x0f whether someone is or isn't a Mafia.  Keep your identity secret, or the Mafia may kill you!"
 
 doctor_intro_text= \
-"You're a citizen, but also a \x034doctor\x0f\x02.  Later on, you'll get chances to save people who are targeted by the Mafia.  Keep your identity secret, or the Mafia may kill you!"
+"You're a \x02citizen\x0f, but also a \x02\x034doctor\x0f.  Later on, you'll get chances to \x02save\x0f people who are targeted by the Mafia.  Keep your identity secret, or the Mafia may kill you!"
 
 detective_intro_text = \
-"You're a citizen, but also a \x034Detective\x0f\x02. Later on, you'll learn the roles of the players killed by the Mafia. Keep your identity secret, or the Mafia may kill you!"
+"You're a \x02citizen\x0f, but also a \x02\x034Detective\x0f. Later on, you'll \x02learn\x0f the roles of the players killed by the Mafia. Keep your identity secret, or the Mafia may kill you!"
 
 citizen_intro_text = \
-"You're an ordinary citizen."
+"You're a \x02citizen\x0f."
 
 
 # Printed when night begins:
 
 night_game_texts = \
-["Darkness falls:  it is \x034night\x0f\x02. The city sleeps peacefully..."]
+["Darkness falls:  it is \x02\x034night\x0f. The city sleeps peacefully..."]
 
 # Printed when Mafia and citizen get nighttime instructions:
 
@@ -282,12 +282,12 @@ class Mafia(BasePlugin):
                         self.bot.noteout(self.doctor, "Because the doctor took too long to decide, the player %s was randomly selected for saving this night." % self.doctor_target)
                 if self.has_sheriff and self.sheriff in self.live_players:
                     if self.sheriff_target == None:
-                        while self.sheriff_target == None or self.sheriff_target == self.sheriff:
-                            self.sheriff_target = random.choice(self.live_players)
-                            if self.sheriff_target == self.sheriff:
-                                self.sheriff_target = None
+                        target = None
+                        while target == None or target == self.sheriff:
+                            target = random.choice(self.live_players)
                         self.sheriff_chosen = True
-                        self.bot.noteout(self.sheriff, "Because the sheriff took too long to decide, the player %s was randomly selected for checking this night." % self.sheriff_target)
+                        self.bot.noteout(self.sheriff, "Because the sheriff took too long to decide, the player %s was randomly selected for checking this night." % target)
+                        self.check(self.sheriff, self.sheriff, target)
                 self.check_game_over()
                 if self.check_night_done():
                     self.day()
@@ -521,7 +521,7 @@ class Mafia(BasePlugin):
 
         # If all Mafia are dead, the citizens win.
         if len(self.Mafia) == 0:
-            self.bot.pubout(channel, "The Mafia are dead!    The \x034citizens\x0f\x02 have \x034won\x0f.")
+            self.bot.pubout(channel, "The Mafia are dead!    The \x034citizens\x0f have \x034won\x0f.")
             self.end_game(self.game_starter)
             return 1
 
@@ -532,7 +532,7 @@ class Mafia(BasePlugin):
                 "There are now an equal number of citizens and Mafia.")
             msg = "The Mafia have no need to hide anymore; "
             msg = msg + "They attack the remaining citizens. "
-            msg = msg + "The \x034Mafia\x0f\x02 have \x034won\x0f."
+            msg = msg + "The \x034Mafia\x0f have \x034won\x0f."
             self.bot.pubout(channel, msg)
             self.end_game(self.game_starter)
             return 1
@@ -613,10 +613,9 @@ class Mafia(BasePlugin):
         channel = self.channel
 
         self.time = "day"
-        self.fix_modes()
 
         # Discover the dead mafia victim.
-        message = "\x034Day\x0f\x02 Breaks!    Sunlight pierces the sky.\x0f "
+        message = "\x034Day\x0f Breaks!    Sunlight pierces the sky."
         if self.doctor_target != self.mafia_target:
             message += "The city awakes in horror... to find the mutilated body of \x034%s\x0f!!"\
                                          % self.mafia_target
@@ -751,6 +750,7 @@ class Mafia(BasePlugin):
 
         if self.doctor_chosen == True and self.doctor_target == player:
             self.bot.noteout(player, "You were saved by the doctor!")
+            self.fix_modes()
             return 0
         else:
             self.live_players.remove(player)
@@ -758,11 +758,11 @@ class Mafia(BasePlugin):
             self.fix_modes()
 
             if player in self.Mafia:
-                id = "a \x034mafia\x0f\x02!"
+                id = "a \x034mafia\x0f!"
             elif player == self.sheriff:
-                id = "the \x034sheriff\x0f\x02!"
+                id = "the \x034sheriff\x0f!"
             elif player == self.doctor:
-                id = "the \x034doctor\x0f\x02!"
+                id = "the \x034doctor\x0f!"
             else:
                 id = "a normal citizen."
 
@@ -780,7 +780,7 @@ class Mafia(BasePlugin):
                 return 1
             else:
                 self.bot.pubout(channel, ("(%s is now dead, and should stay quiet.)") % player)
-                self.bot.noteout(player, "You are now \x034dead\x0f\x02. You may observe the game, but please stay quiet until the game is over. However, you may converse with other dead players using the \x034'dchat'\x0f\x02 command.")
+                self.bot.noteout(player, "You are now \x034dead\x0f. You may observe the game, but please stay quiet until the game is over. However, you may converse with other dead players using the \x034'dchat'\x0f command.")
                 return 0
 
 
@@ -905,7 +905,7 @@ class Mafia(BasePlugin):
                 self.night()
             else:
                 self.bot.pubout(self.channel, ("The majority has voted to lynch %s!! "
-                    "Mob violence ensues.    This player is now \x034dead\x0f\x02." % victim))
+                    "Mob violence ensues.    This player is now \x034dead\x0f." % victim))
                 if not self.kill_player(victim):
                     # Day is done;    flip bot back into night-mode.
                     self.timer = 0
@@ -1020,11 +1020,12 @@ class Mafia(BasePlugin):
                 self.print_tally()
 
     def cmd_del(self, args, channel, user):
-        for nick in args:
-            if nick not in self.live_players + self.dead_players:
-                self.reply(channel, user, "There's nobody playing by the name %s" % nick)
-            else:
+        if len(args) >= 1:
+            nick = self.match_name(args[0].strip())
+            if nick:
                 self._removeUser(nick)
+            else:
+                self.reply(channel, user, "There's nobody playing by the name %s" % args[0])
             
     def cmd_quit(self, args, channel, user):
         if user not in self.live_players + self.dead_players + self.spectators:
