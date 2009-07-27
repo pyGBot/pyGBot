@@ -180,6 +180,13 @@ class Mafia(BasePlugin):
         #self._removeUser(username)
         pass
         
+    def user_join(self, channel, username):
+        if channel == self.channel:
+            if username in self.live_players:
+                if self.gamestate == self.GAMESTATE_RUNNING:
+                    self.fix_modes()
+        pass
+        
     def user_kicked(self, channel, username, kicker, message=""):
         self._removeUser(username)
 
