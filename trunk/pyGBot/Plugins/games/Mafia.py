@@ -1138,9 +1138,9 @@ class Mafia(BasePlugin):
     def cmd_resetstarter(self, args, channel, user):
         if user == self.game_starter:
             self.game_starter = None
-            self.bot.pubout(channel, user, "Game control is now open to all.")
+            self.bot.pubout(channel, "Game control is now open to all.")
         else:
-            self.bot.pubout(channel, user, "You are not the game starter.")
+            self.reply(channel, user, "You are not the game starter.")
 
     def cmd_moderation(self, args, channel, user):
         if self.game_starter and self.game_starter != user:

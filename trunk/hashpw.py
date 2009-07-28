@@ -26,7 +26,7 @@ from contrib.configobj import ConfigObj, ConfigObjError
 if __name__ == "__main__":
     uname = raw_input("Enter username: ")
     pwhash = hashlib.sha1(raw_input("Enter pw: ") + 'pygb0t').hexdigest()
-    ulevel = raw_input("Enter userlevel: ")
+    ulevel = raw_input("Enter userlevel (User, Mod or Admin): ")
 
     conf = ConfigObj('users.ini')
     conf[uname] = {'passhash': pwhash, 'userlevel': ulevel}
