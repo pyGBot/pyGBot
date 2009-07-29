@@ -115,13 +115,13 @@ night_doctor_texts = \
   not attempt it this night."]
 
 night_Mafia_texts = \
-["As the citizens sleep, you must now decide whom you want to kill. You and the other Mafia (if he is exists and is alive) should discuss (privately) and choose a victim. Please type 'kill <nickname>' (as a private message to me)."]
+["As the citizens sleep, you must now decide whom you want to kill. You and the other Mafia (if he is exists and is alive) should discuss (privately) and choose a victim. Please type 'kill <nickname>' (as a private message to me). Alternatively, you can elect not to kill anyone. To do this, pleaes type 'nokill' (as a private message to me)."]
 
 
 # Printed when day begins.
 
 day_game_texts = \
-["The citizens *must* decide to lynch one player. When each player is ready, send me the command:  'lynch <nickname>', and I will keep track of votes, until the majority agrees."]
+["The citizens may decide to lynch one player. When each player is ready, send me the command:  'lynch <nickname>' or 'nolynch', and I will keep track of votes, until the majority agrees. You can undo a lynch vote with 'unlynch'."]
 
 
 
@@ -136,6 +136,7 @@ IRC_BOLD = "\x02"
 class Mafia(BasePlugin):
     GAMESTATE_NONE, GAMESTATE_STARTING, GAMESTATE_RUNNING = range(3)
     NOLYNCH = 0
+    NOKILL = 1
     def __init__(self, bot, options):
         BasePlugin.__init__(self, bot, options)
         self.output = True
@@ -623,7 +624,7 @@ class Mafia(BasePlugin):
 
         # Discover the dead mafia victim.
         message = "\x034Day\x0f Breaks!    Sunlight pierces the sky."
-        if self.doctor_target != self.mafia_target:
+        if self.doctor_target != self.mafia_target and self.mafia_target != self.NOKILL:
             message += "The city awakes in horror... to find the mutilated body of \x034%s\x0f!!"\
                                          % self.mafia_target
         else:
@@ -721,7 +722,7 @@ class Mafia(BasePlugin):
         if user not in self.Mafia:
             self.reply(channel, user, "Huh?")
             return
-        if who not in self.live_players:
+        if who not in self.live_players and who != self.NOKILL:
             self.reply(channel, user, "That player either doesn't exist, or is dead.")
             return
         if len(self.Mafia) > 1:
@@ -757,6 +758,9 @@ class Mafia(BasePlugin):
 
         if self.doctor_chosen == True and self.doctor_target == player:
             self.bot.noteout(player, "You were saved by the doctor!")
+            self.fix_modes()
+            return 0
+        elif player == self.NOKILL:
             self.fix_modes()
             return 0
         else:
@@ -1068,6 +1072,9 @@ class Mafia(BasePlugin):
                 self.kill(channel, user, killee)
                 return
         self.reply(channel, user, "Kill whom?")
+
+    def cmd_nokill(self, args, channel, user):
+        self.kill(channel, user, self.NOKILL)
 
     def cmd_lynch(self, args, channel, user):
         if len(args) == 1:
