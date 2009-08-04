@@ -66,11 +66,13 @@ svn_url = svn_url[svn_url.find(' ')+1:svn_url.rfind('/')+1]
 
 new_game_texts = \
 ["This is a game of paranoia and psychological intrigue.  Everyone in this group appears to be a common citizen, but several of you are 'special'. \
- One or two of you are actually in the Mafia, trying to kill everyone while concealing their identity.",
+ A small amount of you are actually in the Mafia, trying to kill everyone while concealing their identity.",
 
  "One of you is also a 'sheriff'; you have the ability to learn whether a specific person is or is not in the Mafia.",
  
  "And another is the 'doctor'; you have the ability to save someone's life, if you pick the player who is chosen by the Mafia.",
+ 
+ "One of the Mafia may also be an 'agent'; they have the ability to alter the Sheriff's files at night.",
 
  "As a community, your group objective is to weed out the Mafia and lynch them before you're all killed in your sleep."]
 
@@ -243,10 +245,9 @@ class Mafia(BasePlugin):
                     self.bot.noteout(self.sheriff, "Due to %s's unexpected erasure from reality, you may Check once again this night." % nick)
                     self.sheriff_target = None
                     self.sheriff_chosen = False
-            if nick == self.agent_target:
-                if self.has_agent:
-                    self.bot.noteout(self.agent, "Due to %s's unexpected erasure from reality, you may Alter once again this night." % nick)
-                    self.agent_chosen = False
+            if self.has_agent and self.agent_chosen:
+                self.bot.noteout(self.agent, "Due to %s's unexpected erasure from reality, you may Alter once again this night." % nick)
+                self.agent_chosen = False
             if nick == self.mafia_target:
                 self.notify_mafia("Due to %s's unexpected erasure from reality, you can choose someone else to kill tonight." % nick)
                 self.mafia_target = None
@@ -315,10 +316,7 @@ class Mafia(BasePlugin):
                         target = None
                         while target == None or target == self.agent:
                             target = random.choice(self.live_players)
-                        if self.sheriff_files[target]:
-                            self.sheriff_files[target] = False
-                        else:
-                            self.sheriff_files[target] = True
+                        self.sheriff_files[target] = not self.sheriff_files[target]
                         self.agent_chosen = True
                         self.bot.noteout(self.agent, "Because the agent took too long to decide, the player %s was randomly selected for file-altering this night." % target)
                 self.check_game_over()
@@ -796,10 +794,7 @@ class Mafia(BasePlugin):
                     elif who == user:
                         self.reply(channel, user, "You can't alter your own file!")
                     else:
-                        if self.sheriff_files[who]:
-                            self.sheriff_files[who] = False
-                        else:
-                            self.sheriff_files[who] = True
+                        self.sheriff_files[who] = not self.sheriff_files[who]
                         self.agent_chosen = True
                         self.reply(channel, user, "You have altered the file on %s." % who)
                         if self.check_night_done():
@@ -876,14 +871,14 @@ class Mafia(BasePlugin):
             self.dead_players.append(player)
             self.fix_modes()
 
-            if player in self.Mafia:
+            if player == self.agent:
+                id = "a \x034mafia\x0f, but also the \x034agent\x0f!"
+            elif player in self.Mafia:
                 id = "a \x034mafia\x0f!"
             elif player == self.sheriff:
                 id = "the \x034sheriff\x0f!"
             elif player == self.doctor:
                 id = "the \x034doctor\x0f!"
-            elif player == self.agent:
-                id = "the \x034agent\x0f!"
             else:
                 id = "a normal citizen."
 
