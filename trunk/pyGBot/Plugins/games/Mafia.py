@@ -1300,6 +1300,25 @@ class Mafia(BasePlugin):
                 self.reply(channel, user, "You are in the game, you can't spectate!")
         else:
             self.reply(channel, user, "There is no game in progress.")
+            
+    def cmd_role(self, args, channel, user):
+        if self.gamestate == self.GAMESTATE_RUNNING:
+            if user in self.live_players:
+                if user == self.agent:
+                    id = "a \x034mafia\x0f, but also the \x034agent\x0f."
+                elif user in self.Mafia:
+                    id = "a \x034mafia\x0f."
+                elif user == self.sheriff:
+                    id = "the \x034sheriff\x0f."
+                elif user == self.doctor:
+                    id = "the \x034doctor\x0f."
+                else:
+                    id = "a normal citizen."
+                self.bot.noteout(user,"You are %s" % id)
+            else:
+                self.reply(channel, user, "You are not playing.")
+        else:
+            self.reply(channel, user, "There is no game in progress.")
 
     def do_command(self, channel, user, cmd):
         """This is the function called whenever someone sends a public or
