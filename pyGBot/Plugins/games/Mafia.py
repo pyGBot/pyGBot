@@ -80,7 +80,7 @@ mafia_intro_text = \
 "You're a \x02\x034Mafia\x0f.  You want to \x02kill\x0f everyone while they sleep. Whatever happens, keep your identity secret.  Act natural!"
 
 agent_intro_text = \
-"You're a \x02\x034Mafia\x0f, but also an \x02\x034agent\x0f. Later on, you'll get chances to change the 'files' the Sheriff checks to keep the Mafia a secret, or put suspicion on a villager. Act natural!"
+"You're a \x02\x034Mafia\x0f, but also an \x02\x034agent\x0f. Later on, you'll get chances to \x02alter\x0f the 'files' the Sheriff checks to keep the Mafia a secret, or put suspicion on a villager. Act natural!"
 
 sheriff_intro_text = \
 "You're a \x02citizen\x0f, but also a \x02\x034sheriff\x0f.  Later on, you'll get chances to \x02check\x0f whether someone is or isn't a Mafia.  Keep your identity secret, or the Mafia may kill you!"
@@ -115,8 +115,13 @@ night_doctor_texts = \
   not attempt it this night."]
 
 night_Mafia_texts = \
-["As the citizens sleep, you must now decide whom you want to kill. You and the other Mafia (if he is exists and is alive) should discuss (privately) and choose a victim. Please type 'kill <nickname>' (as a private message to me). Alternatively, you can elect not to kill anyone. To do this, pleaes type 'nokill' (as a private message to me)."]
+["As the citizens sleep, you may now decide whom you want to kill. You and the other Mafia (if they is exist and are alive) should discuss (privately) and choose a victim. Please type 'kill <nickname>' (as a private message to me). Alternatively, you can elect not to kill anyone. To do this, please type 'nokill' (as a private message to me)."]
 
+night_agent_texts = \
+["As the citizens sleep, you may now decide to alter the Sheriff's files.\
+  You do not need to use this power now: type 'alter <nickname>' (as\
+  a private message to me) to change the file, or 'noalter' to\
+  not change any files tonight."]
 
 # Printed when day begins.
 
@@ -169,9 +174,12 @@ class Mafia(BasePlugin):
             for k, v in map_.items():
                 if v == old:
                     map_[k] = new
-        for var in ('game_starter', 'sheriff', 'sheriff_target', 'mafia_target', 'doctor', 'doctor_target'):
+        for var in ('game_starter', 'sheriff', 'sheriff_target', 'mafia_target', 'doctor', 'doctor_target', 'agent'):
             if getattr(self, var) == old:
                 setattr(self, var, new)
+        if old in self.sheriff_files:
+            self.sheriff_files[new] = self.sheriff_files[old]
+            del self.sheriff_files[old]
                 
     def user_part(self, channel, username):
         #self._removeUser(username)
@@ -193,6 +201,10 @@ class Mafia(BasePlugin):
 
     def notify_mafia(self, msg):
         for mafia in self.Mafia:
+            self.bot.noteout(mafia, msg)
+            
+    def notify_votingmafia(self, msg):
+        for mafia in self.VotingMafia:
             self.bot.noteout(mafia, msg)
 
     def _removeUser(self, nick):
@@ -231,6 +243,10 @@ class Mafia(BasePlugin):
                     self.bot.noteout(self.sheriff, "Due to %s's unexpected erasure from reality, you may Check once again this night." % nick)
                     self.sheriff_target = None
                     self.sheriff_chosen = False
+            if nick == self.agent_target:
+                if self.has_agent:
+                    self.bot.noteout(self.agent, "Due to %s's unexpected erasure from reality, you may Alter once again this night." % nick)
+                    self.agent_chosen = False
             if nick == self.mafia_target:
                 self.notify_mafia("Due to %s's unexpected erasure from reality, you can choose someone else to kill tonight." % nick)
                 self.mafia_target = None
@@ -262,11 +278,13 @@ class Mafia(BasePlugin):
                 # One minute remaining before night times out.
                 self.bot.pubout(self.channel, "There is one minute remaining before dawn.")
                 if self.mafia_target == None:
-                    self.notify_mafia("Please hurry, %s, you have less than one minute before the night ends! (If no choice is made, a random voted-for target (or if no votes, a random non-mafia target) will be selected.)" % ", ".join(self.Mafia))
+                    self.notify_votingmafia("Please hurry, %s, you have less than one minute before the night ends! (If no choice is made, a random voted-for target (or if no votes, a random non-mafia target) will be selected.)" % ", ".join(self.Mafia))
                 if self.has_doctor and self.doctor_target == None and self.doctor in self.live_players:
                     self.bot.noteout(self.doctor, "Please hurry, %s, you have less than one minute before the night ends! (If no choice is made, a random target will be selected.)" % self.doctor)
                 if self.has_sheriff and self.sheriff_target == None and self.sheriff in self.live_players:
                     self.bot.noteout(self.sheriff, "Please hurry, %s, you have less than one minute before the night ends! (If no choice is made, a random target will be selected.)" % self.sheriff)
+                if self.has_agent and self.agent_chosen == False and self.agent in self.live_players:
+                    self.bot.noteout(self.agent, "Please hurry, %s, you have less than one minute before the night ends! (If no choice is made, a random target will be selected.)" % self.agent)
             if self.timer == self.nighttimeout:
                 # Some power role is taking too long at night. Doctor and sheriff get random live non-self targets.
                 # Mafia get a target randomly chosen from the votes list, or just random non-mafia if no votes list.
@@ -284,18 +302,25 @@ class Mafia(BasePlugin):
                     if self.doctor_target == None:
                         while self.doctor_target == None or self.doctor_target == self.doctor:
                             self.doctor_target = random.choice(self.live_players)
-                            if self.doctor_target == self.doctor:
-                                self.doctor_target = None
                         self.doctor_chosen = True
                         self.bot.noteout(self.doctor, "Because the doctor took too long to decide, the player %s was randomly selected for saving this night." % self.doctor_target)
                 if self.has_sheriff and self.sheriff in self.live_players:
                     if self.sheriff_target == None:
-                        target = None
-                        while target == None or target == self.sheriff:
-                            target = random.choice(self.live_players)
+                        while self.sheriff_target == None or self.sheriff_target == self.sheriff:
+                            self.sheriff_target = random.choice(self.live_players)
                         self.sheriff_chosen = True
                         self.bot.noteout(self.sheriff, "Because the sheriff took too long to decide, the player %s was randomly selected for checking this night." % target)
-                        self.check(self.sheriff, self.sheriff, target)
+                if self.has_agent and self.agent in self.live_players:
+                    if not self.agent_chosen:
+                        target = None
+                        while target == None or target == self.agent:
+                            target = random.choice(self.live_players)
+                        if self.sheriff_files[target]:
+                            self.sheriff_files[target] = False
+                        else:
+                            self.sheriff_files[target] = True
+                        self.agent_chosen = True
+                        self.bot.noteout(self.agent, "Because the agent took too long to decide, the player %s was randomly selected for file-altering this night." % target)
                 self.check_game_over()
                 if self.check_night_done():
                     self.day()
@@ -342,20 +367,26 @@ class Mafia(BasePlugin):
         self.live_players = []
         self.dead_players = []
         self.Mafia = []
+        self.VotingMafia = []
         self.citizens = []
         self.police = []
         self.has_sheriff = False
         self.sheriff = None
+        self.sheriff_files = {}
         self.has_doctor = False
         self.doctor = None
         self.has_detective = False
         self.detective = None
+        self.has_agent = False
+        self.agent = None
         self.originalMafia = []
         self.spectators = []
         # Night round variables
         self.sheriff_target = None
+        self.sheriff_chosen = False
         self.doctor_target = None
         self.doctor_chosen = False
+        self.agent_chosen = False
         self.mafia_target = None
         self.mafia_votes = {}
         self.timer = 0
@@ -435,10 +466,21 @@ class Mafia(BasePlugin):
                     self.bot.pubout(channel, "There are %d Mafia." % len(self.Mafia))
                     
                 # Set night timer to two and a half minutes plus one minute for each Mafia.
-                # (Arbitrary values, may update later based on player feedback)
+                # This seems to be a fairly optimum time.
                 self.nighttimeout = 150 + (60 * len(self.Mafia))
 
                 self.originalMafia = self.Mafia[:]
+                
+                # Pick a mafia to be agent, if more than 2
+                if len(self.Mafia) >= 2:
+                    self.agent = random.choice(self.Mafia)
+                    self.has_agent = True
+                
+                # Add mafia to sheriff files and non-agent mafia to voting list
+                for mafia in self.originalMafia:
+                    self.sheriff_files[mafia] = True
+                    if mafia != self.agent:
+                        self.VotingMafia.append(mafia)
                 
                 #Breaking C9 for now. Oh. Well.
                 #if self.c9_setup == False or (self.c9_setup == True and random.randint(0,1) == 1):
@@ -451,17 +493,19 @@ class Mafia(BasePlugin):
                 if len(self.live_players) >= 4:
                     self.has_doctor = True
                     self.doctor = users.pop(random.randrange(len(users)))
+                    self.sheriff_files[self.doctor] = False
                 if len(self.live_players) >= 6:
                     self.has_detective = True
                     self.detective = users.pop(random.randrange(len(users)))
-                    self.police.append(self.detective)
+                    self.sheriff_files[self.detective] = False
                 if len(self.live_players) >= 5:
                     self.has_sheriff = True
                     self.sheriff = users.pop(random.randrange(len(users)))
-                    self.police.append(self.sheriff)
+                    self.sheriff_files[self.sheriff] = False
         
                 for user in users:
                     self.citizens.append(user)
+                    self.sheriff_files[user] = False
 
                 # Private message each user, tell them their role.
                 if self.has_sheriff:
@@ -470,9 +514,11 @@ class Mafia(BasePlugin):
                     self.bot.noteout(self.doctor, doctor_intro_text)
                 if self.has_detective:
                     self.bot.noteout(self.detective, detective_intro_text)
+                if self.has_agent:
+                    self.bot.noteout(self.agent, agent_intro_text)
 #                for cops in self.police:
 #                        self.bot.noteout(cops, "The police force is: %s. You can talk to them using pchat." % ", ".join(self.police))
-                self.notify_mafia(mafia_intro_text)
+                self.notify_votingmafia(mafia_intro_text)
                 for citizen in self.citizens:
                     self.bot.noteout(citizen, citizen_intro_text)
 
@@ -511,6 +557,8 @@ class Mafia(BasePlugin):
         channel = self.channel
 
         message = "*** The mafia were %s" % ", ".join(self.originalMafia)
+        if self.has_agent:
+            message += ", the agent was %s" % self.agent
         if self.has_sheriff:
             message += ", the sheriff was %s" % self.sheriff
         if self.has_detective:
@@ -550,6 +598,10 @@ class Mafia(BasePlugin):
 
     def check_night_done(self):
         "Check if nighttime is over.    Return 1 if night is done, 0 otherwise."
+        
+        # Are there mafia alive to vote?
+        if len(self.VotingMafia) < 1:
+            self.mafia_target = self.NOKILL
 
         # Is the sheriff done checking?
         if self.has_sheriff == False or self.sheriff not in self.live_players:
@@ -568,8 +620,17 @@ class Mafia(BasePlugin):
                 doctor_done = 0
             else:
                 doctor_done = 1
+        
+        # Is the agent done altering?
+        if self.has_agent == False or self.agent not in self.live_players:
+            agent_done = 1
+        else:
+            if self.agent_chosen == False:
+                agent_done = 0
+            else:
+                agent_done = 1
 
-        if (self.mafia_target is not None) and sheriff_done and doctor_done:
+        if (self.mafia_target is not None) and sheriff_done and doctor_done and agent_done:
             return 1
         else:
             return 0
@@ -605,11 +666,14 @@ class Mafia(BasePlugin):
         if self.has_doctor and self.doctor in self.live_players:
             for text in night_doctor_texts:
                 self.bot.noteout(self.doctor, text)
+        if self.has_agent and self.agent in self.live_players:
+            for text in night_agent_texts:
+                self.bot.noteout(self.agent, text)
         for text in night_Mafia_texts:
-            self.notify_mafia(text)
+            self.notify_votingmafia(text)
         if len(self.Mafia) >= 2:
-            self.notify_mafia("The Mafia are %s. You can confer with them privately using the 'mchat' command."
-                                                % ", ".join(self.Mafia))
+            self.notify_mafia("The Mafia that can vote are %s. The Agent is %s. You can confer with them privately using the 'mchat' command."
+                                                % (", ".join(self.VotingMafia), self.agent))
 
         # ... bot is now in 'night' mode;    goes back to doing nothing but
         # waiting for commands.
@@ -621,9 +685,18 @@ class Mafia(BasePlugin):
         channel = self.channel
 
         self.time = "day"
+            
+        # Sheriff gets their report.
+        if self.has_sheriff and self.sheriff in self.live_players and self.sheriff != self.mafia_target:
+            if self.sheriff_target == self.agent:
+                self.bot.noteout(self.sheriff, "Your files say that %s is the Agent!" % self.sheriff_target)
+            elif self.sheriff_files[self.sheriff_target]:
+                self.bot.noteout(self.sheriff, "Your files say that %s is a Mafia!" % self.sheriff_target)
+            else:
+                self.bot.noteout(self.sheriff, "Your files say that %s is innocent." % self.sheriff_target)
 
         # Discover the dead mafia victim.
-        message = "\x034Day\x0f Breaks!    Sunlight pierces the sky."
+        message = "\x034Day\x0f Breaks!    Sunlight pierces the sky. "
         if self.doctor_target != self.mafia_target and self.mafia_target != self.NOKILL:
             message += "The city awakes in horror... to find the mutilated body of \x034%s\x0f!!"\
                                          % self.mafia_target
@@ -639,6 +712,7 @@ class Mafia(BasePlugin):
             self.doctor_chosen = False
             self.mafia_target = None
             self.mafia_votes = {}
+            self.agent_chosen = False
 
             # Give daytime instructions.
             self.print_alive()
@@ -662,17 +736,10 @@ class Mafia(BasePlugin):
                 if who not in self.live_players:
                     self.reply(channel, user, "That player either doesn't exist, or is dead.")
                 else:
-                    if self.sheriff_target is not None:
-                        self.reply(channel, user, "You've already checked your files for tonight.")
-                    else:
-                        self.sheriff_target = who
-                        if who in self.Mafia:
-                            self.reply(channel, user, "Your files say that player is a Mafia!")
-                        else:
-                            self.reply(channel, user, "Your files say that player is innocent.")
-                            
-                        if self.check_night_done():
-                            self.day()
+                    self.sheriff_target = who
+                    self.reply(channel, user, "You will check %s tonight, and see your results in the morning." % who)
+                    if self.check_night_done():
+                        self.day()
                             
                             
     def save(self, channel, user, who):
@@ -712,14 +779,52 @@ class Mafia(BasePlugin):
                 self.reply(channel, user, "Tonight, no one will be saved.")
                 if self.check_night_done():
                     self.day()
-
+                    
+    def alter(self, channel, user, who):
+        "Allow an agent to alter files."
+        if self.time != "night":
+            self.reply(channel, user, "Are you an agent?    In any case, it's not nighttime.")
+        else:
+            if self.has_agent == False or user != self.agent:
+                self.reply(channel, user, "Huh?")
+            else:
+                if who not in self.live_players:
+                    self.reply(channel, user, "That player either doesn't exist, or is dead.")
+                else:
+                    if self.agent_chosen is not False:
+                        self.reply(channel, user, "You've already chosen a file to alter tonight.")
+                    elif who == user:
+                        self.reply(channel, user, "You can't alter your own file!")
+                    else:
+                        if self.sheriff_files[who]:
+                            self.sheriff_files[who] = False
+                        else:
+                            self.sheriff_files[who] = True
+                        self.agent_chosen = True
+                        self.reply(channel, user, "You have altered the file on %s." % who)
+                        if self.check_night_done():
+                            self.day()
+                            
+    def noalter(self, channel, user):
+        "The agent decides not to alter any files."
+        
+        if self.time != "night":
+            self.reply(channel, user, "Are you an agent?    In any case, it's not nighttime.")
+        else:
+            if self.has_agent == False or user != self.agent:
+                self.reply(channel, user, "Huh?")
+            else:
+                self.agent_chosen = True
+                self.reply(channel, user, "Tonight, no files will be altered.")
+                if self.check_night_done():
+                    self.day()
 
     def kill(self, channel, user, who):
         "Allow a Mafia to express intent to 'kill' somebody."
         if self.time != "night":
             self.reply(channel, user, "Are you a Mafia?    In any case, it's not nighttime.")
             return
-        if user not in self.Mafia:
+        if user not in self.VotingMafia:
             self.reply(channel, user, "Huh?")
             return
         if who not in self.live_players and who != self.NOKILL:
@@ -728,10 +833,13 @@ class Mafia(BasePlugin):
         if len(self.Mafia) > 1:
             # Multiple Mafia are alive:
             self.mafia_votes[user] = who
-            self.reply(channel, user, "Your vote is acknowledged.")
+            if who != self.NOKILL:
+                self.notify_mafia("%s has voted to kill %s." % (user, who))
+            else:
+                self.notify_mafia("%s has voted not to kill tonight." % user)
 
             # If all Mafia have voted, look for agreement:
-            if len(self.mafia_votes) == len(self.Mafia):
+            if len(self.mafia_votes) == len(self.VotingMafia):
                 for killee in self.mafia_votes.values():
                     if who != killee:
                         break
@@ -774,6 +882,8 @@ class Mafia(BasePlugin):
                 id = "the \x034sheriff\x0f!"
             elif player == self.doctor:
                 id = "the \x034doctor\x0f!"
+            elif player == self.agent:
+                id = "the \x034agent\x0f!"
             else:
                 id = "a normal citizen."
 
@@ -786,6 +896,9 @@ class Mafia(BasePlugin):
             
             if player in self.Mafia:
                 self.Mafia.remove(player)
+                
+            if player in self.VotingMafia:
+                self.VotingMafia.remove(player)
                 
             if self.check_game_over():
                 return 1
@@ -1047,9 +1160,9 @@ class Mafia(BasePlugin):
 
     def cmd_check(self, args, channel, user):
         if len(args) == 1:
-            viewee = self.match_name(args[0].strip())
-            if viewee is not None:
-                self.check(channel, user, viewee.strip())
+            checkee = self.match_name(args[0].strip())
+            if checkee is not None:
+                self.check(channel, user, checkee.strip())
                 return
         self.reply(channel, user, "Check whom?")
         
@@ -1064,7 +1177,19 @@ class Mafia(BasePlugin):
     def cmd_nosave(self, args, channel, user):
         self.nosave(channel, user)
         return
-
+        
+    def cmd_alter(self, args, channel, user):
+        if len(args) == 1:
+            alteree = self.match_name(args[0].strip())
+            if alteree is not None:
+                self.alter(channel, user, alteree.strip())
+                return
+        self.reply(channel, user, "Alter what?")
+        
+    def cmd_noalter(self, args, channel, user):
+        self.noalter(channel, user)
+        return
+        
     def cmd_kill(self, args, channel, user):
         if len(args) == 1:
             killee = self.match_name(args[0].strip())
