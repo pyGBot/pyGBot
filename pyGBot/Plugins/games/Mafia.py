@@ -271,6 +271,7 @@ class Mafia(BasePlugin):
             self.bot.pubout(channel, "Game start is now open to anyone. Type !start to start the game.")
 
     def timer_tick(self):
+        self.check_game_control()
         if self.time is None:
             pass
         elif self.time == "night":
@@ -328,11 +329,10 @@ class Mafia(BasePlugin):
         
 
     GAME_STARTER_TIMEOUT_MINS = 4
-    def check_game_control(self, u, e):
+    def check_game_control(self, nick=None):
         "Implement a timeout for game controller."
         if self.game_starter is None:
             return
-        nick = u
         if self.game_starter == nick:
             self.game_starter_last_checkn = time.time()
         else:
@@ -345,11 +345,11 @@ class Mafia(BasePlugin):
                 self.game_starter = None
 
     def msg_private(self, user, message):
-        self.check_game_control(user, message)
+        self.check_game_control(user)
         self.do_command(user, user, message)
 
     def msg_channel(self, channel, user, message):
-        self.check_game_control(user, message)
+        self.check_game_control(user)
         a = string.split(message, ":", 1)
         if len(a) > 1 and a[0].lower() == self.bot.nickname.lower():
             self.do_command(channel, user, string.strip(a[1]))
