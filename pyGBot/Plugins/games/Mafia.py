@@ -347,6 +347,10 @@ class Mafia(BasePlugin):
     def msg_private(self, user, message):
         self.check_game_control(user)
         self.do_command(user, user, message)
+        
+    def msg_notice(self, user, message):
+        self.check_game_control(user)
+        self.do_command(user, user, message)
 
     def msg_channel(self, channel, user, message):
         self.check_game_control(user)
