@@ -876,9 +876,7 @@ class Mafia(BasePlugin):
             self.dead_players.append(player)
             self.fix_modes()
 
-            if player == self.agent:
-                id = "a \x034mafia\x0f, but also the \x034agent\x0f!"
-            elif player in self.Mafia:
+            if player in self.Mafia:
                 id = "a \x034mafia\x0f!"
             elif player == self.sheriff:
                 id = "the \x034sheriff\x0f!"
