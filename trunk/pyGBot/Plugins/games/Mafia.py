@@ -685,13 +685,14 @@ class Mafia(BasePlugin):
         self.time = "day"
             
         # Sheriff gets their report.
-        if self.has_sheriff and self.sheriff in self.live_players and self.sheriff != self.mafia_target:
-            if self.sheriff_target == self.agent:
-                self.bot.noteout(self.sheriff, "Your files say that %s is the Agent!" % self.sheriff_target)
-            elif self.sheriff_files[self.sheriff_target]:
-                self.bot.noteout(self.sheriff, "Your files say that %s is a Mafia!" % self.sheriff_target)
-            else:
-                self.bot.noteout(self.sheriff, "Your files say that %s is innocent." % self.sheriff_target)
+        if self.has_sheriff and self.sheriff in self.live_players:
+            if self.sheriff != self.mafia_target or (self.sheriff == self.mafia_target and self.sheriff == self.doctor_target):
+                if self.sheriff_target == self.agent:
+                    self.bot.noteout(self.sheriff, "Your files say that %s is the Agent!" % self.sheriff_target)
+                elif self.sheriff_files[self.sheriff_target]:
+                    self.bot.noteout(self.sheriff, "Your files say that %s is a Mafia!" % self.sheriff_target)
+                else:
+                    self.bot.noteout(self.sheriff, "Your files say that %s is innocent." % self.sheriff_target)
 
         # Discover the dead mafia victim.
         message = "\x034Day\x0f Breaks!    Sunlight pierces the sky. "
