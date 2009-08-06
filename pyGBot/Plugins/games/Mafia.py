@@ -245,7 +245,7 @@ class Mafia(BasePlugin):
                     self.bot.noteout(self.sheriff, "Due to %s's unexpected erasure from reality, you may Check once again this night." % nick)
                     self.sheriff_target = None
                     self.sheriff_chosen = False
-            if self.has_agent and self.agent_chosen:
+            if self.has_agent and self.agent_chosen and nick == self.agent_target:
                 self.bot.noteout(self.agent, "Due to %s's unexpected erasure from reality, you may Alter once again this night." % nick)
                 self.agent_chosen = False
             if nick == self.mafia_target:
@@ -347,10 +347,6 @@ class Mafia(BasePlugin):
     def msg_private(self, user, message):
         self.check_game_control(user)
         self.do_command(user, user, message)
-        
-    def msg_notice(self, user, message):
-        self.check_game_control(user)
-        self.do_command(user, user, message)
 
     def msg_channel(self, channel, user, message):
         self.check_game_control(user)
@@ -388,6 +384,7 @@ class Mafia(BasePlugin):
         self.sheriff_chosen = False
         self.doctor_target = None
         self.doctor_chosen = False
+        self.agent_target = None
         self.agent_chosen = False
         self.mafia_target = None
         self.mafia_votes = {}
@@ -716,6 +713,7 @@ class Mafia(BasePlugin):
             self.mafia_target = None
             self.mafia_votes = {}
             self.agent_chosen = False
+            self.agent_target = None
 
             # Give daytime instructions.
             self.print_alive()
@@ -801,6 +799,7 @@ class Mafia(BasePlugin):
                     else:
                         self.sheriff_files[who] = not self.sheriff_files[who]
                         self.agent_chosen = True
+                        self.agent_target = who
                         self.reply(channel, user, "You have altered the file on %s." % who)
                         if self.check_night_done():
                             self.day()
