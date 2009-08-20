@@ -325,10 +325,16 @@ class Mafia(BasePlugin):
                     self.day()
             pass
         elif self.time == "day":
-            pass
-        
+            if self.daytimeout != 0:
+                self.timer += 1
+                if self.timer == self.daytimeout * 60 - 60:
+                    self.bot.pubout(self.channel, "There is only one minute remaining before nightfall.")
+                if self.timer >= self.daytimeout * 60:
+                    self.bot.pubout(self.channel, "The town was not able to decide who to lynch.")
+                    self.night()
 
-    GAME_STARTER_TIMEOUT_MINS = 4
+
+    GAME_STARTER_TIMEOUT_MINS = 5
     def check_game_control(self, nick=None):
         "Implement a timeout for game controller."
         if self.game_starter is None:
@@ -389,6 +395,8 @@ class Mafia(BasePlugin):
         self.mafia_target = None
         self.mafia_votes = {}
         self.timer = 0
+        self.nighttimeout = 120
+        self.daytimeout = 0
         # Day round variables
         self.citizen_votes = {}
         self.tally = {}
@@ -684,6 +692,10 @@ class Mafia(BasePlugin):
         channel = self.channel
 
         self.time = "day"
+        
+        #Reset timer.
+        
+        self.timer = 0
             
         # Sheriff gets their report.
         if self.has_sheriff and self.sheriff in self.live_players:
@@ -1050,8 +1062,6 @@ class Mafia(BasePlugin):
             else:
                 self.reply(channel, user, "You don't have a lynch vote registered.")
 
-        
-
 #Broken anyway.
 #    def cmd_setup(self, args, channel, user):
 #        if len(args) > 0:
@@ -1073,6 +1083,27 @@ class Mafia(BasePlugin):
                 elif args[0].lower() == 'off':
                     self.anon_voting = False
         self.bot.pubout(self.channel, "Anonymous voting is %s" % ("on" if self.anon_voting else "off"))
+        
+    def cmd_timer(self, args, channel, user):
+        if len(args) > 0:
+            if self.gamestate == self.GAMESTATE_RUNNING:
+                self.bot.pubout(self.channel, "You cannot change the day timer while a game is in progress.")
+            elif self.gamestate == self.GAMESTATE_STARTING and self.game_starter != None and user != self.game_starter:
+                self.bot.pubout(self.channel, "A game is starting. Only game starter %s can change day timer." % self.game_starter)
+            else:
+                try: 
+                    newtimeout = self.daytimeout = int(args[0])
+                    if newtimeout >= 0 and newtimeout <= 120:
+                        if newtimeout != 0:
+                            self.bot.pubout(self.channel, "Day timer is now set to %i minutes." % newtimeout)
+                        else:
+                            self.bot.pubout(self.channel, "Day timer is now off.")
+                    else:
+                        self.bot.pubout(self.channel, "%s: Please enter a value between 0 and 120 minutes." % user)
+                except ValueError:
+                    self.bot.pubout(self.channel, "%s: Invalid day timer value. Please enter an integer for day timer in minutes." % user)
+        else:
+            self.bot.pubout(self.channel, "Day timer is %s" % ("%i minutes." % self.daytimeout if self.daytimeout else "off."))
 
     def cmd_opmode(self, args, channel, user):
         get_userlevel = self.bot.plugins['system.Auth'].get_userlevel
@@ -1100,7 +1131,10 @@ class Mafia(BasePlugin):
                 self.tally_votes()
                 self.print_tally()
             if self.time == "night":
-                self.bot.pubout(channel, "There are about %d seconds left before dawn." % int(round(self.nighttimeout - self.timer, -1)))
+                self.bot.pubout(self.channel, "There are about %d seconds left before dawn." % int(round(self.nighttimeout - self.timer, -1)))
+            if self.time == "day":
+                if self.daytimeout != 0:
+                    self.bot.pubout(self.channel, "There are about %d seconds left before nightfall." % int(round(self.daytimeout * 60 - self.timer, -1)))
         elif self.gamestate == self.GAMESTATE_STARTING:
             self.reply(channel, user, "A new game is starting. Currently %d players: %s"
                     % (len(self.live_players),self.live_players,))
