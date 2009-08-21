@@ -1,0 +1,33 @@
+Dealer commands:
+----------------
+ 
+join - Attempt to join the next tournament.
+quit - Quit immediately.  Any money you've put into the pot stays there.
+
+blind <amount> - Set the size of the small blind.
+double <interval> [hands] - Set time interval (seconds) for doubling the blinds.  Optional 'hands' argument changes interval to the number of hands.
+bankroll <amount> - Set the size of the initial bankroll for all players.
+start - Start the tournament.  There must be 2-23 players joined.
+abort - Abort the tournament.  Players will remain joined.
+ 
+check - Get a warning if there's a bet to you.
+color - Toggle colored cards.  This will break some GUIs.
+autofold - Toggle fold behavior.  Either fold immediately or check when there's no bet.   Fold means fold by default.
+fold - Fold at your earliest opportunity.
+jam - Go all in.
+pot - Call and raise the value of the pot.
+call [amount] - Call any bet if you don't specify amount.
+make <amount> - Make the bet <amount>.  Will call or raise depending on amount.
+raise <amount> - Attempt to raise <amount>.
+undo - Undo any advance action.        
+ 
+vacation [nick] - Without an argument, send yourself on vacation.  Otherwise, send nick on vacation.
+back - come back from vacation.  You can only bring yourself back.
+remind <nick> - Remind nick that it's their turn to act.
+ 
+cards - Look at your hole cards.
+hand - Same as 'cards'.
+board - Look at the board.
+status - Print WRGPT-style status message.
+ 
+commands - List of dealer commands (*this* list!)
