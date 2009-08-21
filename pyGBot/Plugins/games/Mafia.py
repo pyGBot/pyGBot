@@ -105,13 +105,13 @@ night_game_texts = \
 # Printed when Mafia and citizen get nighttime instructions:
 
 night_sheriff_texts = \
-["At night, you have the ability to check whether a certain person\
+["Every night, you have the ability to check whether a certain person\
   is or is not a Mafia. You must use this power now: please type 'check <nickname>' (as a\
  private message to me) to learn about one living player's true\
  identity."]
  
 night_doctor_texts = \
-["At night, you have the ability to attempt to save someone's life\
+["Every night, you have the ability to attempt to save someone's life\
   if they are chosen by the Mafia. You do not need to use this power now: type 'save <nickname>' (as\
   a private message to me) to attempt to save them, or 'nosave' to\
   not attempt it this night."]
@@ -258,9 +258,9 @@ class Mafia(BasePlugin):
                 for k, v in map_.items():
                     if v == nick:
                         del map_[k]
-            self.check_game_over()
-            if self.check_night_done():
-                self.day()
+            if not self.check_game_over():
+                if self.check_night_done():
+                    self.day()
 
         if nick in self.spectators:
             self.spectators.remove(nick)
@@ -311,7 +311,7 @@ class Mafia(BasePlugin):
                         while self.sheriff_target == None or self.sheriff_target == self.sheriff:
                             self.sheriff_target = random.choice(self.live_players)
                         self.sheriff_chosen = True
-                        self.bot.noteout(self.sheriff, "Because the sheriff took too long to decide, the player %s was randomly selected for checking this night." % target)
+                        self.bot.noteout(self.sheriff, "Because the sheriff took too long to decide, the player %s was randomly selected for checking this night." % self.sheriff_target)
                 if self.has_agent and self.agent in self.live_players:
                     if not self.agent_chosen:
                         target = None
@@ -320,9 +320,9 @@ class Mafia(BasePlugin):
                         self.sheriff_files[target] = not self.sheriff_files[target]
                         self.agent_chosen = True
                         self.bot.noteout(self.agent, "Because the agent took too long to decide, the player %s was randomly selected for file-altering this night." % target)
-                self.check_game_over()
-                if self.check_night_done():
-                    self.day()
+                if not self.check_game_over():
+                    if self.check_night_done():
+                        self.day()
             pass
         elif self.time == "day":
             if self.daytimeout != 0:
