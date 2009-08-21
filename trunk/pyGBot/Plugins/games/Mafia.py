@@ -1249,11 +1249,11 @@ class Mafia(BasePlugin):
     def cmd_join(self, args, channel, user):
         if self.gamestate == self.GAMESTATE_NONE:
             self.reply(channel, user, 'No game is running, perhaps you would like to start one?')
-            return
-        if self.gamestate == self.GAMESTATE_RUNNING:
+        elif self.gamestate == self.GAMESTATE_RUNNING:
             self.reply(channel, user, 'Game is in progress; please wait for the next game.')
-            return
-        if user in self.live_players:
+        elif channel == user:
+            self.reply(channel, user, 'Please type !join in the public channel to join the game.')
+        elif user in self.live_players:
             self.reply(channel, user, 'You were already in the game!')
         elif user in self.spectators:
             self.reply(channel, user, 'You are currently spectating! Please quit first.')
