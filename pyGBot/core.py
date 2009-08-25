@@ -242,6 +242,7 @@ class GBot(irc.IRCClient):
         """Called when bot has succesfully signed on to server.
         """
         self.join(self.factory.channel)
+        self.regNickServ()
 
     def regNickServ(self):
         if hasattr(self, 'opernick') and hasattr(self, 'operpass'):
