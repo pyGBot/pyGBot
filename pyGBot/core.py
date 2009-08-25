@@ -57,6 +57,11 @@ class GBot(irc.IRCClient):
 
         # strip color codes
         log.chatlog.info('[NTE->%s]%s' % (user, stripcolors(msg)))
+        
+    def invite(self, user, channel):
+        self.sendLine("INVITE %s %s" % (user, channel))
+        
+        log.chatlog.info('[INVITE->%s] %s' % (user, channel))
 
     def actout(self,channel, msg):
         self.me(channel=channel, action=msg)
