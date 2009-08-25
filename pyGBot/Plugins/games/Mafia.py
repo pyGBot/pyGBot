@@ -41,7 +41,7 @@ The main commands are:
 
 """
 
-import sys, string, random, time
+import sys, string, random, time, re, itertools
 
 from pyGBot import log
 from pyGBot.BasePlugin import BasePlugin
@@ -70,7 +70,9 @@ new_game_texts = \
 
  "One of you is also a 'sheriff'; you have the ability to learn whether a specific person is or is not in the Mafia.",
  
- "And another is the 'doctor'; you have the ability to save someone's life, if you pick the player who is chosen by the Mafia.",
+ "Another is the 'detective; you have the ability to see roles upon player deaths."
+ 
+ "And yet another is the 'doctor'; you have the ability to save someone's life, if you pick the player who is chosen by the Mafia.",
  
  "One of the Mafia may also be an 'agent'; they have the ability to alter the Sheriff's files at night.",
 
@@ -148,6 +150,7 @@ class Mafia(BasePlugin):
         BasePlugin.__init__(self, bot, options)
         self.output = True
         self.moderation = True
+        self.timer = 0
         if self.bot.plugins.has_key("system.Modes"):
             self.modeplugin = self.bot.plugins["system.Modes"]
         else:
@@ -157,6 +160,8 @@ class Mafia(BasePlugin):
         if channel == None:
             return False
         self.channel = channel
+        self.dchatchannel = channel + "-dchat"
+        self.bot.join(self.dchatchannel)
         self._reset_gamedata()
         self.c9_setup = False
         self.anon_voting = True
@@ -196,6 +201,9 @@ class Mafia(BasePlugin):
             if username in self.live_players:
                 if self.gamestate == self.GAMESTATE_RUNNING:
                     self.fix_modes()
+        if channel == self.dchatchannel:
+            if username not in self.dead_players and username not in self.spectators:
+                self.bot.kick(self.dchatchannel, username, "You aren't supposed to be here.")
         pass
         
     def user_kicked(self, channel, username, kicker, message=""):
@@ -265,6 +273,7 @@ class Mafia(BasePlugin):
         if nick in self.spectators:
             self.spectators.remove(nick)
             self.reply(channel, nick, "You are no longer spectating.")
+            self.bot.kick(self.dchatchannel, nick, "You are no longer spectating.")
         
         if nick == self.game_starter:
             self.game_starter = None
@@ -394,7 +403,6 @@ class Mafia(BasePlugin):
         self.agent_chosen = False
         self.mafia_target = None
         self.mafia_votes = {}
-        self.timer = 0
         self.nighttimeout = 120
         self.daytimeout = 0
         # Day round variables
@@ -555,6 +563,8 @@ class Mafia(BasePlugin):
 
             self.gamestate = self.GAMESTATE_NONE
             self.fix_modes()
+            for players in self.dead_players + self.spectators:
+                self.bot.kick(self.dchatchannel, players, "The game is now over.")
             self._reset_gamedata()
 
 
@@ -913,7 +923,8 @@ class Mafia(BasePlugin):
                 return 1
             else:
                 self.bot.pubout(channel, ("(%s is now dead, and should stay quiet.)") % player)
-                self.bot.noteout(player, "You are now \x034dead\x0f. You may observe the game, but please stay quiet until the game is over. However, you may converse with other dead players using the \x034'dchat'\x0f command.")
+                self.bot.noteout(player, "You are now \x034dead\x0f. You may observe the game, but please stay quiet until the game is over. However, you may converse with other dead players in the %s channel." % self.dchatchannel)
+                self.bot.invite(player, self.dchatchannel)
                 return 0
 
 
@@ -1263,21 +1274,31 @@ class Mafia(BasePlugin):
 
     def cmd_mchat(self, args, channel, user):
         if user in self.Mafia:
-            for mafioso in self.Mafia:
-                if user != mafioso:
-                    self.bot.noteout(mafioso, "Mafia - <%s> %s" % (user, " ".join(args)))
-                else:
-                    self.bot.noteout(mafioso, "Mafia - You: %s" % (" ".join (args)))
+            if self.time == "night":
+                for mafioso in self.Mafia:
+                    if user != mafioso:
+                        self.bot.noteout(mafioso, "Mafia - <%s> %s" % (user, " ".join(args)))
+                    else:
+                        self.bot.noteout(mafioso, "Mafia - You: %s" % (" ".join (args)))
+            else:
+                self.bot.noteout(user, "You can't use mchat during the day.")
         else:
             self.bot.noteout(user, "You are not a Mafia!")
                 
-    def cmd_dchat(self, args, channel, user):
+    """def cmd_dchat(self, args, channel, user):
         if user in (self.dead_players + self.spectators):
             for ghosts in (self.dead_players + self.spectators):
                 if user != ghosts:
                     self.bot.noteout(ghosts, "Graveyard - <%s> %s" % (user, " ".join(args)))
                 else:
-                    self.bot.noteout(ghosts, "Graveyard - You: %s" % (" ".join(args)))
+                    self.bot.noteout(ghosts, "Graveyard - You: %s" % (" ".join(args)))"""
+                    
+    def cmd_dchat(self, args, channel, user):
+        if user in self.dead_players or user in self.spectators:
+            self.bot.invite(user, self.dchatchannel)
+            self.reply(channel, user, "You have been invited to %s." % self.dchatchannel)
+        else:
+            self.reply(channel, user, "You are not dead or spectating!")
                     
 #    def cmd_pchat(self, args, channel, user):
 #        if user in self.police:
@@ -1329,7 +1350,8 @@ class Mafia(BasePlugin):
             if user not in self.live_players and user not in self.dead_players:
                 if user not in self.spectators:
                     self.spectators.append(user)
-                    self.reply(channel, user, "You are now spectating the game.")
+                    self.reply(channel, user, "You are now spectating the game. Feel free to join %s." % self.dchatchannel)
+                    self.bot.invite(user, self.dchatchannel)
                 else:
                     self.reply(channel, user, "You were already spectating!")
             else:
@@ -1348,11 +1370,55 @@ class Mafia(BasePlugin):
                     id = "the \x034sheriff\x0f."
                 elif user == self.doctor:
                     id = "the \x034doctor\x0f."
+                elif user == self.detective:
+                    id = "the \x034detective\x0f."
                 else:
                     id = "a normal citizen."
                 self.bot.noteout(user,"You are %s" % id)
             else:
                 self.reply(channel, user, "You are not playing.")
+        else:
+            self.reply(channel, user, "There is no game in progress.")
+            
+    def cmd_whisper(self, args, channel, user):
+        if self.gamestate == self.GAMESTATE_RUNNING:
+            if self.time == "day":
+                args[0] = self.match_name(args[0])
+                if args[0] in self.live_players and user in self.live_players:
+                    if args[0] != user:
+                        caps = re.compile("[A-Z]")
+                        message = " ".join(args[1:])
+                        whisperchance = 5
+                        if message.find("!") != -1:
+                            whisperchance = whisperchance * 2
+                        whisperchance += len(caps.findall(message))
+                        self.reply(args[0], args[0], "<%s> %s" % (user, message))
+                        self.reply(user, user, "You whisper to %s: %s" % (args[0], message))
+                        chance = random.randint(1, 100)
+                        if chance < whisperchance:
+                            chance2 = random.randint(1, 100)
+                            if chance2 < 50:
+                                self.bot.pubout(self.channel, "<%s> whispers: %s" % (user, message))
+                            else:
+                                self.bot.pubout(self.channel, "<%s> whispers to <%s>: %s" % (user, args[0], message))
+                        elif chance < whisperchance * 3:
+                            message = args[1:]
+                            for words in range(len(message)):
+                                blankchance = random.randint(1, 100)
+                                if blankchance > 50:
+                                    message[words] = "..."
+                            message = " ".join(x for x, group in itertools.groupby(message))
+                            chance2 = random.randint(1, 100)
+                            if chance2 < 50:
+                                self.bot.pubout(self.channel, "<%s> whispers: %s" % (user, message))
+                            else:
+                                self.bot.pubout(self.channel, "<%s> whispers to <%s>: %s" % (user, args[0], message))
+                    else:
+                        self.reply(channel, user, "You can't whisper to yourself!")
+                else:
+                    self.reply(channel, user, "That player does not exist, or you are not in the game.")
+            else:
+                self.reply(channel, user, "You can only whisper during the day.")
         else:
             self.reply(channel, user, "There is no game in progress.")
 
