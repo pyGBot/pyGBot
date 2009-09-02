@@ -480,10 +480,6 @@ class Mafia(BasePlugin):
                 else:
                     self.bot.pubout(channel, "There are %d Mafia." % len(self.Mafia))
                     
-                # Set night timer to two and a half minutes plus one minute for each Mafia.
-                # This seems to be a fairly optimum time.
-                self.nighttimeout = 150 + (60 * len(self.Mafia))
-
                 self.originalMafia = self.Mafia[:]
                 
                 # Pick a mafia to be agent, if more than 2
@@ -658,7 +654,11 @@ class Mafia(BasePlugin):
 
         #chname, chobj = self.channels.items()[0]
         channel = self.channel
-        
+
+        # Set night timer to two and a half minutes plus one minute for each Mafia.
+        # This seems to be a fairly optimum time.
+        self.nighttimeout = 150 + (20 * len(self.live_players))
+ 
         self.time = "night"
         
         #Reset timer.
