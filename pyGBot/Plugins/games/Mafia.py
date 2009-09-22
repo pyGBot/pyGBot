@@ -169,7 +169,7 @@ class Mafia(BasePlugin):
 
     def user_nickchange(self, old, new):
         for list_ in (self.live_players, self.dead_players, self.Mafia,
-                self.citizens, self.originalMafia):
+                self.citizens, self.originalMafia, self.VotingMafia):
             if old in list_:
                 list_.append(new)
                 list_.remove(old)
@@ -676,22 +676,28 @@ class Mafia(BasePlugin):
         for text in night_game_texts:
             self.bot.pubout(channel, text)
 
+        nighttextrandomqueue = []
+
         # Give private instructions to Mafia and sheriff and doctor.
+        if len(self.Mafia) >= 2:
+            self.notify_mafia("The Mafia that can vote are %s. The Agent is %s. You can confer with them privately using the 'mchat' command." % (", ".join(self.VotingMafia), self.agent))
         if self.has_sheriff and self.sheriff in self.live_players:
             for text in night_sheriff_texts:
-                self.bot.noteout(self.sheriff, text)
+                #self.bot.noteout(self.sheriff, text)
+                nighttextrandomqueue.append([self.sherrif, text])
         if self.has_doctor and self.doctor in self.live_players:
             for text in night_doctor_texts:
-                self.bot.noteout(self.doctor, text)
+                #self.bot.noteout(self.doctor, text)
+                nighttextrandomqueue.append([self.doctor, text])
         if self.has_agent and self.agent in self.live_players:
             for text in night_agent_texts:
-                self.bot.noteout(self.agent, text)
+                #self.bot.noteout(self.agent, text)
+                nighttextrandomqueue.append([self.agent, text])
         for text in night_Mafia_texts:
-            self.notify_votingmafia(text)
-        if len(self.Mafia) >= 2:
-            self.notify_mafia("The Mafia that can vote are %s. The Agent is %s. You can confer with them privately using the 'mchat' command."
-                                                % (", ".join(self.VotingMafia), self.agent))
-
+            for mafia in self.Mafia:
+                #self.bot.noteout(mafia, msg)
+                nighttextrandomqueue.append([mafia, text])
+        
         # ... bot is now in 'night' mode;    goes back to doing nothing but
         # waiting for commands.
 
@@ -1103,12 +1109,14 @@ class Mafia(BasePlugin):
                 self.bot.pubout(self.channel, "A game is starting. Only game starter %s can change day timer." % self.game_starter)
             else:
                 try: 
-                    newtimeout = self.daytimeout = int(args[0])
+                    newtimeout = int(args[0])
                     if newtimeout >= 0 and newtimeout <= 120:
                         if newtimeout != 0:
                             self.bot.pubout(self.channel, "Day timer is now set to %i minutes." % newtimeout)
+                            self.daytimeout = newtimeout
                         else:
                             self.bot.pubout(self.channel, "Day timer is now off.")
+                            self.daytimeout = 0
                     else:
                         self.bot.pubout(self.channel, "%s: Please enter a value between 0 and 120 minutes." % user)
                 except ValueError:
