@@ -207,7 +207,7 @@ class Mafia(BasePlugin):
         pass
         
     def user_kicked(self, channel, username, kicker, message=""):
-        self._removeUser(username)
+        pass
 
     def notify_mafia(self, msg):
         for mafia in self.Mafia:
@@ -218,14 +218,13 @@ class Mafia(BasePlugin):
             self.bot.noteout(mafia, msg)
 
     def _removeUser(self, nick):
-
         channel = self.channel
 
         if nick in self.live_players:
             self.bot.pubout(channel, "%s disappeared in some sort of strange wormhole." % nick)
             self.live_players.remove(nick)
             if self.gamestate == self.GAMESTATE_STARTING:
-                # Check if 
+                # Check if game is empty
                 if len(self.live_players) == 0:
                     self.bot.pubout(channel, "There are no more users in this game. Ending.")
                     self.end_game(self.game_starter)
@@ -310,13 +309,13 @@ class Mafia(BasePlugin):
                                 self.mafia_target = None
                         self.notify_mafia("Because the Mafia took too long to decide, the player %s was randomly selected for killing this night." % self.mafia_target)
                 if self.has_doctor and self.doctor in self.live_players:
-                    if self.doctor_target == None:
+                    if self.doctor_chosen == False:
                         while self.doctor_target == None or self.doctor_target == self.doctor:
                             self.doctor_target = random.choice(self.live_players)
                         self.doctor_chosen = True
                         self.bot.noteout(self.doctor, "Because the doctor took too long to decide, the player %s was randomly selected for saving this night." % self.doctor_target)
                 if self.has_sheriff and self.sheriff in self.live_players:
-                    if self.sheriff_target == None:
+                    if self.sheriff_chosen == False:
                         while self.sheriff_target == None or self.sheriff_target == self.sheriff:
                             self.sheriff_target = random.choice(self.live_players)
                         self.sheriff_chosen = True
@@ -455,7 +454,6 @@ class Mafia(BasePlugin):
                                                 "at least %d active players."%(minUsers))
                 self.bot.pubout(channel, ("I count only %d active players right now: %s."
                     % (len(self.live_players), self.live_players)))
-
             else:
                 # Randomly select Mafia and a sheriff and a doctor. Everyone else is a citizen.
                 users = self.live_players[:]
@@ -684,7 +682,7 @@ class Mafia(BasePlugin):
         if self.has_sheriff and self.sheriff in self.live_players:
             for text in night_sheriff_texts:
                 #self.bot.noteout(self.sheriff, text)
-                nighttextrandomqueue.append([self.sherrif, text])
+                nighttextrandomqueue.append([self.sheriff, text])
         if self.has_doctor and self.doctor in self.live_players:
             for text in night_doctor_texts:
                 #self.bot.noteout(self.doctor, text)
@@ -697,6 +695,13 @@ class Mafia(BasePlugin):
             for mafia in self.Mafia:
                 #self.bot.noteout(mafia, msg)
                 nighttextrandomqueue.append([mafia, text])
+        for player in self.live_players:
+            if player != self.sheriff and player != self.doctor and player != self.agent and player not in self.Mafia:
+                nighttextrandomqueue.append([player, "You cannot do anything during the night. Please wait patiently while the other roles make their decisions."])
+                
+        random.shuffle(nighttextrandomqueue)
+        for messages in nighttextrandomqueue:
+            self.reply(messages[0], messages[0], messages[1])
         
         # ... bot is now in 'night' mode;    goes back to doing nothing but
         # waiting for commands.
@@ -759,7 +764,7 @@ class Mafia(BasePlugin):
         if self.time != "night":
             self.reply(channel, user, "Are you a sheriff?    In any case, it's not nighttime.")
         else:
-            if self.has_sheriff == False or user  != self.sheriff:
+            if self.has_sheriff == False or user != self.sheriff:
                 self.reply(channel, user, "Huh?")
             else:
                 if who not in self.live_players:
@@ -769,7 +774,6 @@ class Mafia(BasePlugin):
                     self.reply(channel, user, "You will check %s tonight, and see your results in the morning." % who)
                     if self.check_night_done():
                         self.day()
-                            
                             
     def save(self, channel, user, who):
         "Allow a doctor to 'save' somebody."
@@ -783,9 +787,7 @@ class Mafia(BasePlugin):
                 if who not in self.live_players:
                     self.reply(channel, user, "That player either doesn't exist, or is dead.")
                 else:
-                    if self.doctor_chosen is not False:
-                        self.reply(channel, user, "You've already chosen someone to save tonight.")
-                    elif who == user:
+                    if who == user:
                         self.reply(channel, user, "You can't save yourself!")
                     else:
                         self.doctor_target = who
@@ -793,7 +795,7 @@ class Mafia(BasePlugin):
                         self.reply(channel, user, "Tonight, you will attempt to save the player %s." % who)
                         if self.check_night_done():
                             self.day()
-                            
+
     def nosave(self, channel, user):
         "The doctor decides not to save anyone."
         
@@ -841,8 +843,11 @@ class Mafia(BasePlugin):
             if self.has_agent == False or user != self.agent:
                 self.reply(channel, user, "Huh?")
             else:
-                self.agent_chosen = True
-                self.reply(channel, user, "Tonight, no files will be altered.")
+                if self.agent_chosen is not False:
+                    self.reply(channel, user, "You've already chosen a file to alter tonight.")
+                else:
+                    self.agent_chosen = True
+                    self.reply(channel, user, "Tonight, no files will be altered.")
                 if self.check_night_done():
                     self.day()
 
