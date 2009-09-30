@@ -692,7 +692,7 @@ class Mafia(BasePlugin):
                 #self.bot.noteout(self.agent, text)
                 nighttextrandomqueue.append([self.agent, text])
         for text in night_Mafia_texts:
-            for mafia in self.Mafia:
+            for mafia in self.VotingMafia:
                 #self.bot.noteout(mafia, msg)
                 nighttextrandomqueue.append([mafia, text])
         for player in self.live_players:
