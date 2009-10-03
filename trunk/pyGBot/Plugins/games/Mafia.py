@@ -618,7 +618,7 @@ class Mafia(BasePlugin):
         if self.has_sheriff == False or self.sheriff not in self.live_players:
             sheriff_done = 1
         else:
-            if self.sheriff_target is None:
+            if self.sheriff_chosen is False:
                 sheriff_done = 0
             else:
                 sheriff_done = 1
@@ -762,7 +762,7 @@ class Mafia(BasePlugin):
         "Allow a sheriff to 'check' somebody."
 
         if self.time != "night":
-            self.reply(channel, user, "Are you a sheriff?    In any case, it's not nighttime.")
+            self.reply(channel, user, "Are you a sheriff? In any case, it's not nighttime.")
         else:
             if self.has_sheriff == False or user != self.sheriff:
                 self.reply(channel, user, "Huh?")
@@ -772,6 +772,7 @@ class Mafia(BasePlugin):
                 else:
                     self.sheriff_target = who
                     self.reply(channel, user, "You will check %s tonight, and see your results in the morning." % who)
+                    self.sheriff_chosen = True
                     if self.check_night_done():
                         self.day()
                             
@@ -779,7 +780,7 @@ class Mafia(BasePlugin):
         "Allow a doctor to 'save' somebody."
 
         if self.time != "night":
-            self.reply(channel, user, "Are you a doctor?    In any case, it's not nighttime.")
+            self.reply(channel, user, "Are you a doctor? In any case, it's not nighttime.")
         else:
             if self.has_doctor == False or user != self.doctor:
                 self.reply(channel, user, "Huh?")
