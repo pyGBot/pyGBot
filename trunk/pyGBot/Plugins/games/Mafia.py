@@ -741,6 +741,7 @@ class Mafia(BasePlugin):
         if not self.kill_player(self.mafia_target):
             # Clear all the nighttime voting variables:
             self.sheriff_target = None
+            self.sheriff_chosen = False
             self.doctor_target = None
             self.doctor_chosen = False
             self.mafia_target = None
