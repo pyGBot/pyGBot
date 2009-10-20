@@ -38,7 +38,7 @@ from pyGBot import log
 from pyGBot.PluginEvents import PluginEvents
 
 class GBot(irc.IRCClient):
-    ''' An IRC Texas Holdem tournament  dealer'''
+    ''' No longer just an IRC Texas Holdem tournament  dealer'''
 
     def pubout(self, channel, msg):
         self.say(channel=channel, message=msg)
@@ -183,6 +183,11 @@ class GBot(irc.IRCClient):
         if conf['IRC'].has_key('idnick'):
             self.idnick = conf['IRC']['idnick']
 
+        if conf['IRC'].has_key('realname'):
+            self.realname = conf['IRC']['realname']
+        if conf['IRC'].has_key('usermodes'):
+            self.usermodes = conf['IRC']['usermodes']
+
         if conf['IRC'].has_key('opernick'):
             self.opernick = conf['IRC']['opernick']
         if conf['IRC'].has_key('operpass'):
@@ -225,6 +230,8 @@ class GBot(irc.IRCClient):
         irc.IRCClient.connectionMade(self)
         log.logger.info("[connected at %s]" %\
                         time.asctime(time.localtime(time.time())))
+
+        self.modestring(self.nickname, self.usermodes)
 
         self.timertask.start(1.0) # 1-second timer granularity
 
