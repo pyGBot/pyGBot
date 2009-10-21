@@ -332,6 +332,15 @@ class GBot(irc.IRCClient):
         # Call Event Handler
         self.events.msg_action(channel, user, msg)
 
+    def topicUpdated(self, user, channel, newTopic):
+        """This will get called when the bot sees the channel topic change.
+        """
+        user = user.split('!', 1)[0]
+        log.chatlog.info('Topic for %s set by %s: %s' % (channel, user, newTopic))
+
+        # Call Event Handler
+        self.events.channel_topic(channel, user, newTopic)
+
     def userJoined(self, user, channel):
         """Called when I see another user joining a channel.
         """

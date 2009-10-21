@@ -28,4 +28,4 @@ class PluginEvents(Events):
     __events__ = ('user_join','user_part','user_kicked','user_quit','user_nickchange',
                   'bot_connect', 'bot_join', 'bot_kicked','bot_disconnect',
                   'msg_channel', 'msg_action', 'msg_private', 'msg_notice',
-                  'channel_names', 'timer_tick')
+                  'channel_names', 'channel_topic', 'timer_tick')
