@@ -373,10 +373,8 @@ class Mafia(BasePlugin):
             self.do_command(channel, user, string.strip(message[1:]))
             
     def channel_topic(self, channel, user, topic):
-        print "%s: Topic updated on channel %s by %s: %s" % (self.bot.nickname, channel, user, topic)
         if channel == self.channel and user != self.bot.nickname:
             self.storedtopic = topic
-            print "Stored topic updated"
 
     def _reset_gamedata(self):
         self.opmode = False
