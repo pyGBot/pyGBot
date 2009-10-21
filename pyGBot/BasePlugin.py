@@ -84,8 +84,13 @@ class BasePlugin:
     def msg_notice(self, user, message):
         pass
 
+    # Event handlers for channel information replies
     def channel_names(self, channel, nameslist):
         pass
 
+    def channel_topic(self, channel, user, topic):
+        pass
+
+    # Other system event handlers
     def timer_tick(self):
         pass
