@@ -467,6 +467,10 @@ class Mafia(BasePlugin):
                 users = self.live_players[:]
                 self.bot.pubout(channel, "A new game has begun! Please wait, assigning roles...")
                 
+                # Moderate the channel, if possible.
+                self.gamestate = self.GAMESTATE_RUNNING
+                self.fix_modes()
+                
                 self.Mafia.append(users.pop(random.randrange(len(users))))
                 if len(self.live_players) >= 6:
                     self.Mafia.append(users.pop(random.randrange(len(users))))
@@ -540,7 +544,6 @@ class Mafia(BasePlugin):
                     self.bot.noteout(citizen, citizen_intro_text)
 
                 self.bot.pubout(channel, "Roles assigned. To learn how to play, say '%s: rules'." % self.bot.nickname)
-                self.gamestate = self.GAMESTATE_RUNNING
 
                 # Start game by putting bot into "night" mode.
                 self.night()
