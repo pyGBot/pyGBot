@@ -706,7 +706,7 @@ class Mafia(BasePlugin):
                 nighttextrandomqueue.append([mafia, text])
         for player in self.live_players:
             if player != self.sheriff and player != self.doctor and player != self.agent and player not in self.Mafia:
-                nighttextrandomqueue.append([player, "Because you are an ordinary citizen, you have no night actions. Sleep soundly..."])
+                nighttextrandomqueue.append([player, "Because you are a role with no night actions, there is nothing you can do at this time. Sleep soundly..."])
                 
         random.shuffle(nighttextrandomqueue)
         for messages in nighttextrandomqueue:
