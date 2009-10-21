@@ -164,7 +164,9 @@ class Mafia(BasePlugin):
         self.bot.join(self.dchatchannel)
         self._reset_gamedata()
         self.c9_setup = False
-        self.anon_voting = True
+        self.anon_voting = False
+        self.storedtopic = ""
+        self.bot.topic(self.channel, None)
         #self.start()
 
     def user_nickchange(self, old, new):
@@ -369,6 +371,12 @@ class Mafia(BasePlugin):
             self.do_command(channel, user, string.strip(a[1]))
         elif message[0]=='!' and (len(message) > 1) and message[1]!='!':
             self.do_command(channel, user, string.strip(message[1:]))
+            
+    def channel_topic(self, channel, user, topic):
+        print "%s: Topic updated on channel %s by %s: %s" % (self.bot.nickname, channel, user, topic)
+        if channel == self.channel and user != self.bot.nickname:
+            self.storedtopic = topic
+            print "Stored topic updated"
 
     def _reset_gamedata(self):
         self.opmode = False
@@ -407,7 +415,6 @@ class Mafia(BasePlugin):
         # Day round variables
         self.citizen_votes = {}
         self.tally = {}
-
 
     def reply(self, channel, user, text):
         "Send TEXT to public channel or as private msg, in reply to event E."
@@ -455,6 +462,9 @@ class Mafia(BasePlugin):
                 self.bot.pubout(channel, ("I count only %d active players right now: %s."
                     % (len(self.live_players), self.live_players)))
             else:
+                # Store the topic and set a "GAME IN PROGRESS" message.
+                self.bot.topic(channel, "~GAME IN PROGRESS~ | " + self.storedtopic)
+            
                 # Randomly select Mafia and a sheriff and a doctor. Everyone else is a citizen.
                 users = self.live_players[:]
                 self.bot.pubout(channel, "A new game has begun! Please wait, assigning roles...")
@@ -559,6 +569,7 @@ class Mafia(BasePlugin):
             self.fix_modes()
             for players in self.dead_players + self.spectators:
                 self.bot.kick(self.dchatchannel, players, "The game is now over.")
+            self.bot.topic(channel, self.storedtopic) # Reset the topic
             self._reset_gamedata()
 
 
@@ -1328,7 +1339,7 @@ class Mafia(BasePlugin):
     def cmd_aboutbot(self, args, channel, user):
         self.reply(channel, user, "This module is heavily modified from a bot written in Python "
                 "using the python-irclib library")
-        self.reply(channel, user, "The source code is available at %s" % svn_url)
+        self.reply(channel, user, "The original source code is available at %s" % svn_url)
        
     def cmd_rules(self, args, channel, user):
         for text in new_game_texts:
