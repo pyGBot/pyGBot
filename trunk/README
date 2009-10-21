@@ -38,9 +38,10 @@ Requirements:
  - Twisted >= 2.0 (including twisted.words)
 
 To run:
-Uncompress, go to src/ and modify the values in pyGBot.ini. The main ones
-you're interested in are host, port, nick, and channel. Once that's done, run
-pyGBot.py.
+Uncompress, go to src/ , rename pyGBot.ini.default to pygbot.ini and 
+users.ini.default to users.ini, and modify the values in pyGBot.ini. The main 
+ones you're interested in are host, port, nick, and channel. Once that's done, 
+run pyGBot.py.
 
 To add users to the Auth system:
 Run hashpw.py, it will prompt you for the relevant details.
