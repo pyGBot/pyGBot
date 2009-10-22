@@ -166,6 +166,7 @@ class Mafia(BasePlugin):
         self.c9_setup = False
         self.anon_voting = False
         self.storedtopic = ""
+        self.topicchanged = False
         self.bot.topic(self.channel, None)
         #self.start()
 
@@ -462,6 +463,7 @@ class Mafia(BasePlugin):
             else:
                 # Store the topic and set a "GAME IN PROGRESS" message.
                 self.bot.topic(channel, "~GAME IN PROGRESS~ | " + self.storedtopic)
+                self.topicchanged = True
             
                 # Randomly select Mafia and a sheriff and a doctor. Everyone else is a citizen.
                 users = self.live_players[:]
@@ -570,7 +572,9 @@ class Mafia(BasePlugin):
             self.fix_modes()
             for players in self.dead_players + self.spectators:
                 self.bot.kick(self.dchatchannel, players, "The game is now over.")
-            self.bot.topic(channel, self.storedtopic) # Reset the topic
+            if self.topicchanged:
+                self.bot.topic(channel, self.storedtopic) # Reset the topic
+                self.topicchanged = False
             self._reset_gamedata()
 
 
