@@ -1469,7 +1469,7 @@ class Mafia(BasePlugin):
 
         # Dead players should not speak.
         if user in self.dead_players:
-             if cmds[0] not in ("stats", "status", "help", "dchat"):
+             if cmds[0] not in ("stats", "status", "help", "dchat", "end", "del"):
                 self.reply(channel, user, "Please -- dead players should keep quiet.")
                 return 0
 
