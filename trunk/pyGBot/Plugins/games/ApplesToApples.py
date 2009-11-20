@@ -714,7 +714,7 @@ REDCARDS = {'A Bad Haircut':'\x02The perfect start to a bad hair day.\x0f',
 'My Dreams':'\x02"What dreams may come ..." -Shakespeare\'s \x0fHamlet',
 'My Family':'They\'ll drive you nuts. As long as you do the same to them, it\'s all even.',
 'My First Kiss':'Sparks were flying. Of course, that could have been the braces ...',
-'My Friends':'With friends like there, who needs enemies?',
+'My Friends':'With friends like these, who needs enemies?',
 'My Future':'\x02"The future\'s so bright, I gotta wear shades ..." \x0f-Timbuk-3',
 'My Hair':'Hair today, gone tomorrow ...',
 'My High School Prom':'As if adolescence isn\'t awkward and painful enough ...',
@@ -1030,6 +1030,13 @@ class ApplesToApples(BasePlugin):
         BasePlugin.__init__(self, bot, options)
         self.output = True
         self.resetdata()
+        
+    def timer_tick(self):
+        if self.gamestate == "InProgress":
+            self.timer = self.timer + 1
+            if self.timer == 60:
+                self.timer = 0
+                self.cmd_prompt([], self.channel, self.bot.nickname)
 
     def msg_channel(self, channel, user, message):
         a = string.split(message, ":", 1)
@@ -1037,10 +1044,9 @@ class ApplesToApples(BasePlugin):
             self.do_command(channel, user, string.strip(a[1]))
         elif message[0]=='!' and (len(message) > 1) and message[1]!='!':
             self.do_command(channel, user, string.strip(message[1:]))
-
-    def pubout(self, channel, message):
-        if self.output == True:
-            self.bot.pubout(channel, message)
+            
+    def msg_private(self, user, message):
+        self.do_command(user, user, message)
 
     def reply(self, channel, user, text):
         if channel != user:
@@ -1066,11 +1072,13 @@ class ApplesToApples(BasePlugin):
         self.woncards = {}
         self.cardstowin = 0
         self.channel = None
+        self.timer = 0
+        self.judging = False
 
     def startgame(self):
         self.gamestate = "InProgress"
-        self.bot.pubout(self.channel, "A new game is starting! Please wait, dealing cards...")
-        self.players = self.live_players
+        self.bot.pubout(self.channel, "A new game is starting! Please wait, dealing cards... (use !peek to see card descriptions)")
+        self.players = list(self.live_players)
         random.shuffle(self.live_players)
         for user in self.live_players:
             self.woncards[user] = []
@@ -1078,7 +1086,6 @@ class ApplesToApples(BasePlugin):
         for i in range(1, 8):
             for user in self.live_players:
                 self.hands[user].append(self.reddeck.pop(0))
-                #self.privreply(user, "You draw: %s - %s" % (self.hands[user][i-1], REDCARDS[self.hands[user][i-1]]))
         for user in self.live_players:
             self.hands[user].sort()
             hand = []
@@ -1103,6 +1110,8 @@ class ApplesToApples(BasePlugin):
         self.resetdata()
         
     def newround(self):
+        self.judging = False
+        self.timer = 0
         self.cmd_scores([], self.channel, self.bot.nickname)
         
         self.playedcards = []
@@ -1117,15 +1126,18 @@ class ApplesToApples(BasePlugin):
         
     def checkroundover(self):
         if len(self.playedcards) == len(self.live_players) - 1:
+            self.bot.pubout(self.channel, "All cards have been played.")
+            self.judging = True
             self.beginjudging()
             
     def beginjudging(self):
-        self.bot.pubout(self.channel, "All cards have been played.")
-        self.bot.pubout(self.channel, "Green card is: \x02\x033%s\x0F - %s" % (self.greencard, GREENCARDS[self.greencard]))
-        random.shuffle(self.playedcards)
-        for i in range (0, len(self.playedcards)):
-            self.bot.pubout(self.channel, "%i. \x034%s\x0F: %s" % (i+1, self.playedcards[i][1], REDCARDS[self.playedcards[i][1]]))
-        self.bot.pubout(self.channel, "%s: Please make your decision now using the '!pick <number>' command." % self.live_players[self.judgeindex])
+        if self.judging == True:
+            self.timer = 0
+            self.bot.pubout(self.channel, "Green card is: \x02\x033%s\x0F - %s" % (self.greencard, GREENCARDS[self.greencard]))
+            random.shuffle(self.playedcards)
+            for i in range (0, len(self.playedcards)):
+                self.bot.pubout(self.channel, "%i. \x034%s\x0F: %s" % (i+1, self.playedcards[i][1], REDCARDS[self.playedcards[i][1]]))
+            self.bot.pubout(self.channel, "%s: Please make your decision now using the '!pick <number>' command." % self.live_players[self.judgeindex])
         
     def cardwin(self, winningcard):
         winner = self.playedcards[winningcard][0]
@@ -1158,7 +1170,7 @@ class ApplesToApples(BasePlugin):
         
     def cmd_play(self, args, channel, user):
         if self.gamestate == "InProgress":
-            if user in self.live_players and user not in self.playedcards and user != self.live_players[self.judgeindex]:
+            if user in self.live_players and user not in self.playedcards and user != self.live_players[self.judgeindex] and self.judging == False:
                 try:
                     if int(args[0]) > 0 and int(args[0]) < 8:
                         cardplayed = False
@@ -1181,12 +1193,14 @@ class ApplesToApples(BasePlugin):
                 self.reply(channel, user, "You have already played a card this round.")
             elif user == self.live_players[self.judgeindex]:
                 self.reply(channel, user, "You are judging this round.")
+            elif self.judging == True:
+                self.reply(channel, user, "Judging has already begun, wait for the next round.")
         else:
             self.reply(channel, user, "There is no game in progress.")
-            
+
     def cmd_pick(self, args, channel, user):
         if self.gamestate == "InProgress":
-            if len(self.playedcards) == len(self.live_players) - 1 and user == self.live_players[self.judgeindex]:
+            if self.judging == True and user == self.live_players[self.judgeindex]:
                 try:
                     if int(args[0]) > 0 and int(args[0]) <= len(self.playedcards):
                         self.reply(channel, user, "You have chosen.")
@@ -1251,6 +1265,9 @@ class ApplesToApples(BasePlugin):
                 self.bot.pubout(self.channel, "Green cards per players: %s. Cards to win: %i." % (", ".join(greenbuild), self.cardstowin))
             else:
                 self.bot.pubout(self.channel, "No scores yet. Cards to win: %i." % self.cardstowin)
+                
+    def cmd_status(self, args, channel, user):
+        self.cmd_stats(args, channel, user)
 
     def cmd_scores(self, args, channel, user):
         if self.gamestate == "None" or self.gamestate == "Starting":
@@ -1276,7 +1293,28 @@ class ApplesToApples(BasePlugin):
             else:
                 self.reply(channel, user, "You are already in the game.")
         elif self.gamestate == "InProgress":
-            self.reply(channel, user, "There is a game in progress. Please wait for it to end.")
+            if user not in self.live_players:
+                self.bot.pubout(self.channel, "%s is now in the game." % user)
+                self.players.append(user)
+                if user not in self.woncards:
+                    self.woncards[user] = []
+                self.live_players.insert(self.judgeindex, user)
+                self.judgeindex = self.judgeindex + 1
+                if user not in self.hands:
+                    self.hands[user] = []
+                    for i in range(1, 8):
+                        self.hands[user].append(self.reddeck.pop(0))
+                    self.hands[user].sort()
+                    hand = []
+                    for i in range (1, 8):
+                        hand.append("%i: \x034%s\x0F" % (i, self.hands[user][i-1]))
+                else:
+                    while len(self.hands[user]) < 7:
+                        self.hands[user].append(self.reddeck.pop(0))
+                        self.privreply(user, "You draw: \x034%s\x0F: %s" % (self.hands[user][len(self.hands[user])-1], REDCARDS[self.hands[user][len(self.hands[user])-1]]))
+                self.privreply(user, "Your hand: %s" % ", ".join(hand))
+            else:
+                self.reply(channel, user, "You are already in the game.")
 
     def cmd_hand(self, args, channel, user):
         if self.gamestate == "InProgress":
@@ -1340,12 +1378,11 @@ class ApplesToApples(BasePlugin):
                         print self.playedcards
                         print judge
                         for i in range(0, len(self.playedcards)):
-                            print self.playedcards[i]
-                            if self.playedcards[i][0] == judge:
+                            print self.playedcards[i-1]
+                            if self.playedcards[i-1][0] == judge:
                                 print "attempting to remove card"
-                                self.playedcards.remove(self.playedcards[i])
+                                self.playedcards.remove(self.playedcards[i-1])
                         print self.playedcards
-                        self.beginjudging()
                     else:
                       self.judgeindex = self.live_players.index(judge)  
                 self.checkroundover()
@@ -1355,10 +1392,67 @@ class ApplesToApples(BasePlugin):
             if user in self.live_players:
                 self.bot.pubout(self.channel, "%s has quit the game." % user)
                 self.live_players.remove(user)
+                if len(self.live_players) == 0:
+                    self.bot.pubout(self.channel, "Game is now empty.")
+                    self.endgame()
             else:
                 self.reply(channel, user, "You are not in this game.")
         else:
             self.reply(channel, user, "There is no game in progress.")
+            
+    def cmd_del(self, args, channel, user):
+        auth = self.bot.plugins['system.Auth']
+        userlevel = auth.get_userlevel(user)
+        if userlevel > 50:
+            if self.gamestate == "InProgress":
+                try:
+                    player = args[0]
+                    if player in self.live_players:
+                        judge = self.live_players[self.judgeindex]
+                        self.bot.pubout(self.channel, "%s has quit the game." % player)
+                        self.live_players.remove(player)
+                        if len(self.live_players) < 3:
+                            self.bot.pubout(self.channel, "There are now too few players to continue the game.")
+                            self.endgame()
+                        else:
+                            if self.judgeindex == len(self.live_players):
+                                self.judgeindex = 0
+                            if player == judge:
+                                self.bot.pubout(self.channel, "The judge is now %s." % self.live_players[self.judgeindex])
+                                judge = self.live_players[self.judgeindex]
+                                print self.playedcards
+                                print judge
+                                for i in range(0, len(self.playedcards)):
+                                    print self.playedcards[i-1]
+                                    if self.playedcards[i][0] == judge:
+                                        print "attempting to remove card"
+                                        self.playedcards.remove(self.playedcards[i])
+                                print self.playedcards
+                                self.beginjudging()
+                            else:
+                              self.judgeindex = self.live_players.index(judge)  
+                        self.checkroundover()
+                    else:
+                        self.reply(channel, user, "That player is not in this game.")
+                except IndexError:
+                    self.reply(channel, user, "Please specify the player to delete.")
+            elif self.gamestate == "Starting":
+                try:
+                    player = args[0]
+                    if user in self.live_players:
+                        self.bot.pubout(self.channel, "%s has been deleted from the game." % player)
+                        self.live_players.remove(player)
+                        if len(self.live_players) == 0:
+                            self.bot.pubout(self.channel, "Game is now empty.")
+                            self.endgame()
+                    else:
+                        self.reply(channel, user, "That player is not in this game.")
+                except IndexError:
+                    self.reply(channel, user, "Please specify the player to delete.")
+            else:
+                self.reply(channel, user, "There is no game in progress.")
+        else:
+            self.reply(channel, user, "You need to be at least a botmod to use that command.")
             
     def cmd_end(self, args, channel, user):
         auth = self.bot.plugins['system.Auth']
