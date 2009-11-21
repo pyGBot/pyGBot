@@ -1481,7 +1481,7 @@ REDCARDS = {
 'Giraffes':'\x02Giraffes can grow to 18 feet tall and have been known to kill a lion with a single kick. \x0fNot just another pretty face\x02.',
 'Go Karts':'\x0fGo kart, go!\x02 ',
 'Going On A Cruise':'\x0fIceberg, dead ahead!\x02 ',
-'Gold & Silver':'\x02There\'s a good reason Fort Knox is full of golg and not silver.',
+'Gold & Silver':'\x02There\'s a good reason Fort Knox is full of gold and not silver.',
 'Good & Plenty':'\x02The licorice candy was first produced in 1893, making it the oldest branded candy in the United States.',
 'Goose & The Gander':'\x0fIf it\'s good for the goose...\x02 ',
 'Gourmet Coffee Shops':'\x0fI\'ll have a tall, double cappuccino, wet, with vanilla, half decaf, - to walk\x02.',
@@ -1988,7 +1988,7 @@ REDCARDS = {
 'Meteorologists':'\x0fThey\'re so predictable\x02...',
 'Miami Beach':'\x0fSo hot and yet so cool\x02.',
 'Michael Moore':'\x021954-, American documentary film maker of \x0fRoger and Me\x02 and \x0fFahrenheit 9/11\x02 He won an Academy Award for \x0fBowling for Columbine\x02.',
-'Mimes':'\x02<U><font size=-2>[No words, just two four-fingered gloves.]</font></U> ',
+'Mimes':'\x02[No words, just two four-fingered gloves.]',
 'Mint Jelly':'\x02Good with lamb... \x0fand that\'s about it\x02.',
 'Mistletoe':'\x02The Druids believe that mistletoe could improve fertility...\x0fso be careful who you kiss\x02.',
 'Model Prisoner':'\x02He made the \x0fBEST\x02 license plates.',
@@ -2522,14 +2522,9 @@ class ApplesToApples(BasePlugin):
                     if user == judge:
                         self.bot.pubout(self.channel, "The judge is now %s." % self.live_players[self.judgeindex])
                         judge = self.live_players[self.judgeindex]
-                        print self.playedcards
-                        print judge
                         for i in range(0, len(self.playedcards)):
-                            print self.playedcards[i-1]
                             if self.playedcards[i-1][0] == judge:
-                                print "attempting to remove card"
                                 self.playedcards.remove(self.playedcards[i-1])
-                        print self.playedcards
                     else:
                       self.judgeindex = self.live_players.index(judge)  
                 self.checkroundover()
@@ -2567,14 +2562,9 @@ class ApplesToApples(BasePlugin):
                             if player == judge:
                                 self.bot.pubout(self.channel, "The judge is now %s." % self.live_players[self.judgeindex])
                                 judge = self.live_players[self.judgeindex]
-                                print self.playedcards
-                                print judge
                                 for i in range(0, len(self.playedcards)):
-                                    print self.playedcards[i-1]
                                     if self.playedcards[i][0] == judge:
-                                        print "attempting to remove card"
                                         self.playedcards.remove(self.playedcards[i])
-                                print self.playedcards
                                 self.beginjudging()
                             else:
                               self.judgeindex = self.live_players.index(judge)  
