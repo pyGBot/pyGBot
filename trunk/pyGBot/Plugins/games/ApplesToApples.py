@@ -1736,7 +1736,7 @@ REDCARDS = {
 'Yin & Yang':'\x02Two elements that oppose each other and give life balance. \x0fIf you\'re lucky\x02.',
 'Zippers':'\x0fZip it, zip it good\x02.',
 'Zombies':'\x02Undead ghouls that feed off of brains. \x0fSo WE\'RE safe...\x02 ',
-'4-H Clubs':'\x02Head, Heart, Hands and Health. A youth organization promoting leadership, citizenship, and life skills. \x0fSee you at the fair!\x02 ',
+' 4-H Clubs':'\x02Head, Heart, Hands and Health. A youth organization promoting leadership, citizenship, and life skills. \x0fSee you at the fair!\x02 ',
 'A Blackberry':'\x02It\'s a fruit \x0fand\x02 an integrated communications system!',
 'A Blind Date':'\x0fI can\'t see much future in it\x02.',
 'A Broken Nose':'\x02It adds character!',
