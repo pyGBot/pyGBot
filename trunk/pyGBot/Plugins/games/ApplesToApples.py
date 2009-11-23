@@ -583,7 +583,7 @@ REDCARDS = {
 'A Used Car Lot':'\x0fOne of the most honest places around. Honest...\x02 ',
 'Abraham Lincoln':'\x021809-65, 16th U.S. president, led the Union to victory in the American Civil War and abolished slavery. \x0fWas assassinated for his efforts.\x02 ',
 'Adam Sandler':'\x021966- , American comedian, film star, and \x0fSaturday Night Live\x02 alumnus. \x0fGenius or goofball - you make the call\x02.',
-'Adolph Hitler':'\x021889-1945, turned Germany into a militarized dictatorship, caused the slaughter of millions and launched World War II.',
+'Adolf Hitler':'\x021889-1945, turned Germany into a militarized dictatorship, caused the slaughter of millions and launched World War II.',
 'AIDS':'\x02Acquired Immune Deficiency Syndrome.',
 'Airline Food':'\x0fSince when is a bag of peanuts considered a meal?\x02 ',
 'Al Pacino':'\x021940- , Oscar winning American actor and star of "The Godfather," "Dog Day Afternoon" and "Scent Of A Woman." \x0fOne very intense guy.\x02 ',
@@ -720,7 +720,7 @@ REDCARDS = {
 'Clowns':'\x02They would be \x0freally funny\x02 if they weren\'t so darn scary.',
 'Cocaine':'\x02Alkaloid obtained from leaves of the coca plant and used as a local anesthetic and abused as a drug.',
 'Cockroaches':'\x02Annoying insects that can survive a nuclear war. \x0fFortunately, they can\'t survive the heel of your shoe.\x02 ',
-'Coconuts':'\x02"Put the lime in the coconut, and drank them both up." -\x0fHarry Nillson\x02 ',
+'Coconuts':'\x02"Put the lime in the coconut, and drink them both up." -\x0fHarry Nillson\x02 ',
 'Cold Pizza':'\x0fThe breakfast of champions.\x02 ',
 'Communists':'\x02"From each, according to their ability, to each according to their need." \x0fI need a new Ferrari.\x02 ',
 'Commuting':'\x02The daily grind. \x0fAnd we\'re not talking coffee.\x02 ',
@@ -1091,7 +1091,7 @@ REDCARDS = {
 'Rocket Scientists':'\x02Hey! They\'re not rocket scie \x0f... oh... never mind.\x02 ',
 'Rocky Mountains':'\x02These extend 2,000 miles from northeastern British Columbia to central New Mexico, \x0fand keep the Californians away from everyone else...\x02 ',
 'Rolling The Car':'\x0fYou\'ll flip for this one\x02...',
-'Roman Numerals':'\x0fThere\'s a\x02 <B>I</B> \x0fin\x02 <B>VII</B> \x0fchance you\'ll know them\x02.',
+'Roman Numerals':'\x0fThere\'s a \x02I\x0f in \x02VII\x0f chance you\'ll know them\x02.',
 'Romeo And Juliet':'\x02William Shakespeare\'s best known play, written in 1595. \x0fYouthful love and hasty temperaments\x02.',
 'Root Beer Floats':'\x0fActually, it\'s the ice cream that floats!\x02 ',
 'Rosa Parks':'\x021913-, civil rights icon arrested in 1956 for violating U.S. segregation laws by refusing to give up her bus seat to a white passenger.',
@@ -1396,7 +1396,7 @@ REDCARDS = {
 'Chips & Dip':'\x02No double dipping!',
 'Chips & Salsa':'\x0fNacho average snack!\x02 ',
 'Chutes & Ladders':'\x0fA game of ups and downs\x02.',
-'Circus Peanuts':'\x02Chewy, oragne marshmallow things shaped like peanuts. \x0fSeldom found at the circus\x02.',
+'Circus Peanuts':'\x02Chewy, orange marshmallow things shaped like peanuts. \x0fSeldom found at the circus\x02.',
 'Cleveland':'\x02"Cleveland rocks! Cleveland rocks!" - \x0fThe Drew Carey Show\x02 ',
 'Cloned Sheep':'\x0fDolly good show!\x02 ',
 'Cockles & Mussels':'\x02"Alive--alive-o!" \x0fI think I just lost my appetite\x02.',
@@ -1671,7 +1671,7 @@ REDCARDS = {
 'Strained Peas':'\x0fThe strain comes when you have to eat them\x02.',
 'Street Mimes':'\x02A mime is a terrible thing to waste. \x0fOn second thought...\x02 ',
 'Stretch Limos':'\x0fStretch your legs, stretch your wallet\x02.',
-'Strip Malls':'\x0fAlmost as attractive as stip mines\x02.',
+'Strip Malls':'\x0fAlmost as attractive as strip mines\x02.',
 'Sugar & Spice':'\x02And everything nice.',
 'Suit & Tie':'\x0fIt\'s business as usual!\x02 ',
 'Sumo Wrestlers':'\x02Wrestlers usually weigh 300-400 pounds and win this Japanese form of wrestling by forcing an opponent out of the ring.',
@@ -2266,7 +2266,7 @@ class ApplesToApples(BasePlugin):
             self.judgeindex = 0
         else:
             self.judgeindex = self.judgeindex + 1
-        self.bot.pubout(self.channel, "This round's judge is %s." % self.live_players[self.judgeindex])
+        self.bot.pubout(self.channel, "This round's judge is \x02\x0312%s\x0F." % self.live_players[self.judgeindex])
         
         self.greencard = self.greendeck.pop(0)
         self.bot.pubout(self.channel, "The new green card is: \x02\x033%s\x0F - %s. Please play cards from your hand using '!play <number>'." % (self.greencard, GREENCARDS[self.greencard]))
@@ -2284,11 +2284,11 @@ class ApplesToApples(BasePlugin):
             random.shuffle(self.playedcards)
             for i in range (0, len(self.playedcards)):
                 self.bot.pubout(self.channel, "%i. \x034%s\x0F: %s" % (i+1, self.playedcards[i][1], REDCARDS[self.playedcards[i][1]]))
-            self.bot.pubout(self.channel, "%s: Please make your decision now using the '!pick <number>' command." % self.live_players[self.judgeindex])
+            self.bot.pubout(self.channel, "\x02\x0312%s\x0F: Please make your decision now using the '!pick <number>' command." % self.live_players[self.judgeindex])
         
     def cardwin(self, winningcard):
         winner = self.playedcards[winningcard][0]
-        self.bot.pubout(self.channel, "The judge picked \x034%s\x0F! %s played that red card, and gets to keep the green card." % (self.playedcards[winningcard][1], winner))
+        self.bot.pubout(self.channel, "The judge picked \x034%s\x0F! \x02\x0312%s\x0F played that red card, and gets to keep the green card." % (self.playedcards[winningcard][1], winner))
         self.woncards[winner].append(self.greencard)
         if not self.checkgamewin():
             self.deal()
