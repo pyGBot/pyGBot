@@ -98,6 +98,7 @@ system.Startup =
 system.Auth =
 system.Commands =
 system.Modes =
+games.ApplesToApples = 
 games.Mafia =
 games.Poker =
 games.Werewolf =
