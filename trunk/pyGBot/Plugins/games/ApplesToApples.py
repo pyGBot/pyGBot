@@ -2576,7 +2576,7 @@ class ApplesToApples(BasePlugin):
             elif self.gamestate == "Starting":
                 try:
                     player = args[0]
-                    if user in self.live_players:
+                    if player in self.live_players:
                         self.bot.pubout(self.channel, "%s has been deleted from the game." % player)
                         self.live_players.remove(player)
                         if len(self.live_players) == 0:
