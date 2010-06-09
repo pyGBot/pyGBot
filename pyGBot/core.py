@@ -23,7 +23,9 @@ except ImportError:
     #assume a pre-2.0 version of Twisted
     from twisted.protocols import irc
 
-if int(twistedversion[0]) >= 2:
+twistedmajor = int(twistedversion.split('.')[0])
+
+if twistedmajor >= 2:
     from twisted.words.protocols import irc
 
 from twisted.internet import reactor, protocol, task
