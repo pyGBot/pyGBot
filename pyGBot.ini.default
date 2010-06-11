@@ -103,6 +103,7 @@ games.Mafia =
 games.Poker =
 games.Werewolf =
 games.Uno =
+games.Fluxx =
 math.Calculate =
 probability.Decide =
 probability.Roll =
