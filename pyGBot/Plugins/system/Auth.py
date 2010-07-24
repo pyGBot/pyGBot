@@ -38,6 +38,14 @@ class Auth(BasePlugin):
         BasePlugin.__init__(self, bot, options)
         self.users = {}
         self.conf = ConfigObj("users.ini")
+        print options
+        try:
+            if options["authtype"] == "nickserv":
+                self.authtype = "nickserv"
+            else:
+                self.authtype = "pygbot"
+        except:
+            self.authtype = "pygbot"
     
     def get_userlevel(self, user):
         if self.users.has_key(user):
@@ -95,21 +103,39 @@ class Auth(BasePlugin):
 
     def msg_private(self, user, message):
         if message.lower().startswith('auth'):
-            cmd, uname, password = message.rsplit(' ',2)
-            if self.get_passhash(uname) == hashlib.sha1(password + 'pygb0t').hexdigest():
-                authlevel = self.get_authlevel(uname)
-                if authlevel != None:
-                    self.set_userlevel(user, self.get_authlevel(uname))
-                    self.bot.noteout(user, 'Successfully authed.')
-                    log.logger.info('Auth: Authorised user %s at level %d.' % (user, authlevel))
+            if self.authtype == "nickserv":
+                self.bot.privout("nickserv", "status %s" % user)
+            if self.authtype == "pygbot":
+                cmd, uname, password = message.rsplit(' ',2)
+                if self.get_passhash(uname) == hashlib.sha1(password + 'pygb0t').hexdigest():
+                    authlevel = self.get_authlevel(uname)
+                    if authlevel != None:
+                        self.set_userlevel(user, self.get_authlevel(uname))
+                        self.bot.noteout(user, 'Successfully authed.')
+                        log.logger.info('Auth: Authorised user %s at level %d.' % (user, authlevel))
+                    else:
+                        self.bot.noteout(user, 'Invalid user level.')
+                        log.logger.info('Auth: Invalid user level for user %s' % user)
                 else:
-                    self.bot.noteout(user, 'Invalid user level.')
-                    log.logger.info('Auth: Invalid user level for user %s' % user)
-            else:
-                self.bot.noteout(user, 'Incorrect user name or password.')
+                    self.bot.noteout(user, 'Incorrect user name or password.')
 
     def msg_notice(self, user, message):
-        pass
+        if self.authtype == "nickserv":
+            if user == "NickServ":
+                if message.startswith("STATUS"):
+                    uname = message.split(" ")[1]
+                    if int(message.split(" ")[2]) == 3:
+                        authlevel = self.get_authlevel(uname)
+                        if authlevel != None:
+                            self.set_userlevel(uname, self.get_authlevel(uname))
+                            self.bot.noteout(uname, 'Successfully authorized via NickServ.')
+                            log.logger.info('Auth: Authorized user %s at level %d throug NickServ.' % (uname, authlevel))
+                        else:
+                            self.set_userlevel(uname, 50)
+                            self.bot.noteout(uname, 'You do not have an account. Successfully authorized as a guest user.')
+                            log.logger.info('Auth: Invalid user level for user %s. Set to default.' % uname)
+                    else:
+                        self.bot.noteout('Authorization unsuccessful. Please log in to NickServ and try again.')
 
     def channel_names(self, channel, nameslist):
         log.logger.info("Users on #" + channel + ": " + ', '.join(nameslist))
