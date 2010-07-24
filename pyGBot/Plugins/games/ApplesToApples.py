@@ -249,7 +249,7 @@ GREENCARDS = {
 'Talented':'gifted, clever, skillful',
 'Tame':'subdued, gentle, trained',
 'Technological':'scientific, futuristic, mechanical',
-'Temperamental':'moody, irritable, short-tempered',
+'Tempermental':'moody, irritable, short-tempered',
 'Timeless':'classic, ageless, well-established',
 'Touchy-Feely':'affectionate, tactile, huggy',
 'Tough':'strong, firm, difficult',
@@ -303,7 +303,7 @@ GREENCARDS = {
 'Down & Dirty':'nasty, vicious, unscrupulous',
 'Down & Out':'destitute, impoverished, penniless',
 'Drunk & Disorderly':'intoxicated, unruly, rowdy',
-'Dumb & Dumber':'stupid, dull, rediculous',
+'Dumb & Dumber':'stupid, dull, ridiculous',
 'Edgy':'irritable, nervous, tense',
 'Enchanting':'captivating, charming, spell-binding',
 'Endangered':'at risk, threatened, unprotected',
@@ -554,7 +554,7 @@ GREENCARDS = {
 'Trite':'commonplace, unoriginal, cliched',
 'Trivial':'unimportant, random, erratic',
 'Uplifting':'elevating, inspiring, soul-stirring',
-'Valuable':'precious, important, expansive',
+'Valuable':'precious, important, expensive',
 'Warm':'tepid, mild, affectionate',
 'Well-preserved':'youthful, fresh-looking, unchanged',
 'Worthless':'insignificant, useless, trashy',
@@ -650,7 +650,7 @@ REDCARDS = {
 'Bird Watching':'\x02A hobby that relies on a wing and a prayer.',
 'Black Holes':'\x02The gravitational field of a black hole is so strong that nothing, including light, can escape from its vicinity.',
 'Black Velvet':'\x02Smooth, silky and sophisticated... \x0funtil you paint an Elvis on it\x02.',
-'Blizzard':'\x02Extreme cold, strong winds, and a head snowfall. \x0fAlso known as Canada.\x02 ',
+'Blizzard':'\x02Extreme cold, strong winds, and a heady snowfall. \x0fAlso known as Canada.\x02 ',
 'Blood':'\x02A healthy human body contains between five and six quarts of blood. \x0fBloody right they do!\x02 ',
 'Board Games':'\x02Games have been played for thousands of years. \x0fSome games of Monopoly just SEEM that long\x02.',
 'Body Odor':'\x02Over $1.6 billion is spent each year on antiperspirants in the United States. \x0fThat stinks!\x02 ',
@@ -730,7 +730,7 @@ REDCARDS = {
 'Conspiracy Theories':'\x0fOh, that was just a coincidence!\x02 ',
 'Construction Workers':'\x0fHard hats -hard bodies.\x02 ',
 'Corn On The Cob':'\x02A grain native to the Americas, corn was a staple food for many centuries \x0fbefore corn holders were invented.\x02 ',
-'Corvettes':'\x02In 1953, Chevrolet introduced the Corverre, the first mass-produced sports car with a fiberglass body. \x0fThe perfect cure for a midlife crisis.\x02 ',
+'Corvettes':'\x02In 1953, Chevrolet introduced the Corvette, the first mass-produced sports car with a fiberglass body. \x0fThe perfect cure for a midlife crisis.\x02 ',
 'Count Dracula':'\x0f"I vant to suck your blood!"\x02 ',
 'Country Music':'\x02Encompassing styles such as western swing, honky-tonk, bluegrass and rockabilly. \x0fShould mention a pickup truck and a dog named "Bo."\x02 ',
 'Cow-Pies':'\x02When dried, these "cow chips" are hurled discus-like over great distances. \x0fIt\'s true.\x02 ',
@@ -750,7 +750,7 @@ REDCARDS = {
 'Daytime TV':'\x02Soap operas, game shows, talk shows and reruns... \x0fis this a great country or what?\x02 ',
 'Death Valley':'\x02Arid, desolate and hellish region of California. Named by a survivor of an attempted 1849 crossing.',
 'Deer Hunting':'\x0fNooo! Nooooo! Not BAMBI\'S MOTHER!\x02 ',
-'Demi Moore':'\x021962-, American actor in \x0fSt. Elmo\'s Fire\x02, \x0fGhost\x02 and \x0fGI Jane.\x02 ',
+'Demi Moore':'\x021962-, American actress in \x0fSt. Elmo\'s Fire\x02, \x0fGhost\x02 and \x0fGI Jane.\x02 ',
 'Democrats':'\x02Their symbol is the donkey, or ass. \x0fInsert your own joke here.\x02 ',
 'Denzel Washington':'\x021954- , American actor known for his powerful roles in such movies as \x0fCry Freedom\x02, \x0fMalcolm X\x02, and \x0fMississippi Masala\x02.',
 'Detroit':'\x02The Motor City is the world\'s foremost automobile manufacturing center, and the tenth largest city in the U.S.',
@@ -762,7 +762,7 @@ REDCARDS = {
 'Doctors':'\x02Over twenty years of education and \x0fthey\'re still "practicing" medicine?\x02 ',
 'Doing The Dishes':'\x0fYou wash, I\'ll watch.\x02 ',
 'Dolly Parton':'\x021967- , American singer, songwriter, and actor. Known as much for her personal style as for her successful career.',
-'Dr. Kevorkin':'\x021928- , Controversial advocate of doctor-assisted suicide.',
+'Dr. Kevorkian':'\x021928- , Controversial advocate of doctor-assisted suicide.',
 'Dr. Seuss':'\x021904-1991, Theodor Suess Geisel , \x0fthe cat who came up with "The Cat in the Hat."\x02 ',
 'Driving Off A Cliff':'\x0fIt was either that or hire someone to do my takes\x02.',
 'Duct Tape':'\x0fAll-purpose,... all the time...\x02 ',
@@ -818,7 +818,7 @@ REDCARDS = {
 'Garrison Keillor':'\x021942- , American author and radio star. He shares the Midwest perspective with 2.6 million listeners each week on \x0fA Prairie Home Companion\x02.',
 'Garth Brooks':'\x021962- , American country music singer and songwriter. \x0fHe\'s got friends in low places.\x02 ',
 'Geishas':'\x02Japanese women training in traditional singing, dancing, and entertaining. \x0fOf course, you would never recognize them without all that make-up\x02.',
-'Gen. George S. Patton':'\x021885-1945, the commander of the American Third Army during World War II. -\x0fa.k.a. Olf Blood and Guts\x02 ',
+'Gen. George S. Patton':'\x021885-1945, the commander of the American Third Army during World War II. -\x0fa.k.a. Old Blood and Guts\x02 ',
 'Genetic Engineering':'\x0fWhat DO you get when you cross a monkey with a potato?\x02 ',
 'George W. Bush':'\x021946- , 43rd president of the United States. The second time ever that the son of a former president was elected to the office.',
 'George Washington':'\x021732-99, First President of the United States. \x0fHe chopped down a cherry tree to make false teeth, or something like that\x02...',
@@ -866,13 +866,13 @@ REDCARDS = {
 'High School Football':'\x0fThe whole ten yards!\x02 ',
 'High School Reunions':'\x02See also: \x0f"root canal, as fun as..."\x02 ',
 'Hillary Rodham Clinton':'\x021947- , New York Senator, lawyer, and former American First Lady.',
-'Hiroshima - 1945':'\x02"I am become death, the destroyer of worlds" - \x0fJ. Robert Oppenheimer, on the detonation of the first atmoic bomb.\x02 ',
+'Hiroshima - 1945':'\x02"I am become death, the destroyer of worlds" - \x0fJ. Robert Oppenheimer, on the detonation of the first atomic bomb.\x02 ',
 'HMOs':'\x02Heath Maintenance Organizations. \x0fHere\'s to your health\x02...',
 'Hockey':'\x0fDid you hear about the big fight last night? All of a sudden, a hockey game broke out!\x02 ',
 'Hollywood':'\x02Motion picture and television industry center of the world. \x0fHooray for Hollywood!\x02 ',
 'Homeless Shelters':'\x02In the United States, nearly three-quarters of the help for the homeless comes from the private sector, mostly from church soup kitchens.',
 'Homer Simpson':'\x02Fictional cartoon character created by Matt Groening. \x0fD\'oh!\x02 ',
-'Homework':'\x0fSomething to do during comercials.\x02 ',
+'Homework':'\x0fSomething to do during commercialss.\x02 ',
 'Hooligans':'\x0f"Hey! Kids! Get outta my yard!"\x02 ',
 'Horseback Riding':'\x0fWHOAAA!!!\x02 ',
 'Hot Lava':'\x0fThere\'s no better way to serve it.\x02 ',
@@ -889,7 +889,7 @@ REDCARDS = {
 'Inside The Sun':'\x02Consisting mostly of hydrogen, the temperature reaches almost 16,000,000 K (about 29,000,000 F).',
 'Intellectuals':'\x0fThey think they\'re so smart.\x02 ',
 'Ireland':'\x02Island of the British Isles, west of Great Britain. Known for its distinctive traditional dance and music.',
-'Israel':'\x02Located on the Mediterranean, the state of Israel was reated by a 1948 U.N. mandate.',
+'Israel':'\x02Located on the Mediterranean, the state of Israel was created by a 1948 U.N. mandate.',
 'Italy':'\x02European Republic, shaped like a boot - \x0fa very fashionable boot.\x02 ',
 'Jack Nicholson':'\x021937- , American motion-picture actor of "Chinatown," "Terms Of Endearment" and "The Shining." \x0fHe\'s as good as it gets!\x02 ',
 'Jack The Ripper':'\x02Accused of murdering six women in 1888, and suspected in other murders. \x0fStill at large.\x02 ',
@@ -962,14 +962,14 @@ REDCARDS = {
 'Meat Cleavers':'\x02No relation to Ward, June, or the Beaver...',
 'Meatloaf':'\x02Large and intimidating -\x0fthe dish not the singer!\x02 ',
 'Meg Ryan':'\x021961- , American actor and girl-next-door star of \x0fWhen Harry Met Sally\x02, \x0fSleepless In Seattle\x02, and \x0fYou\'ve Got Mail\x02.',
-'Mel Gibson':'\x021956-, Australian actor. Known for \x0fThe Road Warrior\x02, \x0fBraveheart\x02 and \x0f:eatha; Weapon I, II, III, IV...\x02 ',
+'Mel Gibson':'\x021956-, Australian actor. Known for \x0fThe Road Warrior\x02, \x0fBraveheart\x02 and \x0fLethal Weapon I, II, III, IV...\x02 ',
 'Men':'\x0fREAL Men\x02.',
 'Men In Black':'\x0fWe\'re not here. You don\'t see us. The government did NOT send us.\x02 ',
 'Meryl Streep':'\x021959-, accomplished American actor, two-time Oscar winner, with over a dozen Academy Award nominations.',
 'Mexico':'\x02Federal republic in North America. The capital and largest city is Mexico City.',
 'Mice':'\x02"The best-laid schemes o\' mice an\' men..." -\x0fRobert Burns\x02 ',
-'Michael Jackson':'\x021958-, American popular singer, dancer, and songwriter. \x0fWelcome to Neverland.\x02 ',
-'Michael Jordon':'\x021963- , American professional basketball legend, led Chicago to six world championships. \x0fNo bull.\x02 ',
+'Michael Jackson':'\x021958-2009, American popular singer, dancer, and songwriter. \x0fWelcome to Neverland.\x02 ',
+'Michael Jordan':'\x021963- , American professional basketball legend, led Chicago to six world championships. \x0fNo bull.\x02 ',
 'Michelangelo':'\x021475-1564, inspired Italian sculptor, architect, painter, and poet. \x0f A REAL Renaissance man.\x02 ',
 'Michelle Pfeiffer':'\x021957-, American actor whose career began with \x0fGrease 2\x02. \x0fShe\'d like us to forget that but remember her Oscar nominations.\x02 ',
 'Microsoft':'\x02A leading American software company. \x0fWe\'d say more but we don\'t want to monopolize your time\x02...',
@@ -999,7 +999,7 @@ REDCARDS = {
 'My Dreams':'\x02"What dreams may come..." -Shakespeare\'s \x0fHamlet\x02 ',
 'My Family':'\x0fThey\'ll drive you nuts. As long as you do the same to them, it\'s all even.\x02 ',
 'My First Kiss':'\x0fSparks were flying. Of course, that could have been the braces...\x02 ',
-'My Friends':'\x0fWith friends like there, who needs enemies?\x02 ',
+'My Friends':'\x0fWith friends like these, who needs enemies?\x02 ',
 'My Future':'\x02"The future\'s so bright, I gotta wear shades..." -\x0fTimbuk-3\x02 ',
 'My Hair':'\x0fHair today, gone tomorrow...\x02 ',
 'My High School Prom':'\x0fAs if adolescence isn\'t awkward and painful enough...\x02 ',
@@ -1021,7 +1021,7 @@ REDCARDS = {
 'Ninjas':'\x0fTeenage mutant turtles need not apply.\x02 ',
 'Nobel Peace Prize':'\x02Established by Alfred Nobel. Swedish industrialist and inventor of dynamite. \x0fLed to an explosion of peace efforts.\x02 ',
 'Noisy Neighbors':'\x0fWHAT? I CAN\'T HEAR YOU!\x02 ',
-'Normal Rockwell':'\x021894-1978, American painter, illustrator and all-around interpreter of small town American life.',
+'Norman Rockwell':'\x021894-1978, American painter, illustrator and all-around interpreter of small town American life.',
 'Nuclear Power Plants':'\x02"You\'ve turned a potential Chernobyl into a mere Three Mile Island." -\x0fMontgomery Burns, "The Simpsons"\x02 ',
 'NYPD':'\x02The New York Police Department. \x0fThey\'re so good, they have their own TV show.\x02 ',
 'Oil Spills':'\x02The American oil tanker, Exxon Valdez, went aground in Prince William Sound, Alaska, Mar. 24, 1989. \x0fSlick Move.\x02 ',
@@ -1065,12 +1065,12 @@ REDCARDS = {
 'Pumping Iron':'\x0fWhen a great weight needs to be lifted.\x02 ',
 'Pushups':'\x0fExercises, a type of bra, or the ice cream treat\x02.',
 'Pyramids':'\x02Built by ancient civilizations, found mainly in Egypt, Guatemala, Honduras, Mexico and Peru. \x0fProbably the result of some pyramid scheme\x02.',
-'Quentin Terantino':'\x021963- , Groundbreaking American director and actor. \x0fNice movies, but not nearly enough blood.\x02 ',
+'Quentin Tarantino':'\x021963- , Groundbreaking American director and actor. \x0fNice movies, but not nearly enough blood.\x02 ',
 'Quicksand':'\x0fJust don\'t let it get you down.\x02 ',
 'Ragweed':'\x02A weed of the genus Ambrosia. \x0fNothing to sneeze at\x02.',
 'Rain':'\x02"When the rain comes, they run and hide their heads; they might as well be dead." -\x0fThe Beatles\x02 ',
 'Rainbows':'\x02"Someday they\'ll find it/ The Rainbow Connection/ The lovers, the dreamers and me..." -\x0fKermit the Frog\x02 ',
-'Rappers':'\x02PAENTAL ADVISORY EXPLICIT CONTENT \x0fHasn\'t seemed to hurt sales...\x02 ',
+'Rappers':'\x02PARENTAL ADVISORY EXPLICIT CONTENT \x0fHasn\'t seemed to hurt sales...\x02 ',
 'Reading A Good Book':'\x02So many books, so little time.',
 'Recreational Vehicles':'\x0fIf they\'re trying to get away from it all, why are they taking it all with them?\x02 ',
 'Recycling':'\x02More than one million tons of aluminum are NOT recycled each year. \x0fWhere do you throw your cans?\x02 ',
@@ -1101,11 +1101,11 @@ REDCARDS = {
 'Rush Limbaugh':'\x021951- , conservative talk-radio personality. Claims to host his radio show with half his brain tied behind his back, just to make it fair.',
 'Russia':'\x02The world\'s largest country, spanning 11 time zones. Famous for borscht, ballet, chess and vodka -\x0fjust don\'t mix them.\x02 ',
 'Rust':'\x02"Rust never sleeps." -\x0fNeil Young\x02 ',
-'Saddam Hussein':'\x021937-, dictator of Iraq 1979-2003.',
+'Saddam Hussein':'\x021937-2006, dictator of Iraq 1979-2003.',
 'Sailors':'\x02"In the Navy, you can sail the seven seas..." -\x0fThe Village People\x02 ',
 'Salads':'\x0fLettuce not knock the vegetarians\x02.',
 'Salsa Dancing':'\x02Popular form of Latin American dance. A little jazz, a little blues, a touch of rock \x0fand lots of heat\x02.',
-'Salvador Dali':'\x021904-89, Spansih artist best known for his dream imagery and surrealism, including the limp watches in \x0fThe Persistence Of Memory.\x02 ',
+'Salvador Dali':'\x021904-89, Spanish artist best known for his dream imagery and surrealism, including the limp watches in \x0fThe Persistence Of Memory.\x02 ',
 'Samuel L. Jackson':'\x021948-, powerful American actor of \x0fPulp Fiction\x02, \x0fJackie Brown\x02, and \x0fThe Negotiator.\x02 ',
 'Saturday Cartoons':'\x02Get your blanket, a bowl of cereal and snuggle in for three hours of commercials.',
 'San Francisco':'\x02California\'s City by the Bay. \x0fWhere many hearts are left.\x02 ',
@@ -1178,7 +1178,7 @@ REDCARDS = {
 'Thanksgiving Day':'\x02The fourth Thursday of November in the U.S.; the second Monday in October in Canada.',
 'The 1920s':'\x0fPros: the Jazz Age. Cons: Presidents who look like librarians.\x02 ',
 'The 1950s':'\x0fPros: Barbies, barbecues, and bikinis. Cons: McCarthy, the Korean War, television.\x02 ',
-'The 1960s':'\x0fPros: the Moon Lsnding, the music. Cons: hippies who refuse to believe they\'re over.\x02 ',
+'The 1960s':'\x0fPros: the Moon Landing, the music. Cons: hippies who refuse to believe they\'re over.\x02 ',
 'The 1970s':'\x0fPros... uh... pros... uh... GIVE US A MINUTE, OKAY?\x02 ',
 'The 1980s':'\x0fPros: meant the end of the 1970s. Cons: \'80s nostalgia.\x02 ',
 'The 21st Century':'\x0fThe future is NOW!\x02 ',
@@ -1254,13 +1254,13 @@ REDCARDS = {
 'Toasters':'\x0fWait\x02 -\x0fdon\'t stick that fork in there!\x02 ',
 'Tobacco Companies':'\x02Who says tobacco\'s not addictive? \x0fTHEY can\'t give it up\x02...',
 'Toes':'\x02"This little piggy went to market..."',
-'Tom Cruise':'\x021962-, American actor. It looked like \x0fRicky Business\x02 early on, but by 1986 he was \x0fTop Gun\x02. No \x0fMission Impossible\x02 for him.',
+'Tom Cruise':'\x021962-, American actor. It looked like \x0fRisky Business\x02 early on, but by 1986 he was \x0fTop Gun\x02. No \x0fMission Impossible\x02 for him.',
 'Tom Hanks':'\x021956-, American actor and star of such varied films as \x0fBig\x02, \x0fPhiladelphia\x02, \x0fForrest Gump\x02, \x0fSaving Private Ryan\x02 and \x0fCastaway.\x02 ',
 'Top Of A Rollercoaster':'\x0fJust remember: what goes UP...\x02 ',
 'Tornadoes':'\x02Funnel-shaped cloud whirling destructively at speeds up to 300 mph. \x0f"Honey, do you hear a freight train... Honey?"\x02 ',
 'Toys':'\x0fThey\'re not just for kids, anymore...\x02 ',
 'Trailer Parks':'\x02Also known as \x0ftornado magnets\x02.',
-'Trampolines':'\x02Trampolines have been used in circuses wince the 18th century. \x0fDespite slumps in popularity, they always seem to bounce back!\x02 ',
+'Trampolines':'\x02Trampolines have been used in circuses since the 18th century. \x0fDespite slumps in popularity, they always seem to bounce back!\x02 ',
 'Tree Huggers':'\x0f"Environmentalists" to the left. "Wackos" to the right.\x02 ',
 'Truck Stops':'\x02Breakfast 24 hours a day and you\'re on your way.',
 'Tyrannosaurus Rex':'\x02Large carnivorous dinosaur of the latter part of the Mesozoic era. \x0fMy, what big teeth you have!\x02 ',
@@ -1321,7 +1321,7 @@ REDCARDS = {
 'A Spare Tire':'\x02The good news is: we have a spare tire...',
 'Abbot & Costello':'\x02Comedy team who had everyone guessing - \x0f"Who\'s on first?"\x02 ',
 'Adam & Eve':'\x02A relationship of Biblical proportions.',
-'Alan Greenspan':'\x021926-, chairman of the U.S. Federal Reserve Board.',
+'Alan Greenspan':'\x021926-, former chairman of the U.S. Federal Reserve Board.',
 'AM & FM':'\x0fMaking waves in radio\x02.',
 'Amsterdam':'\x02The capital of the Netherlands, and one of Europe\'s most beautiful and notorious cities.',
 'Ancient Rome':'\x02In ancient times, all roads led to Rome, \x0fand the traffic has only gotten worse\x02.',
@@ -1333,7 +1333,7 @@ REDCARDS = {
 'Apples & Oranges':'\x0fDon\'t even TRY to compare them\x02.',
 'Aristotle':'\x02384-322 B.C., ancient Greek philosopher. His writings formed the foundation for much of today\'s philosophical and political thought.',
 'Arm & A Leg':'\x0fSure, they were free, but just try replacing them\x02.',
-'Armadillo':'\x02Burrowing mammal with armor-like bony plat covering. \x0fRoadkill extraordinaire\x02.',
+'Armadillo':'\x02Burrowing mammal with armor-like bony plate covering. \x0fRoadkill extraordinaire\x02.',
 'Arnold Schwarzenegger':'\x021947-, Austrian born body-builder turned actor. "My body is like breakfast, lunch, and dinner. I don\'t thinkabout it, I just have it."',
 'Aroma Therapy':'\x02Alternative medicine. \x0fSomething\'s smelly about it\x02.',
 'Arsenic & Old Lace':'\x02The hilarious dark comedy written by Joseph Kesselring, or the 1944 film adaptation by Frank Capra.',
@@ -1380,8 +1380,8 @@ REDCARDS = {
 'Bumper Cars':'\x0fMuch like rush hour in Chicago\x02.',
 'Burger & Fries':'\x0fYou want flies with that?"\x02 ',
 'Buttons & Bows':'\x02Cute as a button, or a bow.',
-'Calvin & Hobbs':'\x02Bill Waterson\'s late, great comic strip featuring a little boy and his tiger.',
-'Camelot':'\x02"On second though, let\'s not go to Camelot. \'Tis a silly place." - \x0fKing Arthur, Monty Python and the Holy Grail\x02 ',
+'Calvin & Hobbes':'\x02Bill Waterson\'s late, great comic strip featuring a little boy and his tiger.',
+'Camelot':'\x02"On second thought, let\'s not go to Camelot. \'Tis a silly place." - \x0fKing Arthur, Monty Python and the Holy Grail\x02 ',
 'Carlos Santana':'\x021947-, guitar legend and member of the Rock and Roll Hall of Fame. Truly \x0fSupernatural\x02.',
 'Carrot & A Stick':'\x02The ultimate motivator... \x0ffor a donkey\x02.',
 'Cat & Mouse':'\x02It\'s just a game.',
@@ -1414,7 +1414,7 @@ REDCARDS = {
 'Crabs':'\x02As crustaceans, crabs are related to lobster and shrimp. \x0fWhat do they all have in common? They all go well with butter\x02.',
 'Crash & Burn':'\x02Try, try again.',
 'Cream & Sugar':'\x0fDo you want some coffee with that?\x02 ',
-'Crime & Punishment':'\x02Fyodor Dostoevsky\'s 1917 classic novel following the tormented life of the murderer Rodion Romanovich Roskolnikov.',
+'Crime & Punishment':'\x02Fyodor Dostoevsky\'s 1866 classic novel following the tormented life of the murderer Rodion Romanovich Roskolnikov.',
 'Cup & Saucer':'\x02Tea Time!',
 'Curds & Whey':'\x0fWhat? It\'s just cottage cheese?\x02 ',
 'Currier & Ives':'\x02The lithography shop operated from 1834 to 1907 and produced over 7500 titles, all of which could have been called \x0f"Life In America."\x02 ',
@@ -1463,7 +1463,7 @@ REDCARDS = {
 'Food & Shelter':'\x02Gotta have it.',
 'Food Poisoning':'\x0fThis chicken tastes kinda funny...\x02 ',
 'Foot & Mouth':'\x02An infectious disease of animals with hooves. \x0fNot the same as foot-IN-mouth disease which affects everybody at one time or another\x02.',
-'Forever & Ever':'\x02"Oh, baby, I\'m gonna to love you forever/ Forever and ever amen." \x0fRandy Travis\x02 ',
+'Forever & Ever':'\x02"Oh, baby, I\'m gonna love you forever/ Forever and ever amen." \x0fRandy Travis\x02 ',
 'Fortune Cookies':'\x0f"You will soon eat a flat, dry, tasteless cookie..."\x02 ',
 'Freaks & Geeks':'\x02The 1999 television show, \x0for those outside the social norm\x02.',
 'Fred & Ginger':'\x02Fred Astair & Ginger Rogers - tap dancing their way into the hearts of millions.',
@@ -1526,12 +1526,12 @@ REDCARDS = {
 'King Tut':'\x02Boy king who ruled Egypt from 1333 to 1323 B.C., known for the great wealth of objects found in his tomb. \x0fHe took it with him\x02.',
 'Kiss & Tell':'\x0fBest to keep your mouth shut\x02.',
 'Knife & Fork':'\x02Knife on the right, fork on the left.',
-'Knitting Needles':'\x02Knit one, pearl two...',
+'Knitting Needles':'\x02Knit one, purl two...',
 'Lady & The Tramp':'\x02The 1955 Disney animated film featuring dogs, love and spaghetti.',
 'Lance Armstrong':'\x021971-, American cyclist, cancer survivor and winner of the Tour De France - \x0fbrought new meaning to the phrase "Going Postal."\x02 ',
 'Lassie':'\x02A famous collie, Lassie starred in her own TV show. \x0fWhat\'s that you say Lassie? Little Timmy\'s fallen down the well?\x02 ',
 'Last Night':'\x0fAbout last night...\x02 ',
-'Last Will & Testament':'\x0fIt may be your only chance to get the last work on anything\x02.',
+'Last Will & Testament':'\x0fIt may be your only chance to get the last word on anything\x02.',
 'Laurel & Hardy':'\x02Classic fat-skinny comedy duo of the 1920s.',
 'Laverne & Shirley':'\x02The 1970s sitcom phenomenon that defined Milwaukee for the world. \x0fAnd Milwaukee\'s still trying to live it down!\x02 ',
 'Law & Order':'\x02The television show, or the concept.',
@@ -1657,7 +1657,7 @@ REDCARDS = {
 'Smith & Wesson':'\x0fFirearms when ready!\x02 ',
 'Smoke & Mirrors':'\x0fThat\'s how we do it!\x02 ',
 'Snips & Snails':'\x02And puppy dog tails.',
-'Snoopy & The Red Barron':'\x02Characters in the \x0fPeanuts\x02 comic strip. \x0fTalk about a dog fight!\x02 ',
+'Snoopy & The Red Baron':'\x02Characters in the \x0fPeanuts\x02 comic strip. \x0fTalk about a dog fight!\x02 ',
 'Space & Time':'\x02Infinite.',
 'Spiders & Snakes':'\x0fCreepy! Legs or no legs\x02.',
 'Spit & Polish':'\x0fWe could do with less spit and more polish\x02.',
@@ -1706,7 +1706,7 @@ REDCARDS = {
 'Thunder & Lightning':'\x02Nature\'s fireworks.',
 'Timbuktu':'\x02City of 20,000 located in the West African nation of Mali. The official name if Tombouctou. \x0fFrom here to Timbuktu\x02.',
 'Time Travel':'\x02"What do you mean I missed my connection in the 14th Century?"',
-'Timothy McVey':'\x021961-2001, the Oklahoma City Bomber.',
+'Timothy McVeigh':'\x021961-2001, the Oklahoma City Bomber.',
 'Tom & Jerry':'\x0fA good chaser\x02.',
 'Tony Blair':'\x021951-, British Prime Minister, "We will not rest until this evil is driven from our world." Sept. 11, 2001.',
 'Track & Field':'\x02It\'s eventful.',
@@ -1770,7 +1770,7 @@ REDCARDS = {
 'Aretha Franklin':'\x021942-, American rock and roll, blues, and gospel singer. \x0fThe Queen of Soul deserves more than a little R-E-S-P-E-C-T.',
 'Avalanches':'\x02Nearly all avalanches that involve people are triggered by the victims themselves. \x0fSo walk softly and carry a cell phone\x02.',
 'Baghdad':'\x02The capital of Iraq. This city was founded in 764 A.D. and called Madinat as-Salam which means "City of Peace."',
-'Barbra Streisand':'\x021942- , American singer, actor, director, and producer. The first ever to win a Grammy, Emmy, Oscar and a Tony. \x0fA star WAS born!\x02 ',
+'Barbera Streisand':'\x021942- , American singer, actor, director, and producer. The first ever to win a Grammy, Emmy, Oscar and a Tony. \x0fA star WAS born!\x02 ',
 'Bette Midler':'\x021945-, American actor and popular singer. From the New York bathhouses to the "Divine Miss M."',
 'Big Bellies':'\x0fOften found on chubby hubbies\x02...',
 'Bill Cosby':'\x021937-, American actor and comedian who starred in \x0fI Spy\x02, \x0fThe Cosby Show\x02, and created Fat Albert. \x0fHey, hey, hey-he\'s got a PhD!\x02 ',
@@ -1889,10 +1889,10 @@ REDCARDS = {
 'Galactic Noise':'\x02The radio-frequency radiation originating outside the solar system. \x0fIs it just us, or is there somebody else out there?\x02 ',
 'Game Sanctuaries':'\x0fProtection for game players everywhere\x02.',
 'Garage Sales':'\x02Tag sales, yard sales, rummage sales - take your pick, just get there early!',
-'Garlic':'\x02The flavor that lasts, and last, and lasts...',
+'Garlic':'\x02The flavor that lasts, and lasts, and lasts...',
 'Gas Prices':'\x02What goes up, must...go up again!',
 'Gen. Douglas MacArthur':'\x021880-1964, the most decorated soldier in the history of the U.S. military. MacArthur took part in WWI, WWII and the Korean War.',
-'Gentlemen':'\x0fThey prefer blondes... brunettes...redheads...\x02 ',
+'Gentlemen':'\x0fThey prefer blondes... brunettes... redheads...\x02 ',
 'Geronimo':'\x021829-1909, Apache leader known for his wisdom and courage. He died as a prisoner of war at Fort Sill in Oklahoma.',
 'Getting A Raise':'\x02Asking for one gets a raise... out of your boss.',
 'Girls Night Out':'\x0fDon\'t worry, Honey, it\'s just shopping and dinner\x02.',
@@ -1935,19 +1935,19 @@ REDCARDS = {
 'Injustice':'\x02It\'s just not fair.',
 'Intelligent Design':'\x02The name given to the concept that the universe, and all living things, are a result of an intelligent creator.',
 'International Spies':'\x02Cool gadgets.',
-'Internet Dating':'\x02Turn-ones: candlelight dinners and walks on the beach. Turn-offs: \x0fthe computer crashing\x02...',
+'Internet Dating':'\x02Turn-ons: candlelight dinners and walks on the beach. Turn-offs: \x0fthe computer crashing\x02...',
 'Iraq':'\x02Iraq attained its independence in 1932 and was declared a republic in 1958. Population: 26 million',
 'Irish Setters':'\x02High-energy bird dog known for its silky red coat and playful personality. \x0fErin go woof\x02.',
 'Iron Chef':'\x02Japanese television program. World-class chefs compete to create 3-course meals. \x0fGalloping Gourmet meets World Wrestling Federation\x02.',
 'Island Retreat':'\x02Look, Honey, \x0fThe Island of Dr. Moreau,\x02 doesn\'t that sound nice?...',
 'Jail':'\x02Do not pass Go. Do not collect $200.',
 'James Woods':'\x021947-, American actor nominated for Academy Awards for \x0fGhosts of Mississippi\x02 and \x0fSalvador\x02. He dropped out of M.I.T. to pursue acting.',
-'Jane Fonda':'\x021937-, American actor who made 40 films and won Academy Awards for \x0fKlute\x02 and \x0fComing Home\x02. A.k.a. Hanoi Jane.',
+'Jane Fonda':'\x021937-, American actress who made 40 films and won Academy Awards for \x0fKlute\x02 and \x0fComing Home\x02. A.k.a. Hanoi Jane.',
 'Janet Jackson':'\x021966-, American singer, composer and actor. Early in her career she played Penny on \x0fGood Times\x02 and Charlene on \x0fDiff\'rent Strokes\x02.',
-'Jennifer Anistor':'\x021969-, American film and television actress, best known for the highly successful comedy series, \x0fFriends\x02.',
+'Jennifer Aniston':'\x021969-, American film and television actress, best known for the highly successful comedy series, \x0fFriends\x02.',
 'Jet Lag':'\x02Some travel experts estimate that it takes a day of recovery for each time zone passed.',
 'John Doe':'\x02Who?',
-'Jahn Malkovich':'\x021953-, American movie actor and director. Known for \x0fIn the Line of Fire\x02, \x0fPlaces in the Heart\x02 and, of course, \x0fBeing John Malkovich\x02.',
+'John Malkovich':'\x021953-, American movie actor and director. Known for \x0fIn the Line of Fire\x02, \x0fPlaces in the Heart\x02 and, of course, \x0fBeing John Malkovich\x02.',
 'Jugglers':'\x0fThey\'ve got their hands full\x02.',
 'Julia Child':'\x021912-2004, American chef, author and television personality. She popularized French cooking in the United States. Bon Appetit!',
 'Justin Timberlake':'\x021981-, American singer whose career began on \x0fStar Search\x02 at age 11, then on to \x0fThe Mickey Mouse Club\x02, and \'N Sync. \x0fCurly Spice!\x02 ',
@@ -1970,7 +1970,7 @@ REDCARDS = {
 'Liberals':'\x02To the left of the political spectrum.',
 'Librarians':'\x02"How to make an atomic bomb? No problem, we have a book on that."',
 'Lima Beans':'\x02Lima beans have been cultivated in Peru since 6000 B.C. - that\'s a whole lotta limas.',
-'Limosines':'\x02Stretch out and enjoy the ride.',
+'Limousines':'\x02Stretch out and enjoy the ride.',
 'Live Bait':'\x02GONE FISHIN\'',
 'Long Division':'\x0fThat\'s why calculators were invented\x02.',
 'Losing Your Luggage':'\x02If only your luggage got frequent flyer miles.',
@@ -2005,7 +2005,7 @@ REDCARDS = {
 'My Inheritance':'\x02It\'s all in the family...',
 'My Obituary':'\x02"The report of my death was an exaggeration.: - \x0fMark Twain\x02 ',
 'My Sweetheart':'\x02"No, I love YOU more!" "\x0fNo, I love YOU more!\x02"',
-'Nachos':'\x02"Nacho, nacho man. I want to be a nacho man,: - \x0fHomer Simpson\x02 ',
+'Nachos':'\x02"Nacho, nacho man. I want to be a nacho man!" - \x0fHomer Simpson\x02 ',
 'Napoleon Dynamite':'\x022004 upbeat comedy film starring Jon Heder as an alienated teenager in a small western high school. \x0fGosh!\x02 ',
 'National Debt':'\x02We\'ll let our kids worry about that...',
 'Nebraska':'\x02Famous Nebraskans: Willa Cather, Crazy Horse, Fred Astaire, and Marlon Brando.',
@@ -2013,13 +2013,14 @@ REDCARDS = {
 'New Year\'s Resolution':'\x0fThis year\'s going to be different\x02...',
 'New York Times':'\x02"The grey lady" was one of the last newspapers to adopt color photography. \x0fSeems like they were a bit behind the times\x02...',
 'Nicole Kidman':'\x021967-, actor, American born but raised in Australia. She won Academy Awards for \x0fThe Hours\x02 and \x0fMoulin Rouge\x02.',
-'Norway Spruce':'\x02This fast-growing conifer is native to central and northern Europe and quickly reaches 80 feet in \height.',
+'Norway Spruce':'\x02This fast-growing conifer is native to central and northern Europe and quickly reaches 80 feet in height.',
 'Notre Dame Football':'\x02Not just football-it\'s Notre Dame Football! WE-ARE-N-D, GO-IRISH!',
 'Nurses':'\x02"After two days in the hospital I took a turn for the nurse." - \x0fW. C. Fields\x02 ',
 'Oklahoma City Bombing':'\x02On April 19, 1995 a massive explosion was set off, destroying a federal building, killing 168 people, and injuring 850 others.',
 'Oktoberfest':'\x0fLace up your lederhosen and roll out the barrel!\x02 ',
 'Optic Nerves':'\x0fYou\'re getting on your optic nerves, man!\x02 ',
 'Orlando, Florida':'\x02Cypress Gardens, Universal Studios, Sea World and Disney World. Something for everyone- \x0feveryone who likes theme parks, that is.\x02 ',
+'Osama Bin Laden':'\x021957-, Saudi Arabian suspected of masterminding terrorist attacks throughout the world.',
 'Owen Wilson':'\x021968-, American actor, appeared in \x0fRushmore\x02, \x0fThe Royal Tenenbaums\x02 and \x0fWedding Crashers\x02. He\'s a self-proclaimed trouble-maker.',
 'Owning Land':'\x02"Why, land is the only thing in the world worth workin\' for, worth fightin\' for, worth dyin\' for..." - Gerald O\'Hara \x0fGone with the Wind\x02 ',
 'Pamela Anderson':'\x021967-, Canadian actor. From \x0fHome Improvement\x02 to \x0fBaywatch\x02 and \x0fStripperella\x02, with five Playboy covers along the way.',
@@ -2068,7 +2069,7 @@ REDCARDS = {
 'Saber-Tooth Tigers':'\x02Now extinct, the saber-tooth tiger used large canine teeth to rip into the throat or belly of it\'s prey. It\'s the California State Fossil.',
 'Safety Pins':'\x0fFor diapers\x02. \x0fOr punks\x02. \x0fOr old punks\' diapers\x02.',
 'Sand Dollars':'\x02Members of the class of marine animals known as echinoids. Save enough and you can buy a sand castle.',
-'Sand Dunes':'\x02The are five basic dune shapes: linear, dome, crescent, star and parabola.',
+'Sand Dunes':'\x02There are five basic dune shapes: linear, dome, crescent, star and parabola.',
 'Saturday Night Live':'\x02The award-winning comedy show featuring top musical performances and guest hosts. \x0f"Live from New York..."\x02 ',
 'Sauerkraut':'\x02Cabbage, salt and the magic of fermentation...',
 'Saunas':'\x02Just sweat it out...!',
@@ -2088,7 +2089,7 @@ REDCARDS = {
 'Silicon Valley':'\x02Great place to live... they\'re all virus protected.',
 'Single Women':'\x0fGirls just want to have fun!\x02 ',
 'Sleep':'\x02"I have never taken any exercise except sleeping and resting." - \x0fMark Twain\x02 ',
-'Slot Machines':'\x02Think you\'ll win? The they\'re pulling YOUR arm...',
+'Slot Machines':'\x02Think you\'ll win? Then they\'re pulling YOUR arm...',
 'Snoop Dogg':'\x021971-, American popular gangsta-rapper known for his distinctive style, as well as his albums, soundtracks, and TV and film appearances.',
 'Social Workers':'\x0fGoing down to the water cooler doesn\'t make you a social worker\x02.',
 'Sockeye Salmon':'\x02Found in the Pacific and Arctic oceans, the sockeye salmon can be identified by the distinct gill rakers, \x0for the sublime tarragon sauce\x02.',
@@ -2111,7 +2112,7 @@ REDCARDS = {
 'Swordfish':'\x0fA cut above other fish\x02.',
 'Target Stores':'\x02Stores in 47 states... \x0fTarget the one near you\x02.',
 'Tater Tots':'\x02"Are you gonna eat your tots?" - \x0fNapoleon Dynamite\x02 ',
-'Ted Kennedy':'\x021932-, U.S. Democratic Senator representing Massachusetts since 1962. \x0fOne of the clan\x02.',
+'Ted Kennedy':'\x021932-2009, U.S. Democratic Senator representing Massachusetts since 1962. \x0fOne of the clan\x02.',
 'Teleporters':'\x0fBeam me up!\x02 ',
 'The Atkins Diet':'\x02Steak and potatoes... \x0fminus the potatoes\x02...',
 'The Attic':'\x0fIt\'s up there somewhere\x02...',
@@ -2122,7 +2123,7 @@ REDCARDS = {
 'The Frozen Tundra':'\x02Derived from the Finnish word for barren, a tundra has long, cold winters and strong dry winds. \x0fMuskoxen and Packer fans seem to like it\x02.',
 'The Hamptons':'\x02Where the elite meet to summer...',
 'The Infantry':'\x02Branch of the army trained to fight on foot. \x0fThe front line\x02...',
-'The Louisianna Purchase':'\x02In 1803, the U.S. purchased about 600 million acres of land from France for less than three cents per acre. \x0fNow, there\'s a bargain!\x02 ',
+'The Louisiana Purchase':'\x02In 1803, the U.S. purchased about 600 million acres of land from France for less than three cents per acre. \x0fNow, there\'s a bargain!\x02 ',
 'The Marines':'\x02The United States Marine Corps. The Few. The Proud. \x0fSemper Fi\x02.',
 'The Meaning Of Life':'\x02Go ask your mother.',
 'The Milk Man':'\x02Door-to-door dairy.',
@@ -2134,7 +2135,7 @@ REDCARDS = {
 'The Rodeo':'\x02Real cowboys... \x0fsurrounded by a bunch of clowns\x02...',
 'The Secret Service':'\x0fThey\'re so cool, they wear sunglasses at night\x02.',
 'The Seven Dwarfs':'\x02From the classic 1937 Disney film, \x0fSnow White and the Seven Dwarfs\x02. Snow White\'s posse.',
-'The Speed Of Light':'\x02According to Einstein, nothing in the Universe can exceed the sped of light. \x0fIt\'s the cosmic speed limit!\x02 ',
+'The Speed Of Light':'\x02According to Einstein, nothing in the Universe can exceed the speed of light. \x0fIt\'s the cosmic speed limit!\x02 ',
 'The Starship Enterprise':'\x02A galaxy-class, extended duration, starship from \x0fStar Trek\x02. \x0f"The engines can\'nae take it, Captain!"\x02 ',
 'The Suburbs':'\x02"Another Pleasant Valley Sunday, charcoal burning everywhere, rows of houses that are all the same..." - \x0fThe Monkees\x02 ',
 'The Village People':'\x02Disco band formed in the 1970s. Y...M...C...A...',
@@ -2150,7 +2151,6 @@ REDCARDS = {
 'Trout Fishing':'\x0fEverybody\'s got an angler\x02.',
 'Tsunami':'\x02The Japanese word meaning "harbor wave." The wave heightens when the speed diminishes as the wave travels into shallower water.',
 'U.S. Air Force':'\x02U.S. air and space power. The most technologically sophisticated of the military branches. \x0fCross Into The Blue\x02.',
-'Usama Bin Laden':'\x021957-, Saudi Arabian suspected of masterminding terrorist attacks throughout the world.',
 'Utah':'\x02The name, Utah, came from the American Indian tribe Ute, and means \x0f"people of the mountains."\x02 ',
 'V8':'\x02Super charged: the tomato juice or the engine. \x0fWow, I could have had a V8!\x02 ',
 'Vegetarians':'\x0fI\'ll take the tofu burger with the soy bacon strips\x02.',
@@ -2200,11 +2200,24 @@ class ApplesToApples(BasePlugin):
 
     def privreply(self, user, text):
         self.bot.noteout(user, text)
+        
+    def user_nickchange(self, old, new):
+        for list_ in (self.players, self.live_players, self.round_players):
+            if old in list_:
+                list_[list_.index(old)] = new
+        for value in (self.playedcards):
+            if value[0] == old:
+                value[0] = new
+        for map_ in (self.hands, self.woncards):
+            if map_.has_key(old):
+                map_[new] = map_[old]
+                del map_[old]
 
     def resetdata(self):
         self.gamestate = "None"
         self.players = []
         self.live_players = []
+        self.round_players = []
         self.greendeck = GREENCARDS.keys()
         random.shuffle(self.greendeck)
         self.reddeck = REDCARDS.keys()
@@ -2272,7 +2285,16 @@ class ApplesToApples(BasePlugin):
         self.bot.pubout(self.channel, "The new green card is: \x02\x033%s\x0F - %s. Please play cards from your hand using '!play <number>'." % (self.greencard, GREENCARDS[self.greencard]))
         
     def checkroundover(self):
-        if len(self.playedcards) == len(self.live_players) - 1:
+        allplayed = True
+        for player in self.live_players:
+            if player != self.live_players[self.judgeindex]:
+                playerplayed = False
+                for card in self.playedcards:
+                    if player == card[0]:
+                        playerplayed = True
+                if playerplayed == False:
+                    allplayed = False
+        if allplayed:
             self.bot.pubout(self.channel, "All cards have been played.")
             self.judging = True
             self.beginjudging()
@@ -2442,7 +2464,8 @@ class ApplesToApples(BasePlugin):
         elif self.gamestate == "InProgress":
             if user not in self.live_players:
                 self.bot.pubout(self.channel, "%s is now in the game." % user)
-                self.players.append(user)
+                if user not in self.players:
+                    self.players.append(user)
                 if user not in self.woncards:
                     self.woncards[user] = []
                 self.live_players.insert(self.judgeindex, user)
@@ -2452,13 +2475,13 @@ class ApplesToApples(BasePlugin):
                     for i in range(1, 8):
                         self.hands[user].append(self.reddeck.pop(0))
                     self.hands[user].sort()
-                    hand = []
-                    for i in range (1, 8):
-                        hand.append("%i: \x034%s\x0F" % (i, self.hands[user][i-1]))
                 else:
                     while len(self.hands[user]) < 7:
                         self.hands[user].append(self.reddeck.pop(0))
                         self.privreply(user, "You draw: \x034%s\x0F: %s" % (self.hands[user][len(self.hands[user])-1], REDCARDS[self.hands[user][len(self.hands[user])-1]]))
+                hand = []
+                for i in range (1, 8):
+                    hand.append("%i: \x034%s\x0F" % (i, self.hands[user][i-1]))
                 self.privreply(user, "Your hand: %s" % ", ".join(hand))
             else:
                 self.reply(channel, user, "You are already in the game.")
@@ -2492,7 +2515,7 @@ class ApplesToApples(BasePlugin):
             
     def cmd_prompt(self, args, channel, user):
         if self.gamestate == "InProgress":
-            if len(self.playedcards) != len(self.live_players) - 1:
+            if self.judging == False:
                 finishedplayers = [self.judgeindex]
                 for card in self.playedcards:
                     finishedplayers.append(card[0])
@@ -2573,21 +2596,21 @@ class ApplesToApples(BasePlugin):
                         self.reply(channel, user, "That player is not in this game.")
                 except IndexError:
                     self.reply(channel, user, "Please specify the player to delete.")
-            elif self.gamestate == "Starting":
-                try:
-                    player = args[0]
-                    if player in self.live_players:
-                        self.bot.pubout(self.channel, "%s has been deleted from the game." % player)
-                        self.live_players.remove(player)
-                        if len(self.live_players) == 0:
-                            self.bot.pubout(self.channel, "Game is now empty.")
-                            self.endgame()
-                    else:
-                        self.reply(channel, user, "That player is not in this game.")
-                except IndexError:
-                    self.reply(channel, user, "Please specify the player to delete.")
             else:
                 self.reply(channel, user, "There is no game in progress.")
+        elif self.gamestate == "Starting":
+            try:
+                player = args[0]
+                if player in self.live_players:
+                    self.bot.pubout(self.channel, "%s has been deleted from the game." % player)
+                    self.live_players.remove(player)
+                    if len(self.live_players) == 0:
+                        self.bot.pubout(self.channel, "Game is now empty.")
+                        self.endgame()
+                else:
+                    self.reply(channel, user, "That player is not in this game.")
+            except IndexError:
+                self.reply(channel, user, "Please specify the player to delete.")
         else:
             self.reply(channel, user, "You need to be at least a botmod to use that command.")
             
@@ -2608,8 +2631,8 @@ class ApplesToApples(BasePlugin):
 
     def cmd_rules(self, args, channel, user):
         self.reply(channel, user, "Apples to Apples is a very simple, yet surprisingly fun, party game. Playing is easy! Just say !join to join a game, or !start to begin one if there are none starting. Every player gets 7 cards, replenished at the start of each round. A green card is also selected at the start of each round.")
-        self.reply(channel, user, "If you are not judging, use !play [number from your hand] to play a card, preferably related to the green card. If you are judging, wait for everyone to play. You can use !prompt to see who has not yet played a card. If you forget your hand, use !hand to see it again. If you want to read a card, use !peek [number from your hand]. To see the green cards you have one, say !greens.")
-        self.reply(channel, user, "After all players have put down a card, the Judge gets to choose the winner, with !pick [number]. There is no set criteria to determine the 'best' card. The judge simpy picks the card they like the most! It could be the one that fits the green card best, or the one they find the funniest. It's up to the judge! Players can only learn what the judges like, and use that to their advantage.")
+        self.reply(channel, user, "If you are not judging, use !play [number from your hand] to play a card, preferably related to the green card. If you are judging, wait for everyone to play. You can use !prompt to see who has not yet played a card. If you forget your hand, use !hand to see it again. If you want to read a card, use !peek [number from your hand]. To see the green cards you have won, say !greens.")
+        self.reply(channel, user, "After all players have put down a card, the Judge gets to choose the winner, with !pick [number]. There is no set criteria to determine the 'best' card. The judge simply picks the card they like the most! It could be the one that fits the green card best, or the one they find the funniest. It's up to the judge! Players can only learn what the judges like, and use that to their advantage.")
 
     def do_command(self, channel, user, cmd):
         if cmd=='': return
