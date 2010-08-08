@@ -1,3 +1,4 @@
+#!/usr/bin/python
 ##
 ##    pyGBot - Versatile IRC Bot
 ##    Copyright (C) 2008 Morgan Lokhorst-Blight, Alex Soborov, Paul Rotering
