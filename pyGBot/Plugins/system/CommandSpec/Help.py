@@ -21,8 +21,8 @@ from pyGBot.Plugins.system.Auth import AuthLevels as AL
 
 class Help(BaseCommand):
     level = AL.User
-    def __init__(self, bot, channel, user, args):        bot.pubout(channel, 'Commands available:')        bot.pubout(channel, 'list: Lists games to play.')
-        bot.pubout(channel, 'start <gamename>: Starts a game.')                bot.pubout(channel, 'stop <gamename>: Stops a game.')
+    def __init__(self, bot, channel, user, args):        bot.pubout(channel, 'Commands available:')        bot.pubout(channel, 'list: Lists games to play.')
+        bot.pubout(channel, 'start <gamename>: Starts a game.')                bot.pubout(channel, 'stop <gamename>: Stops a game.')
         bot.pubout(channel, 'join <channel>: Joins a channel.')
         bot.pubout(channel, 'part <channel>: Parts a channel.')
         bot.pubout(channel, 'say <channel> <message>: Says <message> on <channel>.')
