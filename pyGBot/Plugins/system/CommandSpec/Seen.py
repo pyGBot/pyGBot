@@ -36,16 +36,9 @@ class Seen(BaseCommand):
     level = AL.User
 
     def __init__(self, bot, channel, user, args):
-        if channel is None:
-            out = privout(bot)
-            target = user
-        else:
-            out = pubout(bot)
-            target = channel
-
         args = args.strip().split()
         if not args:
-            out(target, 'Command usage: seen <user> [channel]')
+            replyout(channel, user, 'Command usage: seen <user> [channel]')
             return
 
         username = args[0]
@@ -106,5 +99,5 @@ class Seen(BaseCommand):
             outmessage += "changing nick to %s." % event.message
         elif event.type == "NickFrom":
             outmessage += "changing nick from %s." % event.message
-        out(target, outmessage)
+        replyout(channel, user, outmessage)
 
