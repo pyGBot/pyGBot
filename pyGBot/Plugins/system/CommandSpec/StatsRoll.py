@@ -49,7 +49,7 @@ class StatsRoll(BaseCommand):
 
             replyout(channel, user, str(rolls))
 
-        replyout(channel, user, ,"Stats are: %s." % ', '.join(map(str, stats)))
+        replyout(channel, user, "Stats are: %s." % ', '.join(map(str, stats)))
 
 
     def rollStats(self, sortdir):
