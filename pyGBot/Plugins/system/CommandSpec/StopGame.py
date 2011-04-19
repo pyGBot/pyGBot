@@ -25,4 +25,4 @@ class StopGame(BaseCommand):
         for p in bot.activeplugins:
             if p.startswith('games.'):
                 if bot.deactivatePlugin(p, channel):
-                    bot.replyout(channel, user, "%s stopped." % p.split('.')[1])
+                    bot.pubout(channel, "%s stopped." % p.split('.')[1])
