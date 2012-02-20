@@ -15,10 +15,12 @@
 #
 
 # These values specify which server to connect to, and should be preferred to
-# 'localaddr' and 'localport'. 
+# 'localaddr' and 'localport'.
+# SSL support now included. Change the value to 'true' to enable.
 
 host = irc.quakenet.org
 port = 6667
+ssl = false
 
 # These values specify a local address to bind to. 'host' and 'port' are 
 # preferred. Uncomment these to enable them.
