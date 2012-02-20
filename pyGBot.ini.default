@@ -91,25 +91,25 @@ flooddelay = 2
 # logfile = /opt/pygbot/pygbot.log
 # chatlogfile = /opt/pygbot/chat.log
 
-# You should ignore all the following values unless you are positive you know 
-# how they work. Changes to this list will not be supported, and are highly 
-# discouraged.
+# Unless otherwise noted, you should ignore all the following values unless
+# you are positive you know how they work. Changes to this list will not be
+# supported, and are highly discouraged.
 
 [Plugins]
 system.Startup =
 system.Auth =
 system.Commands =
 system.Modes =
-games.ApplesToApples = 
-games.Mafia =
-games.Poker =
-games.Werewolf =
-games.Uno =
-games.Fluxx =
-math.Calculate =
-probability.Decide =
-probability.Roll =
-features.Seen =
+
+# Optional features. Uncomment to enable.
+#games.ApplesToApples = 
+#games.Mafia =
+#games.Poker =
+#games.Werewolf =
+#games.Uno =
+#games.Fluxx =
+#probability.Decide =
+#features.Seen =
 
 # Plugins to activate on connect
 
@@ -117,10 +117,10 @@ features.Seen =
 system.Auth =
 system.Commands =
 system.Modes =
-math.Calculate =
-probability.Decide =
-probability.Roll =
-features.Seen =
+
+# More optional features.
+#probability.Decide =
+#features.Seen =
 
 [Plugins.system.Commands]
 _prefix = ^
@@ -134,11 +134,13 @@ part = PartChannel
 say = Say
 do = Do
 msg = Msg
-statsroll = StatsRoll
 help = Help
 nick = ChangeNick
 seen = Seen
 usermode = UserMode
+
+# This one's optional.
+#statsroll = StatsRoll
 
 [version]
 number = 0.1.5
