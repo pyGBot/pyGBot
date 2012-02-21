@@ -93,6 +93,10 @@ class Auth(BasePlugin):
     def bot_disconnect(self):
         pass
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/master
     # Event handlers for incoming messages
     def msg_channel(self, channel, user, message):
         pass
@@ -153,4 +157,8 @@ class Auth(BasePlugin):
                 return None
         else:
             return None
+<<<<<<< HEAD
  
+=======
+ 
+>>>>>>> upstream/master

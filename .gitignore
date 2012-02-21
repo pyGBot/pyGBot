@@ -2,3 +2,5 @@
 *.sqlite
 *.log
 *.ini
+*~
+.*.sw?

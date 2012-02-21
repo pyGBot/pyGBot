@@ -1,3 +1,4 @@
+#!/usr/bin/python
 ##
 ##    hashpw - a tool for generating password hashes and user entries for
 ##             pyGBot.

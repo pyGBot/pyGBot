@@ -21,12 +21,15 @@ from pyGBot.Plugins.system.Auth import AuthLevels as AL
 
 class Help(BaseCommand):
     level = AL.User
-    def __init__(self, bot, channel, user, args):        bot.pubout(channel, 'Commands available:')        bot.pubout(channel, 'list: Lists games to play.')
-        bot.pubout(channel, 'start <gamename>: Starts a game.')                bot.pubout(channel, 'stop <gamename>: Stops a game.')
-        bot.pubout(channel, 'join <channel>: Joins a channel.')
-        bot.pubout(channel, 'part <channel>: Parts a channel.')
-        bot.pubout(channel, 'say <channel> <message>: Says <message> on <channel>.')
-        bot.pubout(channel, 'do <channel> <action>: Performs <action> in <channel> (the /me command).')
-        bot.pubout(channel, 'msg <user> <message>: Sends <user> a message.')        
-        bot.pubout(channel, 'statsroll: Generates a DnD-style Stats set.')
-        bot.pubout(channel, 'help: This help.')
+    def __init__(self, bot, channel, user, args):
+        bot.replyout(channel, user, 'Commands available:')
+        bot.replyout(channel, user, 'list: Lists games to play.')
+        bot.replyout(channel, user, 'start <gamename>: Starts a game.')
+        bot.replyout(channel, user, 'stop <gamename>: Stops a game.')
+        bot.replyout(channel, user, 'join <channel>: Joins a channel.')
+        bot.replyout(channel, user, 'part <channel>: Parts a channel.')
+        bot.replyout(channel, user, 'say <channel> <message>: Says <message> on <channel>.')
+        bot.replyout(channel, user, 'do <channel> <action>: Performs <action> in <channel> (the /me command).')
+        bot.replyout(channel, user, 'msg <user> <message>: Sends <user> a message.')        
+        bot.replyout(channel, user, 'statsroll: Generates a DnD-style Stats set.')
+        bot.replyout(channel, user, 'help: This help.')

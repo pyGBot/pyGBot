@@ -25,8 +25,8 @@ class ListGames(BaseCommand):
         args = args.split()
 
         avail = [p.split('.')[1] for p in bot.plugins.iterkeys() if p.startswith('games.')]
-        bot.pubout(channel, 'Available games: %s' % ', '.join(avail))
+        bot.replyout(channel, user, 'Available games: %s' % ', '.join(avail))
         
         active = [p.split('.')[1] for p in bot.activeplugins if p.startswith('games.')]
         if len(active) > 0:
-            bot.pubout(channel, 'Active game: %s' % active[0])
+            bot.replyout(channel, user, 'Active game: %s' % active[0])

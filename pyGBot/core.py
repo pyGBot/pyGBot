@@ -54,6 +54,12 @@ class GBot(irc.IRCClient):
         # strip color codes
         log.chatlog.info('[PRV->%s]%s' % (user, stripcolors(msg)))
 
+    def replyout(self, channel, user, msg):
+        if (channel is None):
+            self.privout(user, msg)
+        else:
+            self.pubout(channel, msg)
+
     def noteout(self, user, msg):
         self.notice(user=user, message=msg)
 
