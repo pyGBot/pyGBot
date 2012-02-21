@@ -149,7 +149,7 @@ name = pyGBot
 [Plugins.system.Auth]
 # Set the authtype value to nickserv to auth via NickServ.
 # Command is then simply 'auth', no user or password required.
-# Any NickServ that responds to a STATUS request with 3 when
-# a user is fully authenticated is supported.
+# Nickserv auth is supported on standard Atheme services.
+
 authtype = pygbot
 #authtype = nickserv
