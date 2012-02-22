@@ -134,10 +134,6 @@ part = PartChannel
 say = Say
 do = Do
 msg = Msg
-<<<<<<< HEAD
-=======
-statsroll = StatsRoll
->>>>>>> upstream/master
 help = Help
 nick = ChangeNick
 seen = Seen
