@@ -156,33 +156,9 @@ class GBot(irc.IRCClient):
             print "Cant open config file: ", msg
             sys.exit(1)
 
-        try:
-            print "Opening log file..."
-            log.addScreenHandler(log.logger, log.formatter)
-            log.addLogFileHandler(log.logger,conf['IRC']['logfile'],log.formatter)
-        except IOError, msg:
-            print "Unable to open log file: ", msg
-            print "Defaulting to local."
-            log.addLogFileHandler(log.logger,'pyGBot.log',log.formatter)
-        except KeyError:
-            print "No log file config found. Defaulting to local."
-            log.addLogFileHandler(log.logger,'pyGBot.log',log.formatter)
-
-        try:
-            print "Opening log file..."
-            log.addLogFileHandler(log.chatlog,conf['IRC']['chatlogfile'],log.cformat)
-        except IOError, msg:
-            print "Unable to open log file: ", msg
-            print "Defaulting to local."
-            log.addLogFileHandler(log.chatlog,'chat.log',log.cformat)
-        except KeyError:
-            print "No log file config found. Defaulting to local."
-            log.addLogFileHandler(log.chatlog,'chat.log',log.cformat)
-
         if conf.has_key('IRC') == False:
             print "Config file does not contain IRC connection information"
             sys.exit(1)
-
 
         if conf['IRC'].has_key('nick'):
             self.nickname = conf['IRC']['nick']
@@ -414,6 +390,30 @@ class GBotFactory(protocol.ClientFactory):
     def __init__(self, channel, filename):
         self.channel = channel
         self.filename = filename
+        conf = ConfigObj('pyGBot.ini')
+        
+        try:
+            print "Opening log file..."
+            log.addScreenHandler(log.logger, log.formatter)
+            log.addLogFileHandler(log.logger,conf['IRC']['logfile'],log.formatter)
+        except IOError, msg:
+            print "Unable to open log file: ", msg
+            print "Defaulting to local."
+            log.addLogFileHandler(log.logger,'pyGBot.log',log.formatter)
+        except KeyError:
+            print "No log file config found. Defaulting to local."
+            log.addLogFileHandler(log.logger,'pyGBot.log',log.formatter)
+
+        try:
+            print "Opening log file..."
+            log.addLogFileHandler(log.chatlog,conf['IRC']['chatlogfile'],log.cformat)
+        except IOError, msg:
+            print "Unable to open log file: ", msg
+            print "Defaulting to local."
+            log.addLogFileHandler(log.chatlog,'chat.log',log.cformat)
+        except KeyError:
+            print "No log file config found. Defaulting to local."
+            log.addLogFileHandler(log.chatlog,'chat.log',log.cformat)
 
     def clientConnectionLost(self, connector, reason):
         """If we get disconnected, reconnect to server."""
@@ -462,19 +462,36 @@ def run():
         localport = int(conf['IRC']['localport'])
     if conf['IRC'].has_key('localaddr'):
         localaddr = conf['IRC']['localaddr']
+        
+    # hacked in SSL config option
+    sslconnect = False
+    if conf['IRC'].has_key('ssl'):
+        if conf['IRC']['ssl'].lower() == "true":
+            sslconnect = True
+            from twisted.internet import ssl
 
     print "Initialising Factory..."
     # create factory protocol and application
     fact = GBotFactory(channel, 'UNUSED')
+    # "Doctor, how does SSL work?" "I HAVE NO IDEA!"
+    if sslconnect:
+        cfact = ssl.ClientContextFactory()
 
     print "Connecting..."
 
     try:
         # connect factory to this host and port
-        if localaddr and localport:
-            reactor.connectTCP(host, port, fact, bindAddress=(localaddr, localport))
+        # now with SSL hack!
+        if sslconnect:
+            if localaddr and localport:
+                reactor.connectSSL(host, port, fact, cfact, bindAddress=(localaddr, localport))
+            else:
+                reactor.connectSSL(host, port, fact, cfact)
         else:
-            reactor.connectTCP(host, port, fact)
+            if localaddr and localport:
+                reactor.connectTCP(host, port, fact, bindAddress=(localaddr, localport))
+            else:
+                reactor.connectTCP(host, port, fact)
 
         # run bot
         reactor.run()
