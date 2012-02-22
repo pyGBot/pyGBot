@@ -38,7 +38,6 @@ class Auth(BasePlugin):
         BasePlugin.__init__(self, bot, options)
         self.users = {}
         self.conf = ConfigObj("users.ini")
-        print options
         try:
             if options["authtype"] == "nickserv":
                 self.authtype = "nickserv"
