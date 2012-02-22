@@ -15,10 +15,12 @@
 #
 
 # These values specify which server to connect to, and should be preferred to
-# 'localaddr' and 'localport'. 
+# 'localaddr' and 'localport'.
+# SSL support now included. Change the value to 'true' to enable.
 
 host = irc.quakenet.org
 port = 6667
+ssl = false
 
 # These values specify a local address to bind to. 'host' and 'port' are 
 # preferred. Uncomment these to enable them.
@@ -89,25 +91,25 @@ flooddelay = 2
 # logfile = /opt/pygbot/pygbot.log
 # chatlogfile = /opt/pygbot/chat.log
 
-# You should ignore all the following values unless you are positive you know 
-# how they work. Changes to this list will not be supported, and are highly 
-# discouraged.
+# Unless otherwise noted, you should ignore all the following values unless
+# you are positive you know how they work. Changes to this list will not be
+# supported, and are highly discouraged.
 
 [Plugins]
 system.Startup =
 system.Auth =
 system.Commands =
 system.Modes =
-games.ApplesToApples = 
-games.Mafia =
-games.Poker =
-games.Werewolf =
-games.Uno =
-games.Fluxx =
-math.Calculate =
-probability.Decide =
-probability.Roll =
-features.Seen =
+
+# Optional features. Uncomment to enable.
+#games.ApplesToApples = 
+#games.Mafia =
+#games.Poker =
+#games.Werewolf =
+#games.Uno =
+#games.Fluxx =
+#probability.Decide =
+#features.Seen =
 
 # Plugins to activate on connect
 
@@ -115,10 +117,10 @@ features.Seen =
 system.Auth =
 system.Commands =
 system.Modes =
-math.Calculate =
-probability.Decide =
-probability.Roll =
-features.Seen =
+
+# More optional features.
+#probability.Decide =
+#features.Seen =
 
 [Plugins.system.Commands]
 _prefix = ^
@@ -132,12 +134,22 @@ part = PartChannel
 say = Say
 do = Do
 msg = Msg
-statsroll = StatsRoll
 help = Help
 nick = ChangeNick
 seen = Seen
 usermode = UserMode
 
+# This one's optional.
+#statsroll = StatsRoll
+
 [version]
 number = 0.1.5
 name = pyGBot
+
+[Plugins.system.Auth]
+# Set the authtype value to nickserv to auth via NickServ.
+# Command is then simply 'auth', no user or password required.
+# Nickserv auth is supported on standard Atheme services.
+
+authtype = pygbot
+#authtype = nickserv

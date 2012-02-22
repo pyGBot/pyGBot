@@ -1,6 +1,6 @@
-##
+#
 ##    Apples To Apples - a plugin for pyGBot
-##    Copyright (C) 2008 Morgan Lokhorst-Blight
+##    Copyright (C) 2008 Morgan Lokhorst-Blight and Aleksandr Soborov
 ##
 ##    This program is free software: you can redistribute it and/or modify
 ##    it under the terms of the GNU General Public License as published by
@@ -18,2389 +18,393 @@
 
 import sys, string, random, time
 from pyGBot import log
-import random
 from pyGBot.BasePlugin import BasePlugin
 
-# Card lists. Included are the Party set and both expansions.
+# Import the card lists.
+from ApplesCards import GREENCARDS, REDCARDS
 
-GREENCARDS = {
-'Absurd':'ridiculous, senseless, foolish',
-'Addictive':'obsessive, consuming, captivating',
-'Adorable':'lovable, charming, delightful',
-'Aged':'old, ancient, mature',
-'American':'U.S. Citizen, Yankee, Apple Pie',
-'Ancient':'elderly, old, antique',
-'Animated':'lively, exuberant, spirited',
-'Annoying':'irritating, bothersome, teasing',
-'Appetizing':'appealing, tasty, flavorful',
-'Arrogant':'egotistical, overconfident, conceited',
-'Awesome':'amazing, remarkable, majestic',
-'Awkward':'clumsy, bumbling, uncoordinated',
-'Believable':'trustworthy, credible, convincing',
-'Bogus':'fraudulent, phony, insincere',
-'Boisterous':'loud, rambunctious, rowdy',
-'Bold':'daring, brave, courageous',
-'Boring':'dull, tedious, monotonous',
-'Bright':'brilliant, radiant, shiny',
-'Brilliant':'dazzling, gleaming, intelligent',
-'Busy':'occupied, meddlesome, engrossed',
-'Calm':'peaceful, tranquil, placid',
-'Casual':'easygoing, blase, nonchalant',
-'Charismatic':'alluring, magnetic, charming',
-'Charming':'captivating, enchanting, fascinating',
-'Cheesy':'trashy, tawdry, far-fetched',
-'Chewy':'gummy, rubbery, stringy',
-'Chunky':'lumpy, chubby, bumpy',
-'Classic':'timeless, definitive, vintage',
-'Clean':'washed, pure, tidy',
-'Clueless':'unaware, oblivious, ignorant',
-'Cold':'chilly, icy, aloof',
-'Colorful':'vivid, brilliant, kaleidoscopic',
-'Comfortable':'cozy, snug, restful',
-'Comical':'funny, hilarious, amusing',
-'Complicated':'difficult, complex, involved',
-'Confused':'muddled, bewildered, perplexed',
-'Cool':'chilly, hip, cold-blooded',
-'Corrupt':'dishonest, underhanded, shady',
-'Cosmic':'limitless, planetary, far out',
-'Cosmopolitan':'sophisticated, urbane, well-informed',
-'Courageous':'brave, gallant, dauntless',
-'Cowardly':'fearful, afraid, spineless',
-'Cranky':'crabby, cantankerous, grouchy',
-'Crazed':'insane, wild, deranged',
-'Crazy':'insane, bizarre, wacky',
-'Creative':'imaginative, artistic, original',
-'Creepy':'frightening, slithering, scary',
-'Cruel':'mean, harsh, merciless',
-'Cuddly':'loving, tender, huggable',
-'Cute':'pretty, perky, delightful',
-'Dainty':'delicate, fragile, thin',
-'Dangerous':'risky, chancy, hazardous',
-'Dead':'deceased, expired, unresponsive',
-'Deadly':'fatal, lethal, murderous',
-'Delicate':'dainty, tender, elegant',
-'Delicious':'tasty, pleasing, appetizing',
-'Delightful':'pleasing, enjoyable, charming',
-'Demanding':'difficult, exacting, bothersome',
-'Depressing':'dismal, gloomy, sad',
-'Desperate':'frantic, headlong, reckless',
-'Dignified':'stately, honorable, distinguished',
-'Dirty':'unclean, soiled, impure',
-'Distinguished':'dignified, extraordinary, acclaimed',
-'Disturbing':'unsettling, troubling, worrisome',
-'Dramatic':'exciting, sensational, theatrical',
-'Dreamy':'fanciful, whimsical, heavenly',
-'Dull':'boring, stupid, blunt',
-'Dysfunctional':'impaired, damaged, maladjusted',
-'Earthy':'unrefined, natural, crude',
-'Easy':'effortless, gentle, promiscuous',
-'Eccentric':'peculiar, odd, bizarre',
-'Elitist':'snobbish, arrogant, smug',
-'Emotional':'passionate, moving, volatile',
-'Eternal':'timeless, immortal, perpetual',
-'European':'of Europe, from Europe, about Europe',
-'Exciting':'thrilling, breathtaking, arousing',
-'Exhausting':'weakening, tiring, draining',
-'Expensive':'costly, valuable, exorbitant',
-'Explosive':'bursting, blasting, dangerous',
-'Exquisite':'excellent, refined, flawless',
-'Extreme':'exceptional, superlative, radical',
-'Fabulous':'marvelous, wonderful, incredible',
-'Fake':'unreal, counterfeit, deceptive',
-'Fancy':'showy, ornate, decorated',
-'Fantastic':'awesome, outrageous, imaginary',
-'Feminine':'womanly, ladylike, unmanly',
-'Filthy':'dirty, foul, unclean',
-'Flirtatious':'brazen, saucy, forward',
-'Foreign':'alien, unfamiliar, exotic',
-'Fragrant':'aromatic, odorous, perfumed',
-'Frazzled':'exhausted, frayed, worn',
-'Fresh':'new, original, good',
-'Friendly':'affectionate, comforting, welcoming',
-'Frightening':'scary, horrifying, awesome',
-'Frivolous':'trivial, silly, shallow',
-'Funky':'groovy, psychedelic, hip',
-'Funny':'amusing, comic, odd',
-'Furious':'angry, raging, wild',
-'Fuzzy':'downy, unclear, furry',
-'Glamorous':'beautiful, dazzling, stylish',
-'Glitzy':'flashy, showy, gaudy',
-'Global':'world-wide, spherical, universal',
-'Glorious':'magnificent, delightful, splendid',
-'Goody-Goody':'sweet, well-behaved, virtuous',
-'Graceful':'elegant, supple, limber',
-'Handsome':'attractive, elegant, fine',
-'Hardworking':'industrious, diligent, busy',
-'Harmful':'hurtful, unhealthy, damaging',
-'Haunting':'unforgettable, bewitching, unearthly',
-'Healthy':'hearty, robust, wholesome',
-'Heartless':'insensitive, cruel, uncaring',
-'Hilarious':'funny, witty, amusing',
-'Honorable':'honest, just, virtuous',
-'Hopeless':'pessimistic, desperate, downhearted',
-'Horrifying':'offensive, abominable, disgusting',
-'Hostile':'antagonistic, aggressive, warlike',
-'Hot':'blazing, heated, spicy',
-'Idiotic':'foolish, dumb, moronic',
-'Important':'significant, substantial, momentous',
-'Industrious':'diligent, busy, hard-working',
-'Influential':'powerful, prominent, important',
-'Innocent':'guiltless, pure, naive',
-'Insane':'psychotic, deranged, mad',
-'Inspirational':'exhilarating, inspiring, stimulating',
-'Insulting':'offending, discourteous, rude',
-'Intelligent':'bright, smart, brainy',
-'Intense':'extreme, passionate, strained',
-'Irresistible':'overpowering, overwhelming, compelling',
-'Irritating':'annoying, troublesome, provoking',
-'Juicy':'drippy, luscious, tantalizing',
-'Lazy':'lifeless, apathetic, weary',
-'Legendary':'famous, distinctive, prominent',
-'Loud':'noisy, boisterous, deafening',
-'Lovable':'adorable, endearing, cuddly',
-'Lucky':'fortunate, serendipitous, favored',
-'Luscious':'delicious, savory, juicy',
-'Luxurious':'opulent, lavish, sumptuous',
-'Magical':'enchanting, miraculous, marvelous',
-'Manly':'masculine, virile, strong',
-'Masculine':'male, manly, virile',
-'Meek':'shy, mild, timid',
-'Melodramatic':'theatrical, sensational, showy',
-'Mischievous':'naughty, prankish, sly',
-'Miserable':'wretched, pitiful, forlorn',
-'Misunderstood':'not grasped, not learned, not absorbed',
-'Mysterious':'secretive, puzzling, strange',
-'Mystical':'spiritual, secretive, esoteric',
-'Naive':'unsophisticated, childlike, simple',
-'Nasty':'mean, inclement, offensive',
-'Natural':'pure, simple, unadorned',
-'Neat':'tidy, orderly, cool',
-'Neglected':'ignored, disregarded, rejected',
-'Nerdy':'unhip, uncool, dorky',
-'Normal':'usual, common, ordinary',
-'Obnoxious':'offensive, repulsive, annoying',
-'Odd':'different, eccentric, bizarre',
-'Offensive':'insulting, vulgar, attacking',
-'Ordinary':'usual, common, plain',
-'Organic':'natural, clean, biological',
-'Outrageous':'shocking, scandalous, disgraceful',
-'Overwhelming':'exhaustive, breathtaking, monumental',
-'Painful':'hurtful, agonizing, unbearable',
-'Pathetic':'pitiful, distressing, heart-rending',
-'Patriotic':'nationalistic, loyal, public-spirited',
-'Peaceful':'serene, restful, calm',
-'Perfect':'faultless, consummate, exact',
-'Philosophical':'thoughtful, contemplative, wise',
-'Phony':'false, artificial, imitation',
-'Playful':'fun, frisky, entertaining',
-'Popular':'well-liked, accepted, preferred',
-'Powerful':'strong, forceful, robust',
-'Primitive':'prehistoric, primal, uncivilized',
-'Principled':'conscientious, ethical, scrupulous',
-'Profound':'deep, wise, thoughtful',
-'Puffy':'swollen, billowy, bloated',
-'Pure':'innocent, unadulterated, chaste',
-'Quiet':'peaceful, silent, calm',
-'Radiant':'shining, glowing, sparkling',
-'Radical':'unconventional, revolutionary, extreme',
-'Rare':'scarce, unusual, half-cooked',
-'Realistic':'authentic, lifelike, reasonable',
-'Refined':'well-bred, purified, cultivated',
-'Refreshing':'brisk, invigorating, rejuvenating',
-'Relaxing':'restful, calming, peaceful',
-'Repulsive':'disgusting, offensive, foul',
-'Responsible':'accountable, obligated, mature',
-'Revolutionary':'innovative, rebellious, radical',
-'Rich':'wealthy, affluent, moneyed',
-'Ridiculous':'preposterous, absurd, ludicrous',
-'Risky':'hazardous, daring, speculative',
-'Rough':'scratchy, uneven, jagged',
-'Saintly':'virtuous, angelic, divine',
-'Sappy':'gooey, mushy, romantic',
-'Scary':'frightening, absurd, ugly',
-'Scenic':'picturesque, dramatic, panoramic',
-'Selfish':'stingy, greedy, miserly',
-'Senseless':'meaningless, absurd, foolish',
-'Sensitive':'susceptible, sympathetic, tender',
-'Sensual':'tactile, pleasing, sexual',
-'Sexy':'arousing, appealing, seductive',
-'Shallow':'superficial, trivial, not deep',
-'Sharp':'pointed, keen, acute',
-'Shiny':'reflective, gleaming, polished',
-'Shocking':'frightening, electrifying, startling',
-'Shy':'bashful, timid, cautious',
-'Silly':'goofy, absurd, nonsensical',
-'Smart':'intelligent, stylish, witty',
-'Smelly':'stinky, odorous, rank',
-'Smooth':'even, level, flat',
-'Snappy':'stylish, trendy, fast',
-'Soft':'malleable, pliable, mushy',
-'Speedy':'quick, rapid, fast',
-'Spicy':'flavorable, tangy, hot',
-'Spiritual':'religious, inspired, supernatural',
-'Spooky':'scary, weird, ghostly',
-'Spunky':'perky, lively, spirited',
-'Squeaky Clean':'pure, immaculate, unapproachable',
-'Stereotyped':'pigeonholed, caricatured, characterized',
-'Stunning':'astonishing, staggering, astounding',
-'Sultry':'sweltering, humid, sensual',
-'Sweet':'sugary, caring, good',
-'Swift':'quick, speedy, expeditious',
-'Talented':'gifted, clever, skillful',
-'Tame':'subdued, gentle, trained',
-'Technological':'scientific, futuristic, mechanical',
-'Temperamental':'moody, irritable, short-tempered',
-'Timeless':'classic, ageless, well-established',
-'Touchy-Feely':'affectionate, tactile, huggy',
-'Tough':'strong, firm, difficult',
-'Trustworthy':'honest, reliable, unfailing',
-'Twisted':'distorted, warped, perverted',
-'Unbelievable':'incredible, far-fetched, impossible',
-'Unforgettable':'notable, impressive, remarkable',
-'Unhealthy':'risky, sickly, dangerous',
-'Unnatural':'abnormal, artificial, bizarre',
-'Unreal':'imaginary, illusionary, unbelievable',
-'Unscrupulous':'unethical, corrupt, unprincipled',
-'Unusual':'rare, odd, uncommon',
-'Useless':'worthless, ineffective, unneeded',
-'Violent':'furious, vicious, destructive',
-'Virtuous':'worthy, righteous, chaste',
-'Visionary':'idealistic, prophetic, far-seeing',
-'Weird':'abnormal, peculiar, odd',
-'Wicked':'evil, corrupt, depraved',
-'Wild':'untamed, savage, ferocious',
-'Witty':'clever, humorous, cunning',
-'Woebegone':'dismal, sorrowful, bummed out',
-'Worldly':'experienced, sophisticated, materialistic',
-'Zany':'crazy, funny, wacky',
-'Amazing':'astonishing, surprising, wonderful',
-'Armed & Dangerous':'hazardous, threatening, fortified',
-'Attractive':'alluring, engaging, good-looking',
-'Bashful':'shy, timid, modest',
-'Big & Tall':'large, bulky, gigantic',
-'Black & Blue':'bruised, battered, rough',
-'Black & White':'indisputable, distinct, written',
-'Brains & Brawn':'solid, strong, capable',
-'Bright & Shining':'radiant, sparkling, gleaming',
-'Brutal':'cruel, crude, harsh',
-'Clever':'intelligent, ingenious, witty',
-'Clumsy':'awkward, bumbling, uncoordinated',
-'Conceited':'vain, smug, self-centered',
-'Controversial':'contentious, disputable, debatable',
-'Cool & Collected':'controlled, composed, restrained',
-'Cozy':'comfortable, snug, warm',
-'Creepy & Crawly':'frightening, ghastly, icky',
-'Crisp':'brittle, brisk, fresh',
-'Crisp & Delicious':'tasty, crunchy, savory',
-'Cruel & Unusual':'barbaric, merciless, unwarranted',
-'Cut & Dried':'settled, obvious, indisputable',
-'Cute & Cuddly':'adorable, precious, huggable',
-'Dark':'unlit, morbid, sinister',
-'Dashing':'gallant, bold, elegant',
-'Dazed & Confused':'stunned, bewildered, disoriented',
-'Dead & Gone':'deceased, defunct, passe',
-'Devious':'sneaky, shifty, tricky',
-'Down & Dirty':'nasty, vicious, unscrupulous',
-'Down & Out':'destitute, impoverished, penniless',
-'Drunk & Disorderly':'intoxicated, unruly, rowdy',
-'Dumb & Dumber':'stupid, dull, rediculous',
-'Edgy':'irritable, nervous, tense',
-'Enchanting':'captivating, charming, spell-binding',
-'Endangered':'at risk, threatened, unprotected',
-'Energetic':'active, vigorous, forceful',
-'Enjoyable':'pleasurable, entertaining, fun',
-'Enormous':'large, huge, gigantic',
-'Entertaining':'amusing, festive, enjoyable',
-'Evil':'wicked, corrupt, depraved',
-'Famous':'well-known, celebrated, distinguished',
-'Fashionable':'stylish, dashing, current',
-'Fast':'swift, quick, rapid',
-'Fast & Furious':'wild, reckless, breakneck',
-'Fast & Loose':'deceitful, fraudulent, reckless',
-'Fat & Happy':'content, satisfied, assured',
-'Flaky':'foolish, eccentric, crispy',
-'Flamboyant':'ornate, pompous, extravagant',
-'Flavorful':'tasty, savory, pungent',
-'Flawed':'imperfect, defective, unsound',
-'Foot Loose & Fancy Free':'lighthearted, carefree, spontaneous',
-'Fragile':'delicate, frail, breakable',
-'Fun':'enjoyable, playful, amusing',
-'Gloomy':'dreary, depressing, sullen',
-'Goofy':'silly, foolish, giddy',
-'Gorgeous':'beautiful, stunning, magnificent',
-'Grueling':'demanding, exhausting, strenuous',
-'Gruesome':'ghastly, hideous, grisly',
-'Grungy':'dirty, shabby, seedy',
-'Hale & Hearty':'healthy, vigorous, robust',
-'Handy':'convenient, available, capable',
-'Harsh':'severe, glaring, brutal',
-'Hazardous':'risky, dangerous, perilous',
-'High & Dry':'abandoned, alone, helpless',
-'High & Low':'everywhere, universally, all over',
-'High & Mighty':'arrogant, conceited, vain',
-'Hit & Miss':'sporadic, unreliable, erratic',
-'Hot & Bothered':'annoyed, irritated, provoked',
-'Hot & Cold':'ambivalent, indecisive, varying',
-'Hot & Heavy':'passionate, momentous, serious',
-'Hot & Muggy':'sultry, humid, oppressive',
-'Hot & Spicy':'zesty, stimulating, pungent',
-'Hot & Sweaty':'sweltering, intense, perspiring',
-'Huge':'gigantic, immense, important',
-'Humorous':'funny, amusing, comical',
-'Icky':'sickening, disgusting, repulsive',
-'Ideal':'perfect, flawless, model',
-'Jolly':'cheerful, joyous, merry',
-'Lean & Mean':'vigorous, fit, efficient',
-'Lewd & Lascivious':'lustful, obscene, indecent',
-'Light & Fluffy':'billowy, airy, soft',
-'Long & Lean':'slender, lanky, wiry',
-'Loud & Clear':'definite, explicit, unequivocal',
-'Mean':'malicious, ill-tempered, petty',
-'Meek & Mild':'timid, docile, gentle',
-'Mesmerizing':'fascinating, hypnotizing, charming',
-'Messy':'sloppy, disorderly, unclean',
-'Modern':'contemporary, fashionable, trendy',
-'Naughty & Nice':'impish, mischievous, playful',
-'Neat & Clean':'spotless, tidy, shipshape',
-'New & Improved':'upgraded, enhanced, revised',
-'Nutty':'kooky, foolish, nutlike',
-'Obscene':'offensive, indecent, lewd',
-'Old':'aged, elderly, antiquated',
-'Old & Cranky':'crabby, cantankerous, aged',
-'Old & Wise':'experienced, judicious, shrewd',
-'On The Up & Up':'trustworthy, irreproachable, honest',
-'Perverse':'stubborn, obstinate, improper',
-'Plain & Simple':'unadorned, uncomplicated, clear',
-'Plug & Play':'effortless, automatic, self-operating',
-'Plump & Tender':'ripe, chubby, fleshy',
-'Pretty':'lovely, attractive, good-looking',
-'Prim & Proper':'reserved, modest, prudish',
-'Quick & Dirty':'cheap, shoddy, inferior',
-'Raw':'crude, uncooked, harsh',
-'Respectable':'worthy, honorable, decent',
-'Rough & Ready':'crude, makeshift, prepared',
-'Secretive':'concealed, covert, veiled',
-'Sensational':'thrilling, startling, melodramatic',
-'Short & Stout':'plump, portly, tubby',
-'Short & Sweet':'precise, clear-cut, succinct',
-'Sick & Tired':'worn out, exhausted, exasperated',
-'Sick & Twisted':'depraved, wicked, lascivious',
-'Sickening':'nauseating, disgusting, revolting',
-'Slow & Steady':'reliable, deliberate, ponderous',
-'Sluggish':'inactive, lazy, slothful',
-'Smooth & Creamy':'silky, velvety, rich',
-'Sophisticated':'urbane, cosmopolitan, complex',
-'Special':'distinctive, unique, original',
-'Spic & Span':'spotless, tidy, clean',
-'Stupid':'ignorant, unintelligent, inane',
-'Swift & Sure':'steady, prompt, definite',
-'Tasty':'flavorful, savory, appetizing',
-'Tempting':'seductive, enticing, alluring',
-'Tender':'soft, compassionate, fragile',
-'Terrific':'sensational, fabulous, severe',
-'Thick & Chunky':'bulky, heavy, lumpy',
-'Tormenting':'torturing, harassing, agonizing',
-'Torn & Tattered':'shabby, ragged, grungy',
-'Touch & Go':'indecisive, uncertain, insecure',
-'Trashy':'shameless, nasty, indecent',
-'Tried & True':'tested, proven, trustworthy',
-'True & Blue':'loyal, faithful, patriotic',
-'Up & Coming':'promising, enterprising, gifted',
-'Up & Down':'volatile, variable, vertical',
-'Vain':'conceited, arrogant, fruitless',
-'Warm & Cozy':'snug, comfy, friendly',
-'Warm & Fuzzy':'kindhearted, loving, affectionate',
-'Wash & Wear':'durable, easy-care, sturdy',
-'Whimsical':'humourous, peculiar, fanciful',
-'Wild & Wooly':'untamed, uncontrolled, reckless',
-'Wired':'strained, tense, nervous',
-'Young & Restless':'fidgety, impatient, flighty',
-'Active':'lively, vigorous, functioning',
-'Affectionate':'loving, passionate, tender',
-'Alluring':'attracting, charming, seductive',
-'Artistic':'creative, talented, imaginative',
-'Astonishing':'surprising, amazing, shocking',
-'Authentic':'genuine, realistic, reliable',
-'Beloved':'much-loved, cherished, adored',
-'Bewildering':'confusing, baffling, perplexing',
-'Bitter':'sour, harsh, resentful',
-'Bulky':'cumbersome, massive, awkward',
-'Childish':'immature, self-indulgent, silly',
-'Cheerful':'happy, joyful, merry',
-'Cautious':'careful, guarded, watchful',
-'Careless':'imprudent, slipshod, sloppy',
-'Captivating':'charming, enchanting, bewitching',
-'Clear':'understandable, uncluttered, transparent',
-'Common':'ordinary, regular, familiar',
-'Complex':'multifaceted, difficult, complicated',
-'Confusing':'perplexing, bewildering, puzzling',
-'Corny':'silly, cliched, sentimental',
-'Costly':'expensive, valuable, pricey',
-'Crunchy':'crispy, crusty, crackly',
-'Daring':'bold, courageous, defiant',
-'Darling':'adorable, dear, lovely',
-'Dazzling':'impressive, stunning, glittery',
-'Deep':'profound, multi-layered, cavernous',
-'Defective':'faulty, flawed, malfunctioning',
-'Dense':'thick, solid, unintelligent',
-'Deteriorated':'worn, battered, dilapidated',
-'Devoted':'loyal, faithful, committed',
-'Difficult':'complicated, demanding, obstinate',
-'Disagreeable':'offensive, rude, unfriendly',
-'Disappointing':'frustrating, inadequate, unacceptable',
-'Disgraceful':'shameful, scandalous, appalling',
-'Disgusting':'revolting, repulsive, nauseating',
-'Distracting':'off-putting, disturbing, confusing',
-'Disturbed':'troubled, unstable, upset',
-'Dopey':'stupid, dazed, silly',
-'Drab':'dull, dreary, lackluster',
-'Dreadful':'terrible, frightful, shocking',
-'Dumb':'stupid, dull, mute',
-'Durable':'tough, resilient, heavy-duty',
-'Edible':'not poisonous, ripe, tasty',
-'Elegant':'stylish, graceful, chic',
-'Embarrassing':'awkward, upsetting, disconcerting',
-'Engaging':'appealing, engrossing, attractive',
-'Enlightened':'insightful, progressive, knowledgeable',
-'Essential':'necessary, fundamental, crucial',
-'Exceptional':'outstanding, extraordinary, special',
-'Exotic':'unusual, strange, foreign',
-'Extravagant':'lavish, excessive, bling-bling',
-'Familiar':'well-known, comfortable, intimate',
-'Feisty':'lively, spirited, aggressive',
-'Ferocious':'savage, cruel, vicious',
-'Festive':'celebratory, joyful, merry',
-'Fireproof':'incombustable, flame-resistant, fire-retardant',
-'First-class':'superior, unequaled, first rate',
-'Fishy':'suspicious, dubious, seafood',
-'Flammable':'combustible, fiery, burnable',
-'Flexible':'bendable, accommodating, adaptable',
-'Frail':'fragile, delicate, weak',
-'Frisky':'playful, lively, peppy',
-'Frustrating':'exasperating, wearisome, annoying',
-'Ghetto':'in the ghetto, like the ghetto, from the ghetto',
-'Gigantic':'enormous, colossal, gargantuan',
-'Greasy':'oily, slimy, slippery',
-'Gross':'foul, grotesque, disgusting',
-'Grumpy':'irritable, cranky, crabby',
-'Hazy':'misty, unclear, obscure',
-'Heartbreaking':'distressing, tragic, pitiful',
-'Immoral':'morally wrong, wicked, decadent',
-'Impressive':'remarkable, extraordinary, striking',
-'Incredible':'unbelievable, far-fetched, amazing',
-'Inexperienced':'innocent, naive, untested',
-'Inferior':'lesser, second-rate, mediocre',
-'Informal':'casual, relaxed, unceremonious',
-'Intellectual':'thoughtful, rational, scholarly',
-'Intoxicating':'stimulating, exhilarating, alcoholic',
-'Intricate':'elaborate, complicated, complex',
-'Intriguing':'fascinating, captivating, mysterious',
-'Joyful':'happy, pleasant, elated',
-'Lame':'ineffective, weak, crippled',
-'Liberated':'open-minded, free, enlightened',
-'Little':'small, unimportant, miniature',
-'Lively':'energetic, animated, vigorous',
-'Logical':'rational, reasonable, plausible',
-'Magnetic':'attractive, compelling, alluring',
-'Magnificent':'marvelous, glorious, grand',
-'Naughty':'mischievous, wayward, bad',
-'Necessary':'essential, indispensable, basic',
-'Needy':'poor, desperate, dependant',
-'Nerve-racking':'irritating, distressing, annoying',
-'Neurotic':'anxious, phobic, disturbed',
-'Non-threatening':'safe, powerless, weak',
-'Old-fashioned':'outdated, traditional, behind the times',
-'Orderly':'methodical, formal, systematic',
-'Passionate':'zealous, obsessive, loving',
-'Perishable':'unpreserved, fresh, fragile',
-'Perky':'lively, playful, vivacious',
-'Pitiful':'pathetic, disgraceful, inadequate',
-'Plentiful':'abundant, bountiful, ample',
-'Politically Correct':'inoffensive, conciliatory, ingratiating',
-'Polluted':'contaminated, impure, tainted',
-'Practical':'sensible, useful, functional',
-'Precious':'valuable, prized, loved',
-'Precise':'exact, accurate, clear-cut',
-'Proper':'appropriate, polite, correct',
-'Puzzling':'perplexing, mystifying, confusing',
-'Quick':'rapid, speedy, abrupt',
-'Quirky':'unusual, peculiar, odd',
-'Reckless':'irresponsible, careless, wild',
-'Regal':'royal, majestic, dignified',
-'Reliable':'dependable, trustworthy, consistent',
-'Reserved':'detached, aloof, modest',
-'Revealing':'exposing, enlightening, informative',
-'Revolting':'disgusting, repulsive, sickening',
-'Ripe':'ready, mature, full-grown',
-'Romantic':'loving, passionate, idealistic',
-'Scented':'fragrant, aromatic, perfumed',
-'Sensible':'levelheaded, prudent, reasonable',
-'Shabby':'ragged, nasty, tattered',
-'Significant':'important, noteworthy, substantial',
-'Silent':'soundless, hushed, still',
-'Slippery':'slimy, sneaky, greasy',
-'Solid':'firm, dense, reliable',
-'Sour':'acidic, bitter, resentful',
-'Space-aged':'modern, futuristic, newfangled',
-'Sporty':'athletic, active, rakish',
-'Stately':'dignified, elegant, noble',
-'Sticky':'gummy, clammy, gluey',
-'Strange':'bizarre, weird, odd',
-'Sturdy':'durable, well-built, strong',
-'Stylish':'fashionable, trendy, mod',
-'Superior':'top-quality, advanced, pompous',
-'Thick':'wide, dense, bulky',
-'Tormented':'attacked, tortured, distressed',
-'Trite':'commonplace, unoriginal, cliched',
-'Trivial':'unimportant, random, erratic',
-'Uplifting':'elevating, inspiring, soul-stirring',
-'Valuable':'precious, important, expansive',
-'Warm':'tepid, mild, affectionate',
-'Well-preserved':'youthful, fresh-looking, unchanged',
-'Worthless':'insignificant, useless, trashy',
-}
-
-REDCARDS = {
-'A Bad Haircut':'\x02The perfect start to a bad hair day.',
-'A Bull Fight':'\x02Also known as \x0f"la fiesta brava"\x02 (the brave festival). \x0fA whole lot of bull.\x02.',
-'A Car Crash':'\x0f"Hey, it was an accident!"\x02 ',
-'A Cheap Motel':'\x0fNo charge for the cockroaches.\x02 ',
-'A Crawl Space':'\x0fWhere you\'ll find something the cat dragged in.\x02 ',
-'A Dozen Red Roses':'\x0fWhen eleven just won\'t do.\x02 ',
-'A Flat Tire':'\x0f"Whaddya mean, there\'s no spare?"\x02 ',
-'A Full Moon':'\x02"When the moon hits your eye like a big pizza pie, that\'s amore!" -\x0fDean Martin\x02 ',
-'A Haunted House':'\x0fMaybe if people would STOP building their dream homes on ancient burial grounds...\x02 ',
-'A High School Bathroom':'\x02"Fools rush in where angels fear to tread" -\x0fAlexander Pope\x02 ',
-'A Honeymoon':'\x02America\'s top honeymoon spots are Hawaii, Niagara Falls, Las Vegas and Florida. You can get there by air, land, sea... \x0for shotgun.\x02 ',
-'A Locker Room':'\x0fSteamy atmosphere... bawdy humor... sweaty bodies... HEY! Sounds like Cable TV!\x02 ',
-'A Morgue':'\x02"Given strange eons, even death may die..." -\x0fH.P. Lovecraft\x02 ',
-'A Nine Iron':'\x02A golf club best used on short shots \x0for large opponents\x02.',
-'A School Bus':'\x02The only thing we have to fear is fear itself. -\x0fFranklin D. Roosevelt\x02 ',
-'A School Cafeteria':'\x0fFood fight!\x02.',
-'A Sunrise':'\x02"But he who kisses the joy as it flies/ Lives in eternity\'s sunrise." -\x0fWilliam Blake\x02 ',
-'A Sunset':'\x02The sun never set on the British Empire... \x0fbecause God didn\'t trust the English in the dark.\x02 ',
-'A Tree House':'\x02Your first high-rise apartment.',
-'A Used Car Lot':'\x0fOne of the most honest places around. Honest...\x02 ',
-'Abraham Lincoln':'\x021809-65, 16th U.S. president, led the Union to victory in the American Civil War and abolished slavery. \x0fWas assassinated for his efforts.\x02 ',
-'Adam Sandler':'\x021966- , American comedian, film star, and \x0fSaturday Night Live\x02 alumnus. \x0fGenius or goofball - you make the call\x02.',
-'Adolf Hitler':'\x021889-1945, turned Germany into a militarized dictatorship, caused the slaughter of millions and launched World War II.',
-'AIDS':'\x02Acquired Immune Deficiency Syndrome.',
-'Airline Food':'\x0fSince when is a bag of peanuts considered a meal?\x02 ',
-'Al Pacino':'\x021940- , Oscar winning American actor and star of "The Godfather," "Dog Day Afternoon" and "Scent Of A Woman." \x0fOne very intense guy.\x02 ',
-'Albert Einstein':'\x021879-1955, German-born American physicist and Nobel laureate who created theories of relativity. \x0fNice hair.\x02 ',
-'Alfred Hitchcock':'\x021899-1980, British-born American director and producer of brilliant psychological thrillers. \x0fRight, mother? MOTHER!\x02 ',
-'Alien Abductions':'\x02There was a blinding light -\x0fand she was gone!\x02 ',
-'Americans':'\x0fHow many Americans does it take to screw in a light bulb? THAT\'S NOT FUNNY! WE\'RE SUING!\x02 ',
-'Amputations':'\x02"A SCRATCH? Your arm\'s off!" - \x0fMonty Python and the Holy Grail\x02.',
-'Angry Hornets':'\x0fWho put the bees in their bonnets?\x02.',
-'Andy Warhol':'\x021928-87, American painter and filmmaker, a leader of the pop art movement. \x0fFamous for slightly more than 15 minutes.\x02 ',
-'Anne Frank':'\x021929-45, German Jewish girl who wrote in her diary about her family hiding from the Nazis. She died in a concentration camp.',
-'Antarctica':'\x02Home to the lowest temperature ever recorded on earth, -126.9 F.',
-'Anthony Hopkins':'\x021937- , British actor starred in \x0fThe Elephant Man\x02, \x0fHoward\'s End\x02, and, of course, \x0fThe Silence Of The Lambs\x02. Knighted in 1992.',
-'Apple Pie':'\x02It\'s as American as... as... something...',
-'Apples':'\x02More than 40 million metric tons are produced worldwide every year. \x0fHow \'bout them apples?\x02 ',
-'Armed Robbery':'\x02You got your Robbery, your Armed Robbery, your Strong Armed Robbery, and, of course, the \x0ffive finger discount.\x02 ',
-'Assembly Lines':'\x0fFaster. FASTER!\x02 ',
-'At My Parent\'s House':'\x0fLike never-never land, you\'re never seen as an adult here.\x02 ',
-'Atlantis':'\x0fMythological city where the folks had that sinking feeling\x02.',
-'Atomic Bombs':'\x02The Italian physicist Enrico Fermi succeeded in producing the first nuclear chain reaction in 1942, at the University of Chicago.',
-'Attack On Pearl Harbor':'\x02"Yesterday, December 7th, 1941, a date which will live in infamy..." -\x0fFranklin D. Roosevelt\x02 ',
-'Austin Powers':'\x02Fictional British man of mystery. \x0fYeah, bay-beee, yeah!\x02 ',
-'Australian Outback':'\x02Beware of dangerous temperatures, strange animals, and \x0fdidgeridoos.\x02 ',
-'Babe Ruth':'\x021895-1948, American baseball legend, \x0fand one heck of a candy bar!\x02 ',
-'Babies':'\x02Little bundles of joy... \x0fand who needs sleep, anyway?\x02 ',
-'Baby Showers':'\x0fBaby showers may bring flowers...\x02 ',
-'Backstreet Boys':'\x02The latest American pop boy band. \x0fWhich one do you think is the cutest?\x02 ',
-'Bad Dogs':'\x0fBad dog, bad dog. What\'cha gonna do?\x02 ',
-'Bagpipes':'\x02A shrill-toned musical instrument consisting of a leather bag and pipes. \x0fAlso available in plaid.\x02 ',
-'Baked Beans':'\x02Add a little bacon, brown sugar \x0fand Beano!\x02 ',
-'Baked Potatoes':'\x02Hot potato, couch potato, potato head, twice baked, half-baked,... \x0fwhatever.\x02 ',
-'Baking Cookies':'\x02An experience only surpassed by eating them.',
-'Bald Eagles':'\x02Known for their majestic appearance and powerful flight. In 1782, the bald eagle was chosen as the emblem of the United States.',
-'Ballerinas':'\x02Beautiful, graceful dancers \x0fwho are always on their toes.\x02 ',
-'Bangkok':'\x02Capital of Thailand. Location: near the Gulf of Siam. Population: five million. \x0fReputation: seedy.\x02 ',
-'Bankruptcy':'\x0fIt\'ll be the debt of you\x02.',
-'Barbara Walters':'\x021931- , American television journalist and author. Voted one of the most important women of the century by "Ladies Home Journal."',
-'Barbed Wire':'\x02Wire with sharp points, used for fences. \x0fCreated havoc on the western frontier.\x02 ',
-'Barfing':'\x0fWe didn\'t want to bring that up...\x02 ',
-'Barney':'\x02Purple dinosaur. "I love you, you love me, \x0fblah, blah, blah... "\x02 ',
-'Bart Simpson':'\x02Fictional animated character. \x0fDon\'t have a cow, man!"\x02 ',
-'Bates Motel':'\x02The haunt of Alfred Hitchcock\'s psycho, Norman Bates... \x0fand mother, of course\x02...',
-'Batman':'\x02How does Batman\'s mother call him home? \x0f"Dinner, dinner, dinner, dinner, dinner, dinner, dinner, dinner - BATMAN!"\x02 ',
-'Bats':'\x02The little brown bat consumes as many as 600 mosquitoes in an hour. \x0fThe vampire bat dines elsewhere\x02...',
-'Beach Parties':'\x0fUp for some "Beach Blanket Bingo," Annette?\x02 ',
-'Beanie Babies':'\x02Tiny plush collectibles to love and cherish. \x0fDon\'t take that tag off!\x02 ',
-'Beauty And The Beast':'\x02A tale as old as time... \x0fso Disney didn\'t have to pay royalties\x02.',
-'Beer':'\x02"Beer is proof that God loves us and wants us to be happy." - \x0fBenjamin Franklin\x02 ',
-'Beer Bellies':'\x0fJust think of them as microbreweries.\x02 ',
-'Beethoven':'\x021770-1827, German composer, considered one of the greatest of the western world.',
-'Beets':'\x0fBeats Brussels sprout\x02.',
-'Being In Love':'\x02"Love\'s like the measles, all the worse when it comes late." -\x0fDouglas Jerrold\x02 ',
-'Bell-Bottoms':'\x02Bell-bottoms and pea coats -\x0fwho would have thought the Navy could be such a trendsetter?\x02 ',
-'Ben Stiller':'\x021965-, American actor, director, and funny guy of \x0fReality Bites\x02, \x0fThere\'s Something About Mary\x02, and \x0fMeet The Parents\x02 ',
-'Berlin - 1945':'\x02Adolph Hitler\'s last stand. \x0fBunker... I mean -hunker down, soldier.\x02 ',
-'Big Bang Theory':'\x02A cosmological theory for the origin of the universe. \x0fAn explosive idea!\x02 ',
-'Big Macs':'\x02T w o a l l b e e f p a t t i e s s p e c i a l s a u c e l e t t u c e c h e e s e p i c k l e s o n i o n s o n a s e s a m e s e e d b u n .',
-'Bigfoot':'\x02Legendary North American monster, a.k.a. Sasquatch or the Abominable Snowman.',
-'Bill Clinton':'\x021946- , popular, yet embattled, 42nd president of the United States.',
-'Bill Gates':'\x021955-, chairman and chief software architect of Microsoft Corporation. \x0fA very rich guy.\x02 ',
-'Bill Murray':'\x021950-, American actor and comedian. Star of \x0fGhostbusters\x02, \x0fStripes\x02, \x0fGroundhog Day\x02, and \x0fLost In Translation.\x02 ',
-'Billboards':'\x0fOnly 1,254 miles to Wall Drug...\x02 ',
-'Bingo':'\x02"There was a farmer, had a dog, and Bingo was his name-o..."',
-'Bird Watching':'\x02A hobby that relies on a wing and a prayer.',
-'Black Holes':'\x02The gravitational field of a black hole is so strong that nothing, including light, can escape from its vicinity.',
-'Black Velvet':'\x02Smooth, silky and sophisticated... \x0funtil you paint an Elvis on it\x02.',
-'Blizzard':'\x02Extreme cold, strong winds, and a head snowfall. \x0fAlso known as Canada.\x02 ',
-'Blood':'\x02A healthy human body contains between five and six quarts of blood. \x0fBloody right they do!\x02 ',
-'Board Games':'\x02Games have been played for thousands of years. \x0fSome games of Monopoly just SEEM that long\x02.',
-'Body Odor':'\x02Over $1.6 billion is spent each year on antiperspirants in the United States. \x0fThat stinks!\x02 ',
-'Body Piercing':'\x0fYOU STUCK WHAT? WHERE?\x02 ',
-'Body Surfing':'\x0fWhen you\'re too cheap to buy a surfboard.\x02 ',
-'Bonbons':'\x0fSweets for the sweet...\x02 ',
-'Bongos':'\x02Small drums played with the fingers. Used in Latin American and African music. The choice of American beat poets.',
-'Bottled Water':'\x0fHow much are you willing to pay for something you can get for free?\x02 ',
-'Boxing':'\x02An ancient and honorable sport - \x0fnot just for boys anymore\x02...',
-'Boy Scouts':'\x02International organization for boys and young men founded in England in 1908, to foster character, citizenship and outdoor life.',
-'Boyfriends':'\x02"My boyfriend\'s back and you\'re gonna be in trouble." - \x0fThe Angels\x02 ',
-'Brad Pitt':'\x021963- , American actor and heart-throb.',
-'Brain Surgeons':'\x0fHey, it ain\'t brain surgery... oh... wait a second...\x02 ',
-'Brains':'\x02Vital to human existence \x0fand mad scientists\x02.',
-'Britney Spears':'\x021981-, American singer. \x0fFrom mouseketeer to international pop star.\x02 ',
-'Broadway':'\x02The New York theater district. "They say the neon lights shine bright on Broadway." -\x0fBarry Mann\x02 ',
-'Bruce Willis':'\x021955- , Diehard American action movie star who has moonlighted on TV. He also starred in \x0fPulp Fiction\x02, \x0fArmageddon\x02 and \x0fThe Sixth Sense\x02.',
-'Bubble Gum':'\x02Crack it, snap it, pop it, and blow it!',
-'Bubbles':'\x02"Tiny bubbles, in the wine/ Tiny bubble make me feel fine..." -\x0fDon Ho\x02 ',
-'Bullwinkle':'\x02As in the cartoon "The Adventures of Rocky and Bullwinkle" - \x0fthe moose half of moose and squirrel.\x02 ',
-'Bumper Stickers':'\x02Your personal billboard!',
-'Bungee Jumping':'\x0fAnother sport hanging on by a thread.\x02 ',
-'Buying A House':'\x0fIf only we had the money, we could get a mortgage.\x02 ',
-'Cabbage':'\x02From the French word \x0fcaboche\x02, meaning "big head."',
-'Cactus':'\x02Require little care and exhibit bizarre forms. \x0fAs such, they are often mistaken for Survivalists.\x02 ',
-'California':'\x02Sacramento is its capital, Los Angeles its largest city. \x0fHere we come.\x02 ',
-'Camping Trip':'\x02When you just have to get s\'more nature.',
-'Canada':'\x02Federated country of North America. \x0fThe Great White North - eh?\x02 ',
-'Canadians':'\x0fHow many Canadians does it take to screw in a lightbulb? Fifteen. Fourteen to chip it out of the ice, and one to screw it in.\x02 ',
-'Captain Kirk':'\x02Fictional starship captain. "Beam me up Scotty, there is no intelligent life on this planet!" - \x0fbumper sticker, 1980s\x02 ',
-'Car Bombs':'\x0fNot including the Ford Pinto, of course.\x02 ',
-'Car Horns':'\x0fBlow it, buddy!\x02 ',
-'Carl Sagan':'\x021934-96, American astronomer and pioneer exobiologist. Touched many lives. \x0fBillions and billions of them.\x02 ',
-'Carnival Workers':'\x0fStep right up...\x02 ',
-'Cary Grant':'\x021904-86, British-born American actor known for his debonair manner. He can be found \x0fNorth by Northwest\x02.',
-'Casablanca':'\x02The largest city in Morocco, and one heck of a good movie. \x0f"Of all the gin joints in all the towns in all the world..."\x02 ',
-'Casinos':'\x0fSlots and slots of fun.\x02 ',
-'Castles':'\x02Kings, queens, knights in shining armor, \x0fand little square hamburgers\x02.',
-'Caves':'\x02Stalactites, stalagmites. \x0fWhich go up and which go down?\x02 ',
-'Celine Dion':'\x021968-, Canadian singer \x0fwhose heart will go on, and on...\x02 ',
-'Cell Phones':'\x0fGet off the phone or get off the road!\x02 ',
-'Cesar Chavez':'\x021927-93, American labor leader who led the 1965 nationwide boycott of California grapes... \x0fa bunch of sour grapes!\x02 ',
-'Chain Letters':'\x02Send this game to ten of your friends and good luck will follow. \x0fHonest!\x02 ',
-'Chains':'\x0fGold or iron: name your shackles.\x02 ',
-'Challenger Explosion':'\x02"Without a wish, without a will/ I stood upon that silent hill/ and stared into the sky..." - \x0fRalph Hodgeson\x02 ',
-'Chameleons':'\x02The chameleon is a lizard that changes color when frightened -\x0for is that a politician?\x02 ',
-'Charging Rhinos':'\x0fHow do you stop a rhino from charging? Take away its credit cards.\x02 ',
-'Cheesecake':'\x0fA really tasty dish.\x02 ',
-'Cher':'\x021946- , American singer and actor, \x0fshe makes aging look good.\x02 ',
-'Chicago':'\x02Third largest city in the United States. \x0fOur kind of town.\x02 ',
-'Chicken Pox':'\x02Infectious disease usually contracted in childhood. \x0fJust don\'t scratch \'em!\x02 ',
-'Chickens':'\x02From incubator to rotisserie in 56 days! \x0fRun, chicken, run!\x02 ',
-'Chimpanzees':'\x0fSure, they\'re related to us; but they don\'t write, and they NEVER call!\x02 ',
-'China':'\x02The most populous country in the world. More than one-fifth of the world\'s total population lives within its borders.',
-'Chinatown':'\x02International travel, \x0fjust around the corner\x02.',
-'Choir Boys':'\x02They \x0fsound\x02 angelic, \x0fbut\x02...',
-'Chorus Girls':'\x0fLong legs and high kicks!\x02 ',
-'Cigarette Burns':'\x02Another reason to give up smoking.',
-'Cigarettes':'\x0fMind if I smoke?\x02 ',
-'Cinco de Mayo':'\x02Marks the victory of the Mexican Army over the French at the Battle of Puebla, in 1862.',
-'Cindy Crawford':'\x021966- , American Supermodel. \x0fWhat dreams are made of.\x02 ',
-'Clark Gable':'\x021901-60, American film actor, noted as a romantic lead. \x0fFrankly, my dear, he didn\'t give a damn.\x02 ',
-'Claude Monet':'\x021840-1926, French painter, regarded as one of the leaders on the impressionist movement.',
-'Cleaning The Bathroom':'\x0fIt\'s YOUR turn!\x02 ',
-'Cleopatra':'\x02c. 69-30 BC, Queen of Egypt, noted for love affairs with Julius Caesar and Mark Antony, \x0fwhich came back to bite her in the asp.\x02 ',
-'Clint Eastwood':'\x021930-, American film actor and director, past mayor of Carmel, California. \x0fHas earned fistfuls of dollars.\x02 ',
-'Clowns':'\x02They would be \x0freally funny\x02 if they weren\'t so darn scary.',
-'Cocaine':'\x02Alkaloid obtained from leaves of the coca plant and used as a local anesthetic and abused as a drug.',
-'Cockroaches':'\x02Annoying insects that can survive a nuclear war. \x0fFortunately, they can\'t survive the heel of your shoe.\x02 ',
-'Coconuts':'\x02"Put the lime in the coconut, and drink them both up." -\x0fHarry Nillson\x02 ',
-'Cold Pizza':'\x0fThe breakfast of champions.\x02 ',
-'Communists':'\x02"From each, according to their ability, to each according to their need." \x0fI need a new Ferrari.\x02 ',
-'Commuting':'\x02The daily grind. \x0fAnd we\'re not talking coffee.\x02 ',
-'Computer Hackers':'\x02We didn\'t mean to shut down the entire government...',
-'Computers':'\x02British mathematician Charles Babbage worked out the principles of the modern digital computer in the late 1800s.',
-'Confucius':'\x02c. 551-479 BC, K\'ung Fu-Tzu, Chinese philosopher and one of the most influential figures in Chinese history.',
-'Conspiracy Theories':'\x0fOh, that was just a coincidence!\x02 ',
-'Construction Workers':'\x0fHard hats -hard bodies.\x02 ',
-'Corn On The Cob':'\x02A grain native to the Americas, corn was a staple food for many centuries \x0fbefore corn holders were invented.\x02 ',
-'Corvettes':'\x02In 1953, Chevrolet introduced the Corverre, the first mass-produced sports car with a fiberglass body. \x0fThe perfect cure for a midlife crisis.\x02 ',
-'Count Dracula':'\x0f"I vant to suck your blood!"\x02 ',
-'Country Music':'\x02Encompassing styles such as western swing, honky-tonk, bluegrass and rockabilly. \x0fShould mention a pickup truck and a dog named "Bo."\x02 ',
-'Cow-Pies':'\x02When dried, these "cow chips" are hurled discus-like over great distances. \x0fIt\'s true.\x02 ',
-'Crazy Horse':'\x021849?-77, chief of the Oglala Sioux. A leader in the Native American resistance to the westward expansion on the United States.',
-'Creamed Corn':'\x0fEat it, it\'s good for you.\x02 ',
-'Crystal Balls':'\x02I see a Green Apple card in your future.',
-'Cuba':'\x02Island republic in the Caribbean, just south of Florida. \x0fBeans and rice never tasted so good\x02.',
-'Cults':'\x02They \x0fseemed\x02 nice...',
-'Custer\'s Last Stand':'\x021866, Little Big Horn. \x0fVery big mistake.\x02 ',
-'Dandruff':'\x02Dry skin on your scalp? \x0fSounds a bit flaky.\x02 ',
-'Danielle Steel':'\x021947- , Prolific romance novelist. \x0f"Suddenly, Stephanie spotted Lance on the beach..."\x02 ',
-'Danny DeVito':'\x021944- , American television, motion-picture actor, and director. Star of \x0fTaxi\x02, \x0fRomancing The Stone\x02, \x0fTwins\x02, and \x0fGet Shorty\x02.',
-'Dark Alleys':'\x0fDon\'t go there!\x02 ',
-'Darth Vader':'\x02"Luke... \x0f(wheeze)\x02 .. I am... \x0f(wheeze)\x02... your father... \x0fand you don\'t write, you don\'t call... NOTHING."\x02 ',
-'Dating':'\x0fFirst stage of the human mating ritual\x02.',
-'David Letterman':'\x021947- , American television entertainer and talk-show host. And... the Number One reason to watch him \x0f(drum roll, please): TOP TEN LISTS!\x02 ',
-'Daytime TV':'\x02Soap operas, game shows, talk shows and reruns... \x0fis this a great country or what?\x02 ',
-'Death Valley':'\x02Arid, desolate and hellish region of California. Named by a survivor of an attempted 1849 crossing.',
-'Deer Hunting':'\x0fNooo! Nooooo! Not BAMBI\'S MOTHER!\x02 ',
-'Demi Moore':'\x021962-, American actor in \x0fSt. Elmo\'s Fire\x02, \x0fGhost\x02 and \x0fGI Jane.\x02 ',
-'Democrats':'\x02Their symbol is the donkey, or ass. \x0fInsert your own joke here.\x02 ',
-'Denzel Washington':'\x021954- , American actor known for his powerful roles in such movies as \x0fCry Freedom\x02, \x0fMalcolm X\x02, and \x0fMississippi Masala\x02.',
-'Detroit':'\x02The Motor City is the world\'s foremost automobile manufacturing center, and the tenth largest city in the U.S.',
-'Diamonds':'\x02The hard fact: they are just highly refractive crystalline allotropes.',
-'Discos':'\x0fWhere you go to catch "Saturday Night Fever."\x02 ',
-'Discovering America':'\x0f1492, Christopher Columbus discovered that America was discovered centuries before he arrived.\x02 ',
-'Disneyland':'\x0fYou\'ve just won the "Apples to Apples(R) Grand Masters Tournament." Where\'re you gonna go?\x02 ',
-'Divorce':'\x0fIt\'s a trial separation that goes to trial\x02.',
-'Doctors':'\x02Over twenty years of education and \x0fthey\'re still "practicing" medicine?\x02 ',
-'Doing The Dishes':'\x0fYou wash, I\'ll watch.\x02 ',
-'Dolly Parton':'\x021967- , American singer, songwriter, and actor. Known as much for her personal style as for her successful career.',
-'Dr. Kevorkin':'\x021928- , Controversial advocate of doctor-assisted suicide.',
-'Dr. Seuss':'\x021904-1991, Theodor Suess Geisel , \x0fthe cat who came up with "The Cat in the Hat."\x02 ',
-'Driving Off A Cliff':'\x0fIt was either that or hire someone to do my takes\x02.',
-'Duct Tape':'\x0fAll-purpose,... all the time...\x02 ',
-'E-Mail':'\x0fYou\'ve got JUNK mail!\x02 ',
-'Ear Wax':'\x02A waxy, yellowish substance that protects the ear from dust, bacteria, \x0fand from hearing things you don\'t want to hear.\x02 ',
-'Earthquakes':'\x02The Richter scale is named after the American seismologist Charles Richter. \x0fDid the earth move for you?\x02 ',
-'Earwigs':'\x02Nocturnal insects with abdominal pincers. \x0fNothing to do with ears or wigs\x02.',
-'East Coast':'\x02From New England to Florida. \x0fThey\'re not like folks \'round here...\x02 ',
-'Eddie Murphy':'\x021961-, American comedian, actor, and producer. Best known for his work in \x0f48 Hours\x02, \x0fBeverly Hills Cop\x02 and on \x0fSaturday Night Live.\x02 ',
-'Eleanor Roosevelt':'\x021884-1962, first lady, social activist, author, lecturer, and U.S. representative to the United Nations.',
-'Electric Eels':'\x02Slippery and slimy snakelike fishes that emit electrical charges. \x0fThe shocking truth!\x02 ',
-'Electricity':'\x02The repulsive or attractive force between two stationary bodies. \x0fNo problem unless one of those bodies is yours.\x02 ',
-'Elephants':'\x02The largest living land mammal, with two species: Indian and African. \x0fNot counting Dumbo, there are no American elephants.\x02 ',
-'Elizabeth Taylor':'\x021932- , American actor, noted for her lush beauty, emotional performances and multiple husbands.',
-'Elvis Presley':'\x021935-77, American singer and actor and the king of rock-and-roll. \x0fHis death left the music world all shook up.\x02 ',
-'Emily Dickinson':'\x021830-86, American poet, whose lyrics are psychologically astute treatments of love, death, and immortality. \x0fSo there.\x02 ',
-'Ernest Hemingway':'\x021899-1961, American novelist and short-story writer, whose macho style is crisp, laconic and understated.',
-'Europe':'\x02The Old Country... \x0fexcept to people who live there.\x02 ',
-'Exorcism':'\x02To ceremoniously expel an evil spirit.',
-'Eyes':'\x02Light-sensitive organ of vision in animals. \x0fSee?\x02 ',
-'Falling Down':'\x02"What we call failure is not the falling down, but the staying down." -\x0fMary Pickford\x02 ',
-'Family Reunions':'\x02Just to remind you why you moved away in the first place...',
-'Family Vacations':'\x0fDad? Dad? Are we there yet? Are we there yet? Are we? Huh? Dad?\x02 ',
-'Family Values':'\x0fOften said but seldom understood\x02.',
-'Fast Food':'\x0fYou want fries with that?\x02 ',
-'Feathers':'\x02Which weighs more, a pound of feathers or a pound of rocks?',
-'Feminists':'\x02Political and social activists who support selected women\'s causes.',
-'Festering Wounds':'\x0fQuit picking at that!\x02 ',
-'Fidel Castro':'\x021927-, Cuban revolutionary and Communist dictator since 1976. He earned a PhD in law in 1950.',
-'Firefighters':'\x02Emperor Augustus instituted a corps of fire-fighting "watchmen" in 24 B.C. \x0fNero, on the other hand, fiddled while Rome burned.\x02 ',
-'Firestorms':'\x02Some severe wildfires require more than 10,000 firefighters. \x0fAnd, wouldn\'t ya know it, some idiot parked in front of the hydrant!\x02 ',
-'Fireworks':'\x02Includes firecrackers, Roman candles, and bottle rockets. \x0fIt\'s all fun until someone loses an eye... and a nose... and an arm...\x02 ',
-'First Man On The Moon':'\x02July 20, 1969. "That\'s one small step for a man, one giant leap for mankind." -\x0fNeil A. Armstrong\x02 ',
-'Flipper':'\x02American television dolphin of the 1960\'s... \x0flike Lassie, only wetter\x02.',
-'Fly Fishing':'\x0f... if you can"t catch flies any OTHER way...\x02 ',
-'Flying Monkeys':'\x02The reason why "The Wizard Of Oz" still gives us nightmares.',
-'Forest Fires':'\x02"Only YOU can prevent forest fires." \x0fThe heat is on!\x02 ',
-'Fort Knox':'\x02American military post in Kentucky, containing the greater part of the gold reserve of the U.S. government.',
-'Fourth Of July':'\x02"Independence Day" in the United States. \x0f"Thank Goodness We Got Rid of Them Day" in Britain.\x02 ',
-'Frank Lloyd Wright':'\x021867-1959, pioneering American architect. Considered one of the greatest designers of the 20th century.',
-'Frank Sinatra':'\x021915-98, the greatest American pop singer of his generation, award winning film and television actor. \x0fDo-be do-be do, baby.\x02 ',
-'Freckles':'\x0fNo matter what they tell you, freckles won\'t grow together to form a great-looking tan.\x02 ',
-'Freedom':'\x0fExpress yourself!\x02 ',
-'French Wines':'\x0fThe perfect complement to an overpriced meal\x02.',
-'Fresh Water Pearls':'\x0fString them along\x02...',
-'Friction':'\x02Resistance to the motion of a body in contact with another body... \x0fany body will do.\x02 ',
-'Fund Raising':'\x02Hello... my name is Jonathan, would you like to buy some fruit, magazines, candy bars, wreaths, pizzas... ?',
-'Funerals':'\x02"He who dies with the most toys is, nonetheless, still dead." - \x0fAnonymous\x02 ',
-'Fur':'\x02The characteristic covering of mammals \x0fand people with money.\x02 ',
-'Fuzz':'\x0fLint... Policemen... Whatever...\x02 ',
-'Gall Bladder':'\x02Where excess bile is stored. \x0fStored for what, we don\'t know\x02.',
-'Gang Members':'\x02"When you\'re a Jet, you\'re a Jet all the way..." -\x0fWest Side Story\x02 ',
-'Garrison Keillor':'\x021942- , American author and radio star. He shares the Midwest perspective with 2.6 million listeners each week on \x0fA Prairie Home Companion\x02.',
-'Garth Brooks':'\x021962- , American country music singer and songwriter. \x0fHe\'s got friends in low places.\x02 ',
-'Geishas':'\x02Japanese women training in traditional singing, dancing, and entertaining. \x0fOf course, you would never recognize them without all that make-up\x02.',
-'Gen. George S. Patton':'\x021885-1945, the commander of the American Third Army during World War II. -\x0fa.k.a. Olf Blood and Guts\x02 ',
-'Genetic Engineering':'\x0fWhat DO you get when you cross a monkey with a potato?\x02 ',
-'George W. Bush':'\x021946- , 43rd president of the United States. The second time ever that the son of a former president was elected to the office.',
-'George Washington':'\x021732-99, First President of the United States. \x0fHe chopped down a cherry tree to make false teeth, or something like that\x02...',
-'Georgia O\'Keeffe':'\x021887-1986, American abstract painter known for her still life compositions. \x0fHer skull paintings prove that beauty is more than skin deep.\x02 ',
-'Getting A Hug':'\x0fHmmmm... nice.\x02 ',
-'Ghost Towns':'\x02Population unknown.',
-'Ghosts':'\x02Nonmaterial embodiments or the essence of organisms (mostly human beings). \x0fQuite spirited\x02 ',
-'Giant Squid':'\x02Going fishing for giant squid? \x0fNautilus I have to...\x02 ',
-'Gila Monsters':'\x02The largest, and only poisonous lizard found in the United States.',
-'Gingko Trees':'\x02An Asiatic tree, Gingko biloba, known for its fan shaped leaves. \x0fWe can\'t remember what it\'s good for\x02.',
-'Ginseng':'\x02Common name for plants of the ginseng family, source of a stimulant and a supposed aphrodisiac.',
-'Girl Scouts':'\x0fI\'ll take six boxes of Thin Mints and three of the... you know, the kind with the peanut butter.\x02 ',
-'Girlfriends':'\x0fGirlfriend - let\'s talk!\x02 ',
-'Giving A Hug':'\x02"One may give without loving; but none can love without giving." -\x0fAnonymous\x02 ',
-'Glaciers':'\x0fIt\'ll be a cold day when we see THEM again\x02...',
-'Glazed Donuts':'\x0fIf you\'re going to be late, take a box of donuts.\x02 ',
-'Global Warming':'\x0fIs it hot in here, or is it just me?\x02 ',
-'Going To Church':'\x02Weddings, funerals, bazaars, and bingo!',
-'Going To Grandma\'s':'\x02"Grandmother, what big teeth you have!" -\x0fLittle Red Riding Hood\x02 ',
-'Going To School':'\x0fSecondary education? It\'s elementary.\x02 ',
-'Going To The Dentist':'\x0fThis won\'t hurt a bit...\x02 ',
-'Going To The Gym':'\x0fNo pain, no gain.\x02 ',
-'Gold Chains':'\x0fThe more, the better\x02.',
-'Goldfish':'\x0fThe pet, the carnival prize, or the snack cracker\x02.',
-'Golf-Ball-Sized Hail':'\x02... which is almost as impressive as hail-sized golf balls...',
-'Grace Kelly':'\x021929-82, Princess of Monaco and American film star of \x0fDial M for Murder\x02, \x0fRear Window\x02, and \x0fTo Catch a Thief\x02. Always chic, always elegant.',
-'Graffiti':'\x0fArt in a can. We"re drawn to it.\x02 ',
-'Grass Skirts':'\x0fHula loves you, baby?\x02 ',
-'Grave Robbers':'\x0fFamous for their bodies of work.\x02 ',
-'Gravity':'\x02In 1684, the law of gravitation was formulated by English physicist Sir Isaac Newton, \x0fwho recognized the gravity of the situation.\x02 ',
-'Greenpeace':'\x02International organization dedicated to preserving the Earth\'s natural resources, and its diverse plant and animal life.',
-'Gym Teachers':'\x02"I am a \x0fPhysical Education Teacher\x02. Call me a \x0fgym teacher\x02 again and you can drop and give me ten!"',
-'Hair Transplants':'\x0fOh, it looks so natural\x02...',
-'Hairballs':'\x0fCough it up, kitty...\x02 ',
-'Halloween':'\x02October 31, the eve of All Saints\' Day, celebrated with costumes, treats, and scary stuff. \x0fNot just for kids any more!\x02 ',
-'Hand Grenades':'\x02Close only counts in horseshoes and hand grenades!',
-'Handcuffs':'\x0f"You have the right to remain silent..."\x02 ',
-'Handguns':'\x02Source of a never-ending controversy as to how to get them out of the hands of the bad guys and into the hands of the good guys.',
-'Hangnails':'\x0fWe\'ve fingered the cause of the pain.\x02 ',
-'Having A Baby':'\x02"Rock-a-bye baby, on the tree top..." \x0fWho would put a kid on a tree top?\x02 ',
-'Having An Operation':'\x0fWhat a cutup! A real stitch.\x02 ',
-'Hawaii':'\x02The eight islands that make up America\'s 50th state entered the Union on August 21, 1959.',
-'Helen Keller':'\x021880-1968, American author and lecturer who overcame deafness and blindness with the help of her companion, Anne Sullivan.',
-'Hiccups':'\x02How do you, \x0fhic,\x02 get em? How do you, \x0fhic,\x02 get rid of "em?',
-'High School Football':'\x0fThe whole ten yards!\x02 ',
-'High School Reunions':'\x02See also: \x0f"root canal, as fun as..."\x02 ',
-'Hillary Rodham Clinton':'\x021947- , New York Senator, lawyer, and former American First Lady.',
-'Hiroshima - 1945':'\x02"I am become death, the destroyer of worlds" - \x0fJ. Robert Oppenheimer, on the detonation of the first atmoic bomb.\x02 ',
-'HMOs':'\x02Heath Maintenance Organizations. \x0fHere\'s to your health\x02...',
-'Hockey':'\x0fDid you hear about the big fight last night? All of a sudden, a hockey game broke out!\x02 ',
-'Hollywood':'\x02Motion picture and television industry center of the world. \x0fHooray for Hollywood!\x02 ',
-'Homeless Shelters':'\x02In the United States, nearly three-quarters of the help for the homeless comes from the private sector, mostly from church soup kitchens.',
-'Homer Simpson':'\x02Fictional cartoon character created by Matt Groening. \x0fD\'oh!\x02 ',
-'Homework':'\x0fSomething to do during comercials.\x02 ',
-'Hooligans':'\x0f"Hey! Kids! Get outta my yard!"\x02 ',
-'Horseback Riding':'\x0fWHOAAA!!!\x02 ',
-'Hot Lava':'\x0fThere\'s no better way to serve it.\x02 ',
-'House Guests':'\x02How many visitors does it take to drive you crazy? \x0fGo on -take a guest!\x02 ',
-'Hummingbirds':'\x02Why do hummingbirds hum? \x0fBecause they don\'t know the words...... da-dum, dum!\x02 ',
-'Humphrey Bogart':'\x021899-1957, American film actor, starred in such classics as \x0fThe Maltese Falcon\x02 and \x0fCasablanca\x02. "Here\'s looking at you kid."',
-'Icebergs':'\x02May reach 300 to 500 feet above the oceans\'s surface. \x0fAsk the captain of the Titanic about the 90 percent that\'s UNDER water.\x02 ',
-'In A Coma':'\x02A deep, prolonged state of unconsciousness... \x0fsometimes you just feel that way\x02.',
-'Incense':'\x0fIncense is better than no sense at all.\x02 ',
-'India':'\x02The world\'s seventh largest country by area, but the second most populous, with one billion people.',
-'Indiana Jones':'\x02Fictional archeologist and action hero. \x0fProof that a good hat and a whip can take you a long way.\x02 ',
-'Industrial Revolution':'\x02The first Industrial Revolution occurred in Great Britain at the end of the 1700s. \x0fThe second came with the invention of the "Clapper."\x02 ',
-'Infomercials':'\x0fOne of these days, one of them may even say something informative.\x02 ',
-'Inside The Sun':'\x02Consisting mostly of hydrogen, the temperature reaches almost 16,000,000 K (about 29,000,000 F).',
-'Intellectuals':'\x0fThey think they\'re so smart.\x02 ',
-'Ireland':'\x02Island of the British Isles, west of Great Britain. Known for its distinctive traditional dance and music.',
-'Israel':'\x02Located on the Mediterranean, the state of Israel was reated by a 1948 U.N. mandate.',
-'Italy':'\x02European Republic, shaped like a boot - \x0fa very fashionable boot.\x02 ',
-'Jack Nicholson':'\x021937- , American motion-picture actor of "Chinatown," "Terms Of Endearment" and "The Shining." \x0fHe\'s as good as it gets!\x02 ',
-'Jack The Ripper':'\x02Accused of murdering six women in 1888, and suspected in other murders. \x0fStill at large.\x02 ',
-'Jackie Chan':'\x021954-, actor, director, martial artist. Screen name, Sing Lung, means "Becoming the Dragon." \x0fThat\'s "MISTER Becoming the Dragon" to you!\x02 ',
-'Jacques Cousteau':'\x021910-97, French naval officer, marine explorer, and author. Best known as a documentary filmmaker.',
-'Jamaica':'\x02Third largest island of the Greater Antilles, south of Cuba. Tropical climate, reggae music, and jerk cooking.\x02 ',
-'James Bond':'\x02Fictional British secret agent created by English author Ian Fleming. \x0fShaken, but never stirred.\x02 ',
-'James Dean':'\x021931-55, American actor of film, stage, and television. His role in \x0fRebel Without a Cause\x02 helped define "cool."',
-'Japan':'\x02An Asian constitutional monarchy. The capital city is Tokyo. \x0fLet\'s see... sushi, Godzilla, earthquakes...\x02 ',
-'Japanese':'\x0fHow many Japanese does it take to screw in a light bulb? Who needs light bulbs when you\'ve got OUR new technology!\x02 ',
-'Jelly Beans':'\x0fWell, as long as we HAVE to eat our vegetables...\x02 ',
-'Jennifer Lopez':'\x021970-, American singer and actor of \x0fSelena\x02, \x0fMoney Train\x02, and \x0fMaid In Manhattan.\x02 ',
-'Jerry Springer':'\x021944- , controversial talk-show host. \x0fDon\'t those people know that millions of us are watching?\x02 ',
-'Jesse Jackson':'\x021941-, American civil rights leader. Named to "The Gallup List of Ten Most Respected by Americans" for ten years.',
-'Jesse Ventura':'\x021951-, wrestler, Navy Seal, and former governor of Minnesota. Author of \x0fI Ain\'t Got Time To Bleed.\x02 ',
-'Jim Carrey':'\x021962- , Canadian comedian and actor. Famous for outrageous faces, \x0fand dumb and dumber characters.\x02 ',
-'Jimmy Stewart':'\x021908-97, America\'s favorite self-image. \x0fMr. Smith Goes to Washington\x02, \x0fRear Window\x02, \x0fVertigo\x02, and \x0fIt\'s a Wonderful Life\x02,... and it probably was.',
-'Joan Of Arc':'\x021412-31, patron saint of France who decisively turned the tide of the Hundred Years\' War, \x0fwhich really burned her up.\x02 ',
-'Jodie Foster':'\x021962- , American actor began her career on \x0fMayberry, R.F.D.\x02 and went on to win Academy Awards for \x0fThe Accused\x02 and \x0fSilence Of The Lambs\x02.',
-'John F. Kennedy':'\x021917-63, 35th president of the US. "Ask not what your country can do for you; ask what you can do for your country."',
-'John Glenn':'\x021921- , The first U.S. astronaut to orbit the earth in 1962, and a U.S. Senator. \x0fNever too old to shoot for the moon!\x02 ',
-'John Philip Sousa':'\x021854-1932, American bandmaster and composer of \x0fStars and Stripes Forever\x02. Known as "The March King."',
-'John Travolta':'\x021954 - , American actor of "Welcome Back, Kotter," "Grease," "Saturday Night Fever" and "Pulp Fiction." \x0fThat man can dance!\x02 ',
-'Judge Judy':'\x02Ms. Sheindlin presides over real-life cases on this TV courtroom show. \x0f"I\'m the boss, applesauce!"\x02 ',
-'Julia Roberts':'\x021967-, American actor and \x0fPretty Woman\x02. Also starred in \x0fSteel Magnolias\x02, \x0fMy Best Friend\'s Wedding\x02, and \x0fErin Brockovich.\x02 ',
-'Junk Mail':'\x02Contests, credit card applications, solicitations and political ads.',
-'Jupiter':'\x02Story Problem: \x0fIf one year on Jupiter equals 11.86 Earth years, and one day equals 9.92 Earth hours, how many Earth hours are there in a Jupiter year?\x02 ',
-'Katherine Hepburn':'\x021909-2003, American actor and winner of four Academy Awards. She starred in such classics as \x0fThe African Queen\x02.',
-'Keanu Reeves':'\x021964- , American actor of \x0fBill And Ted\'s Excellent Adventure\x02, \x0fThe Matrix\x02 and \x0fSpeed\x02. Keanu means "cool breeze over the mountains."',
-'Killer Whales':'\x02Black and white predatory whales. \x0fBoy, can they sing!\x02 ',
-'Kilts':'\x0fIf Mel Gibson can wear one, so can you\x02.',
-'King Arthur':'\x02Legendary British king best known for Camelot and round tables.',
-'King Henry VIII':'\x021491-1547, King of England, and founder of the Church of England. \x0fSix wives, no waiting.\x02 ',
-'Knock-Knock Jokes':'\x0fWho\'s there?\x02 ',
-'Labor Unions':'\x02Look for the Union label. \x0fAnd, while you\'re at it, look for Jimmy Hoffa...\x02 ',
-'Large Mouth Bass':'\x0fOh, please, let it not sing\x02...',
-'Las Vegas':'\x02The first casino opened in Las Vegas in 1946. \x0fLas Vegas... or it that Lost Wages?"\x02 ',
-'Lawyers':'\x0fWe\'d throw some joke in here, but we\'re afraid of getting sued.\x02 ',
-'Leaf Blowers':'\x0fToro, Toro, Toro!\x02 ',
-'Leather':'\x02Animal hide. \x0fLeather you like it or not.\x02 ',
-'Leeches':'\x0fAny mention of lawyers, agents, or reporters would be FAR too easy...\x02 ',
-'Lemons':'\x02When life gives you lemons, make lemonade... or, in the case of a car, take it back. \x0fThere\'s a law, you know!\x02 ',
-'Lenin\'s Tomb':'\x0fWe\'d love to visit Lenin\'s Tomb, but it\'s probably just another communist plot.\x02 ',
-'Leonardo Da Vinci':'\x021452-1519, Florentine artist, sculptor, architect, engineer, scientist, \x0fand all-around smartypants.\x02 ',
-'Lightning':'\x02Electrical discharge between rain clouds, or between a rain cloud and the earth, \x0for between a rain cloud and an idiot with a kite.\x02 ',
-'Loan Sharks':'\x0fAs dangerous as "Jaws", but without the charisma\x02.',
-'Lobster':'\x02Crustaceans closely related to freshwater crayfishes. \x0fMarket price.\x02 ',
-'Local Police':'\x02They know who you are and they know where you live.',
-'Log Cabins':'\x02Among the many Americans born in log cabins were Preisdents Harrison, Lincoln, and Grant. \x0fJust pass the maple syrup\x02.',
-'Lollipops':'\x0fSucker!\x02 ',
-'London':'\x02Founded even before the Romans reached England\'s shores, now the capital of Great Britain.',
-'Looking For A Job':'\x0fWill work for fool\x02...',
-'Los Angeles':'\x0fLA LA Land\x02.',
-'Losing Your Job':'\x0fThey just didn\'t understand me!\x02 ',
-'Lucille Ball':'\x021911-89, American actor and comedian. \x0fYou love Lucy? I love Lucy.\x02 ',
-'Machine Guns':'\x02Automatic, rapid-fire, repeating weapons. The Gatling gun was used as early as the American Civil War.',
-'Mad Cow Disease':'\x02Degenerative brain disorder in cattle. \x0fThe reason they don\'t know enough to come in out of the rain?\x02 ',
-'Madame Curie':'\x021867-1934, French chemist and physicist who won a Nobel Prize for her work on radiation. \x0fFun fact:\x02 A "curie" is a unit of radioactivity.',
-'Madonna':'\x021958-, American singer, songwriter, actor, writer, and 1980s pop icon. \x0fBlond Ambition.\x02 ',
-'Magic Tricks':'\x02"Nothin\' up my sleeve..." - \x0fBullwinkle\x02 ',
-'Mahatma Gandhi':'\x021869-1948, Indian leader and philosopher who preached nonviolence. \x0fWas assassinated for his efforts.\x02 ',
-'Manhattan':'\x0fI\'ll take Manhattan!\x02.',
-'Mardi Gras':'\x0fFat Tuesday\x02 marks the final day before the Christian fast of Lent, a 40-day period of self-denial and abstinence. \x0fSO LET\'S PARTY!\x02 ',
-'Marilyn Monroe':'\x021926-62, American movie star, pinup and sex symbol. \x0fJust ask the Kennedys.\x02 ',
-'Mark Twain':'\x021835-1910, American writer and humorist, best known for the adventures of Tom Sawyer and Huckleberry Finn.',
-'Marriage':'\x0fIf love and marriage go together like a horse and carriage... who\'s the horse?\x02 ',
-'Mars':'\x02The fourth planet from the sun. \x0fWhere men come from.\x02 ',
-'Martha Stewart':'\x021941-, television personality, magazine editor, and author. \x0fDomestic arts are her stock-in-trade.\x02 ',
-'Martin Luther King, Jr.':'\x021929-68, American civil rights leader and advocate of nonviolent resistance. \x0fWas assassinated for his efforts.\x02 ',
-'Meat Cleavers':'\x02No relation to Ward, June, or the Beaver...',
-'Meatloaf':'\x02Large and intimidating -\x0fthe dish not the singer!\x02 ',
-'Meg Ryan':'\x021961- , American actor and girl-next-door star of \x0fWhen Harry Met Sally\x02, \x0fSleepless In Seattle\x02, and \x0fYou\'ve Got Mail\x02.',
-'Mel Gibson':'\x021956-, Australian actor. Known for \x0fThe Road Warrior\x02, \x0fBraveheart\x02 and \x0f:eatha; Weapon I, II, III, IV...\x02 ',
-'Men':'\x0fREAL Men\x02.',
-'Men In Black':'\x0fWe\'re not here. You don\'t see us. The government did NOT send us.\x02 ',
-'Meryl Streep':'\x021959-, accomplished American actor, two-time Oscar winner, with over a dozen Academy Award nominations.',
-'Mexico':'\x02Federal republic in North America. The capital and largest city is Mexico City.',
-'Mice':'\x02"The best-laid schemes o\' mice an\' men..." -\x0fRobert Burns\x02 ',
-'Michael Jackson':'\x021958-, American popular singer, dancer, and songwriter. \x0fWelcome to Neverland.\x02 ',
-'Michael Jordon':'\x021963- , American professional basketball legend, led Chicago to six world championships. \x0fNo bull.\x02 ',
-'Michelangelo':'\x021475-1564, inspired Italian sculptor, architect, painter, and poet. \x0f A REAL Renaissance man.\x02 ',
-'Michelle Pfeiffer':'\x021957-, American actor whose career began with \x0fGrease 2\x02. \x0fShe\'d like us to forget that but remember her Oscar nominations.\x02 ',
-'Microsoft':'\x02A leading American software company. \x0fWe\'d say more but we don\'t want to monopolize your time\x02...',
-'Midlife Crisis':'\x02"Here comes your 19th nervous breakdown..." -\x0fThe Rolling Stone\x02 ',
-'Mike Tyson':'\x021966- , American heavyweight boxer. \x0fLend him your ear...\x02 ',
-'Miles Davis':'\x021926-91, innovative, influential, and respected American jazz trumpter player and band layer.',
-'Milk':'\x0fThree glasses a day will give you... the gratitude of the dairy industry.\x02 ',
-'Milk Duds':'\x02Chocolate and caramel candy balls. \x0fTooth extractions at no extra charge!\x02 ',
-'Mirrors':'\x0fAnd now, a moment for reflection.\x02 ',
-'Mold':'\x02Fuzzy growth produced on organic matter by several types of fungi. \x0fParticularly attracted to students\' refrigerators\x02 ',
-'Money':'\x02"The best things in life are free/ But you can give them to the birds and bees/ Just give me money..." -\x0fBradford and Gordy\x02 ',
-'Morticians':'\x0fWhy do you hang around with THOSE stiffs...?\x02 ',
-'Mosquitoes':'\x0fThey suck.\x02 ',
-'Motorcycles':'\x0fThe air in your hair and bugs in your teeth\x02.',
-'Mount Rushmore':'\x02Memorial carved into the side of the Black Hills in South Dakota. \x0fHeads above all other monuments.\x02 ',
-'MTV':'\x02"Video killed the radio star." -\x0fThe Buggles\x02 ',
-'Mud':'\x0fWater. Dirt. You do the math.\x02 ',
-'Mudslides':'\x02Chocolate drink or natural disaster... \x0fboth occur frequently in California\x02.',
-'Muhammad Ali':'\x021942- , American heavyweight boxing champion. "Floats like a butterfly, stings like a bee."',
-'Musicals':'\x0fSouth Pacific\x02, \x0fThe King and I\x02, \x0fThe Sound of Music\x02, \x0fA Chorus Line\x02, \x0fCats\x02, \x0fRent\x02...',
-'My 16th Birthday':'\x0fDad, can I have the keys to the car, please?\x02 ',
-'My Bank Account':'\x0fSpeaking of theoretical mathematics and unreal numbers...\x02 ',
-'My Bathroom':'\x02"The bathroom was drenched with their splashings" -\x0fAldous Huxley\x02 ',
-'My Bedroom':'\x02"No one knows what goes on behind closed doors." -\x0fCharlie Rich\x02 ',
-'My Body':'\x02Mine is a temple. \x0fSpecifically, the Temple of Doom...\x02 ',
-'My Boss':'\x0f... is an idiot. You know it; we know it.\x02 ',
-'My Dreams':'\x02"What dreams may come..." -Shakespeare\'s \x0fHamlet\x02 ',
-'My Family':'\x0fThey\'ll drive you nuts. As long as you do the same to them, it\'s all even.\x02 ',
-'My First Kiss':'\x0fSparks were flying. Of course, that could have been the braces...\x02 ',
-'My Friends':'\x0fWith friends like there, who needs enemies?\x02 ',
-'My Future':'\x02"The future\'s so bright, I gotta wear shades..." -\x0fTimbuk-3\x02 ',
-'My Hair':'\x0fHair today, gone tomorrow...\x02 ',
-'My High School Prom':'\x0fAs if adolescence isn\'t awkward and painful enough...\x02 ',
-'My Job':'\x0fLove it or leave it.\x02 ',
-'My Love Life':'\x02"All you need is love..." -\x0fThe Beatles\x02 ',
-'My Mind':'\x0fIt\'s a terrible thing to waste.\x02 ',
-'My Neighborhood':'\x02"Please, won\'t you be my neighbor?" -\x0fFred Rogers\x02 ',
-'My Past':'\x0fWhat\'s past is past... unless you\'re a politician...\x02 ',
-'My Personality':'\x02"I\'m good enough, smart enough and, gosh darn it, people like me." -\x0fStewart Smalley played by Al Franken\x02 ',
-'My Refrigerator':'\x0fIt\'s a science experiment!\x02 ',
-'Napoleon Bonaparte':'\x021769-1821, Emperor of France. Met his Waterloo at the Battle of Waterloo. \x0fThe name should have tipped him off...\x02 ',
-'NASCAR':'\x02Stock car racing began after World War II, breaking records for speed \x0fand for the number of advertisements on a single jacket.\x02 ',
-'Neil Simon':'\x021927-, American producer, playwright, and screenwriter of \x0fThe Odd Couple\x02, \x0fBiloxi Blues\x02, \x0fThe Sunshine Boys\x02, \x0fCalifornia Suite\x02, and many more.',
-'New Orleans':'\x02The Big Easy.',
-'New Shoes':'\x02Make you feel like dancing...',
-'New York City':'\x02America\'s most populous city. \x0fSo good, they named it twice.\x02 ',
-'Niagara Falls':'\x02Niagara Falls was formed about 12,000 years ago, when glaciers retreated north, \x0fand honeymooners approached from the south.\x02 ',
-'Nicholas Cage':'\x021964- , American actor known for his edgy characters in \x0fLeaving Los Vegas\x02, \x0fRaising Arizona\x02, and \x0fMoonstruck\x02.',
-'Ninjas':'\x0fTeenage mutant turtles need not apply.\x02 ',
-'Nobel Peace Prize':'\x02Established by Alfred Nobel. Swedish industrialist and inventor of dynamite. \x0fLed to an explosion of peace efforts.\x02 ',
-'Noisy Neighbors':'\x0fWHAT? I CAN\'T HEAR YOU!\x02 ',
-'Normal Rockwell':'\x021894-1978, American painter, illustrator and all-around interpreter of small town American life.',
-'Nuclear Power Plants':'\x02"You\'ve turned a potential Chernobyl into a mere Three Mile Island." -\x0fMontgomery Burns, "The Simpsons"\x02 ',
-'NYPD':'\x02The New York Police Department. \x0fThey\'re so good, they have their own TV show.\x02 ',
-'Oil Spills':'\x02The American oil tanker, Exxon Valdez, went aground in Prince William Sound, Alaska, Mar. 24, 1989. \x0fSlick Move.\x02 ',
-'Olive Oil':'\x02Derived from fresh ripe fruit, which contain about 20% oil. \x0fBetter than "olive" the other oils.\x02 ',
-'On-Line Shopping':'\x02Enter your credit card number now. This is a secure site... \x0fSure it is\x02...',
-'Oprah Winfrey':'\x021954- , Television talk show host, actor and all-around American success story.',
-'Oral Surgery':'\x0fYou said a mouthful\x02.',
-'Oranges':'\x0fFace it... nothing rhymes with orange.\x02 ',
-'Oxygen':'\x02Oxygen was discovered in 1774. \x0fYou\'d think someone would have noticed it earlier.\x02 ',
-'Pablo Picasso':'\x021881-1973, Spanish painter and sculptor, one of the greatest artists of the 20th century. \x0fIf only he could draw eyes...\x02 ',
-'Parenting':'\x0fThe process of discovering you are becoming just like YOUR parents.\x02 ',
-'Paris, France':'\x02The governmental, cultural and gastronomic capital of France. Or the world. \x0fJust ask the French.\x02 ',
-'Paying Bills':'\x0fAlso known as "Debt Restructuring."\x02 ',
-'Paying Taxes':'\x0fDeath or Taxes? Do we have to choose right away?\x02 ',
-'Penguins':'\x02Flightless, aquatic birds that reside in the Southern Hemisphere. \x0fAll dressed up and no place to go.\x02 ',
-'Picking Your Nose':'\x0fNoses run in our family.\x02 ',
-'Pigeons':'\x02Birds with small heads, short necks, stout bodies, \x0fand an incredible attraction to statues.\x02 ',
-'Pigs':'\x02Domesticated mammal of the swine family. \x0fThaaa... thaaa... that\'s all, folks!\x02 ',
-'Piranha':'\x02Carnivorous fish found in rivers of South America. \x0fWhen you feel like a bite...\x02 ',
-'Pirates':'\x02"Yo, ho, yo, ho, a pirate\'s life for me..." - \x0fPirates of the Caribbean\x02 ',
-'Pit Bulls':'\x02Any of several crossbreeds of bulldogs with terriers. \x0fOr, several radio hosts we could mention.\x02 ',
-'Plane Crashes':'\x02Statistically safer than driving... \x0funless you crash\x02.',
-'Plastic':'\x02Giant molecules of organic polymeric materials. \x0fBags and bags of the stuff.\x02 ',
-'Playing Chess':'\x02Has tantalized many of the world\'s greatest minds for almost 14 centuries. \x0fIt just confuses the rest of us.\x02 ',
-'Poison Ivy':'\x0fItching for a walk in the woods?\x02 ',
-'Pokemon':'\x02Cute cartoon monsters you gotta catch. \x0fWhat you do with them is up to you...\x02 ',
-'Pond Scum':'\x02Simple organisms that carry out photosynthesis... \x0for spammers.\x02 ',
-'Poodles':'\x0fThe only breed that is better groomed than their owners\x02.',
-'Popcorn':'\x0fAir poppers are for air heads... I say bring on the butter!\x02 ',
-'Porsche Boxster':'\x02A two-seat, six cylander roadster - elegant design and superior drivability.\x02 ',
-'Postal Workers':'\x02"Neither snow, nor rain, nor heat, nor gloom of night, stays these couriers from the swift completion of their appointed rounds."',
-'Power Tools':'\x02"\x0fMore power! More power! Argh! Argh!\x02" -\x0fTim, the Tool Man, Taylor, "Home Improvement"\x02 ',
-'Prince Charming':'\x02The perfect man... \x0fmythical, of course\x02.',
-'Princess Di':'\x021962-97, beloved English Princess who died in an auto crash. "Good-bye England\'s Rose..." -\x0fElton John\x02 ',
-'Pro Wrestling':'\x0fThey\'re just faking it. But then, so are we.\x02 ',
-'Psychiatrists':'\x02"And how do you \x0ffeel\x02 about that?"',
-'Psychics':'\x02The Psychic Friends Network went bankrupt in 1997. \x0fPerhaps they should have seen it coming...\x02 ',
-'Public Radio':'\x0f"Good morning... . . This morning............we have Wolfgang... Amadeus Mozart... for your listening pleasure..."\x02 ',
-'Puff Daddy':'\x021971- , American rap artist. "I\'ll be Missing You" shot him to stardom; \x0fno pun intended.\x02 ',
-'Pulling Weeds':'\x0fIt\'s either this or chemical warfare.\x02 ',
-'Pumping Iron':'\x0fWhen a great weight needs to be lifted.\x02 ',
-'Pushups':'\x0fExercises, a type of bra, or the ice cream treat\x02.',
-'Pyramids':'\x02Built by ancient civilizations, found mainly in Egypt, Guatemala, Honduras, Mexico and Peru. \x0fProbably the result of some pyramid scheme\x02.',
-'Quentin Terantino':'\x021963- , Groundbreaking American director and actor. \x0fNice movies, but not nearly enough blood.\x02 ',
-'Quicksand':'\x0fJust don\'t let it get you down.\x02 ',
-'Ragweed':'\x02A weed of the genus Ambrosia. \x0fNothing to sneeze at\x02.',
-'Rain':'\x02"When the rain comes, they run and hide their heads; they might as well be dead." -\x0fThe Beatles\x02 ',
-'Rainbows':'\x02"Someday they\'ll find it/ The Rainbow Connection/ The lovers, the dreamers and me..." -\x0fKermit the Frog\x02 ',
-'Rappers':'\x02PAENTAL ADVISORY EXPLICIT CONTENT \x0fHasn\'t seemed to hurt sales...\x02 ',
-'Reading A Good Book':'\x02So many books, so little time.',
-'Recreational Vehicles':'\x0fIf they\'re trying to get away from it all, why are they taking it all with them?\x02 ',
-'Recycling':'\x02More than one million tons of aluminum are NOT recycled each year. \x0fWhere do you throw your cans?\x02 ',
-'Red Raspberries':'\x0fWorth a few scratches\x02.',
-'Rednecks':'\x0f"You might be a redneck if..."\x02 -\x0fJeff Foxworthy\x02 ',
-'Redwood Forests':'\x02"From the Redwood Forests to the Gulf Stream Waters/ This land was made for you and me." -\x0fWoody Guthrie\x02 ',
-'Reggae Music':'\x02This contemporary Caribbean music, originating in Jamaica, remains an influential style of popular music. \x0fYa mon!\x02 ',
-'Regis Philbin':'\x021934- , American talk and game show host. \x0fWho wants to be a millionaire? Regis, apparently.\x02 ',
-'Remote Controls':'\x0fThe world\'s handiest invention. That is, if you can find it.\x02 ',
-'Republicans':'\x02A U.S. political party symbolized by an elephant... \x0fand don\'t forget it!\x02 ',
-'Richard Nixon':'\x021913-94, 37th President of the United States and the only president to have resigned from office. \x0fAt least that\'s what the tapes say\x02...',
-'Robert DeNiro':'\x021943- , Pre-eminent American actor who earned Academy Awards for \x0fThe Godfather II\x02 and \x0fRaging Bull\x02. \x0f"Are you looking at me?"\x02 ',
-'Road Kill':'\x0fMmmmmm. Them\'s good eatin\'.\x02 ',
-'Road Trips':'\x02"Get Your Kicks on Route 66." -\x0fNelson Riddle\x02 ',
-'Robin Williams':'\x021952- , versatile American comedian and actor. \x0fThe furriest man in show business.\x02 ',
-'Rock And Roll':'-It\'s here to stay!',
-'Rock Concert':'\x0fIf it\'s too loud - you\'re too old.\x02 ',
-'Rocket Scientists':'\x02Hey! They\'re not rocket scie \x0f... oh... never mind.\x02 ',
-'Rocky Mountains':'\x02These extend 2,000 miles from northeastern British Columbia to central New Mexico, \x0fand keep the Californians away from everyone else...\x02 ',
-'Rolling The Car':'\x0fYou\'ll flip for this one\x02...',
-'Roman Numerals':'\x0fThere\'s a \x02I\x0f in \x02VII\x0f chance you\'ll know them\x02.',
-'Romeo And Juliet':'\x02William Shakespeare\'s best known play, written in 1595. \x0fYouthful love and hasty temperaments\x02.',
-'Root Beer Floats':'\x0fActually, it\'s the ice cream that floats!\x02 ',
-'Rosa Parks':'\x021913-, civil rights icon arrested in 1956 for violating U.S. segregation laws by refusing to give up her bus seat to a white passenger.',
-'Rosie O\'Donnell':'\x021962-, American actor and comedian. \x0fShe\'s in a league of her own!\x02 ',
-'Rubber Gloves':'\x0fJust in case\x02...',
-'Running A Marathon':'\x0226 miles, 385 yards: the distance run by a Greek soldier from the town of Marathon to Athens in 490 BC.',
-'Rush Limbaugh':'\x021951- , conservative talk-radio personality. Claims to host his radio show with half his brain tied behind his back, just to make it fair.',
-'Russia':'\x02The world\'s largest country, spanning 11 time zones. Famous for borscht, ballet, chess and vodka -\x0fjust don\'t mix them.\x02 ',
-'Rust':'\x02"Rust never sleeps." -\x0fNeil Young\x02 ',
-'Saddam Hussein':'\x021937-, dictator of Iraq 1979-2003.',
-'Sailors':'\x02"In the Navy, you can sail the seven seas..." -\x0fThe Village People\x02 ',
-'Salads':'\x0fLettuce not knock the vegetarians\x02.',
-'Salsa Dancing':'\x02Popular form of Latin American dance. A little jazz, a little blues, a touch of rock \x0fand lots of heat\x02.',
-'Salvador Dali':'\x021904-89, Spansih artist best known for his dream imagery and surrealism, including the limp watches in \x0fThe Persistence Of Memory.\x02 ',
-'Samuel L. Jackson':'\x021948-, powerful American actor of \x0fPulp Fiction\x02, \x0fJackie Brown\x02, and \x0fThe Negotiator.\x02 ',
-'Saturday Cartoons':'\x02Get your blanket, a bowl of cereal and snuggle in for three hours of commercials.',
-'San Francisco':'\x02California\'s City by the Bay. \x0fWhere many hearts are left.\x02 ',
-'Saturn':'\x02Sixth planet from the sun, and the second largest in the solar system. \x0fHas a nice ring to it, don\'t you think?\x02 ',
-'Scavenger Hunt':'\x0fOK kids, here\'s your list: a marshmallow, a safety pin, a red rubber band, and a moon rock. Go find \'em!\x02 ',
-'Scene Of The Crime':'\x0fIt was Colonel Mustard, in the library, with the candlestick.\x02 ',
-'Schindler\'s List':'\x021993 Steven Spielberg film. Powerful real-life story of a Catholic businessman who eventually saved over 1000 Jews in Nazi Poland.',
-'Science Fair Projects':'\x02No human subjects, please!',
-'Science Fiction':'\x0fIn a galaxy far, far away...\x02 ',
-'Screeching':'\x02Please stop.',
-'Sean Connery':'\x021930- , Accomplished Scottish actor, although best known as the REAL Bond, \x0fJAMES Bond...\x02 ',
-'Shania Twain':'\x021965- , Canadian country singer and songwriter. "Shania" means "I\'m on my way" in Ojibwa.',
-'Sharks':'\x02Many species living today are similar to those from 100 million years ago. \x0fBecause change is scary.\x02 ',
-'Shopping Mall':'\x02Three-quarters of the North American population visit a shopping mall at least once a month.',
-'Silk':'\x02Produced as a cocoon covering by the silk worm, and used in fine fabrics and textiles.',
-'Silly Putty':'\x0fIt\'s putty in your hands!\x02 ',
-'Skateboarding':'\x0fIt\'s just going downhill... down stairs... down ramps...\x02 ',
-'Skiing':'\x02The Super Giant Slalom: \x0fSwiss for "suicide."\x02 ',
-'Skinheads':'\x02Shaved heads, big boots. \x0fSome are Nazis, some are not.\x02 ',
-'Skunks':'\x02Black and white striped mammals known for their offensive smelling defensive spray.',
-'Skydiving':'\x02Parachute canopies are usually made from nylon fabric that lasts for thousands of jumps - \x0fwhether the skydiver does or not.\x02 ',
-'Sleeping Pills':'\x02I remember taking them... \x0fI just... don\'t rememmer... how mamy.\x02 ',
-'Slivers':'\x02Also known as splinters. The worst ones are under your fingernails.',
-'Sloppy Joes':'\x02My favorite recipe -\x0fopen the can.\x02 ',
-'Smithsonian Institution':'\x02Located in Washington, D.C., the largest museum complex in the world. \x0fWouldn\'t that be a great garage sale?\x02 ',
-'Snakes':'\x02Surprising, snakes move rapidly without legs. \x0fAlso surprising, they find OTHER snakes attractive.\x02 ',
-'Snow':'\x02Transparent ice crystals which form around dust and other small particles. \x0fGet my drift?\x02 ',
-'Social Security':'\x02American program designed to provide income and services in the event of retirement, sickness, disability, death or unemployment.',
-'Socks':'\x02"Black socks, they never get dirty, the longer you wear them the stronger they get." -\x0fBill Harley\x02 ',
-'South Africa':'\x02Two oceans, rugged mountains, traditional villages, game sanctuaries, wineries...\x0fforget the past and bring on the tourists.\x02 ',
-'South Park':'\x02Highly-rated, highly offensive animated cartoon series. \x0f"Oh my God! We killed Kenny!"\x02 ',
-'Soy Sauce':'\x02A brewed seasoning made from soybeans, wheat, and salt.',
-'Spam':'\x0fMystery meat, or mystery E-mails...\x02 ',
-'Speeding Tickets':'\x02"No, officer, I don\'t have any idea how fast I was going."',
-'Spiders':'\x02There are more than 34,000 species of spiders. \x0fTry not to think about THAT right before bedtime.\x02 ',
-'Spike Lee':'\x021957-, American film maker and Knicks fan. Best known for \x0fDo the Right Thing\x02, \x0fMalcolm X,\x02 and \x0f4 Little Girls.\x02 ',
-'Spilled Milk':'\x02Got milk? WHOOPS! Apparently not...',
-'Spit':'\x0fLadies and gentlemen, straight from the Salivary Glands...\x02 ',
-'Spontaneous Combustion':'\x02The ignition of substances without application of an external heat source. \x0fA good plot for "The X-Files."\x02 ',
-'Sport Utility Vehicles':'\x0fNeed new tires?\x02 ',
-'Sports Channels':'\x0fAny team, any time\x02.',
-'Star Fruit':'\x0fLooks like plastic, tastes like lemons\x02.',
-'Starry Night':'\x02A sky bright with stars, a classic Van Gogh painting, and a Don McLean song. \x0fThree cards in one!\x02 ',
-'State Fair':'\x0fAw, gee whiz, a blue ribbon for Bessie!\x02 ',
-'Steak And Potatoes':'\x02Hot off the grill!',
-'Stephen King':'\x021947- , American author of horror novels, who\'s sold more than 100 million copies of his books. \x0fTalk about frightening...\x02 ',
-'Steve Martin':'\x021945- , American comedian, actor, writer, and \x0f"wild and crazy guy."\x02 ',
-'Steven Spielberg':'\x021947-, American movie director and producer, and overachiever. From \x0fE.T.\x02 to \x0fSchindler\'s List\x02... too many to list.',
-'Stonehenge':'\x02Prehistoric stone monument located north of Salisbury, England.',
-'Strawberry Shortcake':'\x0fSummertime and the eating is easy\x02...',
-'Stubbed Toes':'\x02It\'ll feel better when it quits hurting.',
-'Stunt People':'\x0fWhen you need someone to take the fall\x02.',
-'Summer Camp':'\x0fIf the bugs don\'t get you, the poison ivy will!\x02 ',
-'Sunday Drivers':'\x0fNow available ANY day of the week!\x02 ',
-'Superman':'\x02Fictional comic book superhero loved by Lois Lane and Jerry Seinfeld.',
-'Supermodels':'\x0fLong legs = big bucks.\x02 ',
-'Surfing The Net':'\x0fwww.otb-games.com\x02 ',
-'Sushi':'\x0fWho would ever have guessed that raw fish could be so fashionable?\x02 ',
-'Swiss Bank Accounts':'\x0fDo you think everyone in Switzerland has one?\x02 ',
-'Swiss Chocolate':'\x02"What use are cartridges in battle? I always carry chocolate instead." -\x0fGeorge Bernard Shaw\x02 ',
-'Swiss Cheese':'\x0fGuess it comes from holey cows\x02...',
-'Taking A Bath':'\x02Bathing facilities have been found in excavations in India from before 2000 BC. \x0fSoap-on-a-Rope hasn\'t.\x02 ',
-'Talk Radio':'\x0fTalk about air pollution\x02.',
-'Teachers':'\x02If you can play this game, thank a teacher.',
-'Telemarketers':'\x02"No, thank you... No, I\'m not interested... No, I have to go now..."',
-'Televangelists':'\x0fNot to be confused with Teletubbies.\x02 ',
-'Television':'\x0fOne-hundred and sixty-four channels, and nothing worth watching.\x02 ',
-'Telling The Truth':'\x02"There are two kinds of truth. There are real truths and there are made-up truths." -\x0fMarion Barry, ex-mayor of Washington, D.C.\x02 ',
-'Terrorist Attack':'\x02We will never negotiate with terrorists.',
-'Thanksgiving Day':'\x02The fourth Thursday of November in the U.S.; the second Monday in October in Canada.',
-'The 1920s':'\x0fPros: the Jazz Age. Cons: Presidents who look like librarians.\x02 ',
-'The 1950s':'\x0fPros: Barbies, barbecues, and bikinis. Cons: McCarthy, the Korean War, television.\x02 ',
-'The 1960s':'\x0fPros: the Moon Lsnding, the music. Cons: hippies who refuse to believe they\'re over.\x02 ',
-'The 1970s':'\x0fPros... uh... pros... uh... GIVE US A MINUTE, OKAY?\x02 ',
-'The 1980s':'\x0fPros: meant the end of the 1970s. Cons: \'80s nostalgia.\x02 ',
-'The 21st Century':'\x0fThe future is NOW!\x02 ',
-'The Academy Awards':'\x02The statue known as "Oscar" weighs only eight and a half pounds. \x0fSo why does it carry so much weight?\x02 ',
-'The Beach':'\x0fA day at the beach is no day at the beach, ya know?\x02 ',
-'The Beatles':'\x021960s British band. Only the most revolutionary, influential and universally acclaimed group of the 20th century. \x0fThat\'s all.\x02 ',
-'The CIA':'\x02The Central Intelligence Agency is responsible for keeping the U.S. government informed of foreign actions affecting the nation\'s interest.',
-'The Cold War':'\x02 The post-World War II struggle between the US and its allies, and the former USSR and its allies. \x0fThings could have gotten hot.\x02 ',
-'The Common Loon':'\x02A spotted, red-eyed diving bird -\x0for various friends or family.\x02 ',
-'The Dallas Cowboys':'\x02National Football League team known for their cheerleaders and their performance, \x0fboth on and off the field.\x02 ',
-'The Dump':'\x0fJust remember to recycle.\x02 ',
-'The Eiffel Tower':'\x02Designed and built by French engineer Alexandre Gustave Eiffel for the Paris World\'s Fair of 1889.',
-'The Electric Chair':'\x02In U.S. prisons, an alternating current of about 2000 volts is used for electrocution.',
-'The End Of The World':'\x02"It\'s the end of the world as we know it, and I feel fine..." -\x0fREM\x02 ',
-'The Everglades':'\x02A vast marsh covering much of southern Florida. \x0fWatch out for alligators!\x02 ',
-'The Far Left':'\x0fThey get high Marx from some\x02.',
-'The Far Right':'\x0fFar right for some and far wrong for others\x02.',
-'The FBI':'\x02The Federal Bureau of Investigation: the investigative agency for the U.S. Department of Justice. \x0fThey\'re listening...\x02 ',
-'The First Day Of School':'\x02"Fear has many eyes." -\x0fCervantes\x02 ',
-'The French Riviera':'\x02Holiday home of the rich, the famous, \x0fand the half-naked.\x02 ',
-'The Godfather':'\x02The 1972 critically acclaimed Mafia movie that \x0fmade us as offer we couldn\'t refuse.\x02 ',
-'The Grand Canyon':'\x02217 miles long, 4 to 18 miles wide, and more than 1 mile deep. \x0fNow THAT\'S grand.\x02 ',
-'The Grateful Dead':'\x02American rock band, founded in 1965 and best known for their "Dead Head" fans.',
-'The Great Chicago Fire':'\x02The noteworthy fire of 1871... \x0fa hot time in the old town...\x02 ',
-'The Great Depression':'\x0fProzac was invented six decades too late.\x02 ',
-'The Green Bay Packers':'\x02Twelve time National Football League world champions, beloved by "Cheeseheads" everywhere. \x0fAre those brats done yet?\x02 ',
-'The Gulf War':'\x02January - February, 1991. This six week conflict with Iraq was also known as "Desert Storm."',
-'The Indy 500':'\x02Contestants must drive the full 500 miles. \x0fBathroom breaks ARE allowed.\x02 ',
-'The Internet':'\x02Computer-based worldwide information network, \x0fand global shopping market\x02.',
-'The IRS':'\x02The Internal Revenue Service: agency of the U.S. Department of the Treasury responsible for collecting taxes. \x0fA human audity.\x02 ',
-'The JFK Assassination':'\x02November 22, 1963. The funeral of President Kennedy was watched on television by millions around the world.',
-'The KKK':'\x0fIf they\'re supposed to be the master race, why do they keep misspelling "Clan"?\x02 ',
-'The Land Of Oz':'\x02"I\'ve a feeling we\'re not in Kansas anymore, Toto." -\x0fDorothy, "The Wizard Of Oz"\x02 ',
-'The Little Mermaid':'\x02The 1837 story by Hans Christian Anderson or the 1989 animated film by Disney. \x0fGuess which made more money?\x02 ',
-'The Mafia':'\x02A loose association of criminal groups, bound by a blood oath and sworn to secrecy. \x0fOf course, now we have to kill you.\x02 ',
-'The Marx Brothers':'\x02Chico, Groucho, Harpo, amd sometimes Zeppo. Their 1930s films include \x0fDuck Soup\x02 and \x0fAnimal Crackers.\x02 ',
-'The Metric System':'\x0fNo, thank you. We like our inches and feet!\x02 ',
-'The Midwest':'\x02America\'s central plains states. \x0fThey\'re not like folks \'round here...\x02 ',
-'The Milky Way':'\x02The galaxy that includes the sun, its solar system, \x0fand a chewy layer of caramel.\x02 ',
-'The Mississippi River':'\x02The Algonquin words "Misi sipi" mean "big river." \x0fWhat\'s Algonquin for "muddy"?\x02 ',
-'The National Enquirer':'\x02American tabloid newspaper. Inquiring minds want to know... \x0fWhy the heck does this thing sell?\x02 ',
-'The New York Yankees':'\x02Legendary American baseball team. \x0fWith so much success, it\'s obvious why they\'re reviled.\x02 ',
-'The NRA':'\x02National Rifle Association. \x0fThey\'re gunning for your vote.\x02 ',
-'The Ocean':'\x02How deep is the ocean? 12,000 feet. \x0fIf they\'d known that, maybe they wouldn\'t have written that stupid song.\x02 ',
-'The Old Man And The Sea':'\x02Ernest Hemingway\'s classic novel - \x0ffishing, hunger, fishing, torment, fishing, personal loss... fishing\x02...',
-'The Olympics':'\x02An international athletic competition held every four years. \x0fThe thrill of victors and the agony of defeat.\x02 ',
-'The Opera':'\x0fIt ain\'t over \'til the fat lady sings. Unfortunately, sometimes, not even then.\x02 ',
-'The Ozone Layer':'\x02Short for ozonosphere. \x0fTheories about the ozone layer are full of holes.\x02 ',
-'The Pentagon':'\x02The five-sided home of the U.S. Department of Defense.',
-'The Pyramids':'\x02The Egyptian pyramids were built from about 2700 BC to about 1000 BC. \x0fTut, tut, tut...\x02 ',
-'The Renaissance':'\x02Beginning in the 1300s, started in Italy and spread across Europe. \x0fKind of like Espresso bars...\x02 ',
-'The Rolling Stones':'\x02British "bad boy" rock band formed in 1962. \x0fStill touring?\x02 ',
-'The San Andreas Fault':'\x02Geological feature in California stretching 600 miles. \x0fLike the state doesn\'t have enough faults already.\x02 ',
-'The South':'\x02Dixie: South of the Mason-Dixon line, that is. \x0fThey\'re not like folks \'round here...\x02 ',
-'The Statue Of Liberty':'\x02"Give me your tired, your poor/ Your huddled masses yearning to breathe free..." -\x0fEmma Lazarus\x02 ',
-'The Super Bowl':'\x0fWho needs another national holiday?\x02 ',
-'The Supreme Court':'\x02The highest court in the United States. \x0fRobes, but no wigs.\x02 ',
-'The Three Tenors':'\x02Opera stars Placido Domingo, Jose Carreras, and Luciano Pavarotti began recording as \x0fThe Three Tenors\x02 in 1990.',
-'The Titanic':'\x02It sank in 1912. \x0fGet over it!\x02 ',
-'The Universe':'\x02Everything. The big "It." Huge. Massive. \x0fTHAT big.\x02 ',
-'The Vatican':'\x02The Papal State in the middle of Rome. Home of the Pope, Swiss Guards, \x0fand lots of pigeons.\x02 ',
-'The Vietnam Memorial':'\x02"The Wall," built in 1982, was designed by 21-year-old architecture student, Maya Lin.',
-'The Williams Sisters':'\x02Venus, 1980-, and Serena, 1981-, Williams, American tennis champs. \x0fOne heck of a sister act.\x02 ',
-'The Wright Brothers':'\x02In 1903, Wilbur and Orville made the first powered airplane flights in history. \x0fAlthough there were delays at the airport.\x02 ',
-'The YMCA':'\x02The Young Men\'s Christian Association has 30 million members in 110 countries. \x0f"It\'s fun to stay at the Y-M-C-A."\x02 -\x0fThe Village People\x02 ',
-'Thomas Edison':'\x021847-1931, American inventor, developed a light bulb, generator, sound-recorder, and motion picture projector. \x0fShow off.\x02 ',
-'Thunder':'\x02"Here it comes again, Thunder and Lightning..." -\x0fELO.\x02 ',
-'Tibet':'\x02Mountainous region of China and religious enclave for a form of Buddhism called Lamaism. Known as the roof of the world.',
-'Ticks':'\x02All ticks are bloodsucking parasites, \x0fbut not all bloodsucking parasites are ticks\x02.',
-'Tidal Waves':'\x02The gigantic ocean waves that strike with tremendous force, and cause considerable damage to life and property. \x0fKind of like Spring Break.\x02 ',
-'Tiger Woods':'\x021975- , American star of the golf circuit. Known for his athletic skill, and youthful, classic style.',
-'Toasted Marshmallows':'\x02How do you like yours - golden brown or flaming?',
-'Toasters':'\x0fWait\x02 -\x0fdon\'t stick that fork in there!\x02 ',
-'Tobacco Companies':'\x02Who says tobacco\'s not addictive? \x0fTHEY can\'t give it up\x02...',
-'Toes':'\x02"This little piggy went to market..."',
-'Tom Cruise':'\x021962-, American actor. It looked like \x0fRicky Business\x02 early on, but by 1986 he was \x0fTop Gun\x02. No \x0fMission Impossible\x02 for him.',
-'Tom Hanks':'\x021956-, American actor and star of such varied films as \x0fBig\x02, \x0fPhiladelphia\x02, \x0fForrest Gump\x02, \x0fSaving Private Ryan\x02 and \x0fCastaway.\x02 ',
-'Top Of A Rollercoaster':'\x0fJust remember: what goes UP...\x02 ',
-'Tornadoes':'\x02Funnel-shaped cloud whirling destructively at speeds up to 300 mph. \x0f"Honey, do you hear a freight train... Honey?"\x02 ',
-'Toys':'\x0fThey\'re not just for kids, anymore...\x02 ',
-'Trailer Parks':'\x02Also known as \x0ftornado magnets\x02.',
-'Trampolines':'\x02Trampolines have been used in circuses wince the 18th century. \x0fDespite slumps in popularity, they always seem to bounce back!\x02 ',
-'Tree Huggers':'\x0f"Environmentalists" to the left. "Wackos" to the right.\x02 ',
-'Truck Stops':'\x02Breakfast 24 hours a day and you\'re on your way.',
-'Tyrannosaurus Rex':'\x02Large carnivorous dinosaur of the latter part of the Mesozoic era. \x0fMy, what big teeth you have!\x02 ',
-'Underwear':'\x0f"Let\'s keep this brief."\x02 ',
-'United Nations':'\x02The U.N. was founded in 1945, after World War II ended. Its mission is to maintain world peace. \x0fIf we ever achieve it, that is\x02...',
-'Vacations':'\x02"Vacation, all I ever wanted, Vacation, had to get away..." -\x0fGo-Go\'s\x02 ',
-'Vampires':'\x02Legendary bloodsucking monsters.',
-'Victorian England':'\x02An era characterized by moral severity and pompous conservatism.',
-'Video Games':'\x0fJust how DO you get to the thirteenth level of "Doom"?\x02 ',
-'Vietnam, 1968':'\x02More than 30,000 Americans had been killed in the Vietnam War by the end of 1968.',
-'Vincent Van Gogh':'\x021853-90, Dutch post-impressionist painter known for dramatic sunflowers and self-portraits. Only one of his paintings sold during his lifetime.',
-'Violins':'\x02It\'s a pain in the neck, but keep practicing.',
-'VW Beetles':'\x02The prototype for the original VW Beetle was developed in 1934, and production begin in 1945. \x0fFunctional, yet so fashionable\x02.',
-'Waco, Texas':'\x02Texas city near where a 51-day standoff between law-enforcement officials and members of the Branch Davidians occurred in 1993.',
-'Wall Street':'\x02The financial center of the United States. \x0fSee also: roller coaster.\x02 ',
-'Walt Disney':'\x021901-1966, \x0fthe head of some Mickey Mouse company.\x02 ',
-'Warts':'\x02Small, benign, circumscribed tumors of the outer layer of the skin. \x0fWarts and all!\x02 ',
-'Watching Football':'\x02Sheer athletic prowess by players in peak physical condition is a glorious thing to behold. \x0fPass the chips and beer.\x02 ',
-'Water Parks':'\x0fYou can go down Dead Man\'s Drop and I\'ll take the Lazy River.\x02 ',
-'Waterbeds':'\x0fCould serve as a safety precaution for those who smoke in bed.\x02 ',
-'Waterfalls':'\x02"Don\'t go chasing waterfalls..." -\x0fTLC\x02 ',
-'Watermelons':'\x02Pardeeville, WI - home of the \x0fWatermelon Seed-Spitting & Speed-Eating Championship\x02. The record is 2.5 lbs. of melon eaten in 3.5 seconds.',
-'Weapons Dealers':'\x0fOK, what kind you need? Assault, Automatic, Atomic...?\x02 ',
-'Weddings':'\x0f"Ding, dong, the bells are gonna chime..."\x02 -\x0fMy Fair Lady\x02 ',
-'Wheat':'\x02Mainly used in flour. World output of wheat is more than 600 million metric tons a year... \x0fso someone\'s making a lot of dough.\x02 ',
-'Wheel Of Fortune':'\x02American TV game show, \x0fBIG MONEY! BIG MONEY!\x02.',
-'Whipped Cream':'\x02Great on strawberry shortcake, banana splits, chocolate pudding...',
-'Whips':'\x02"Crack that whip... whip it, whip it good." -\x0fDevo\x02 ',
-'Whoopie Goldberg':'\x021950-, American actor and comedian. Starred in such movies as \x0fGhost,\x02 which earned her an Academy Award. \x0fWhoopee!\x02 ',
-'Will Smith':'\x021968- , Successful American rap star, TV star and wildly successful motion picture star. \x0fHe\'s got it all. We hate him.\x02 ',
-'William Shakespeare':'\x021564-1616, The English poet and playwright. \x0fAnd all the world IS a stage...\x02 ',
-'Wimbledon':'\x0fStrawberries... cream... temper tantrums...\x02 ',
-'Windsurfing':'\x0fReally just surfing for lazy people.\x02 ',
-'Wine Tasting':'\x0fSpit or swallow?\x02 ',
-'Winning The Lottery':'\x0fThe more you play, the more THEY win.\x02 ',
-'Witch Hunts':'\x02Popular locations: Salem, Massachusetts \x0fand Washington, D.C.\x02 ',
-'Women':'\x0fREAL Women\x02.',
-'Women\'s Soccer':'\x02The 1999 World Cup finals was the most-watched women\'s sporting event in history.',
-'Wood Chippers':'\x02"I guess that was your accomplice in the wood chipper." -\x0fMarge Gunderson, Fargo\x02 ',
-'Woodstock':'\x02The 1969 love, music and mud festival attended by 400,000. \x0fOr, the little yellow bird.\x02 ',
-'Woody Allen':'\x021935- , American comedian, actor and director, of \x0fBananas\x02, \x0fAnnie Hall\x02, \x0fHannah and Her Sisters\x02, and lots of \x0fNew York Stories\x02.',
-'Worms':'\x02"A man may fish with the worm that hath eat of a king, and eat of the fish that has fed of that worm." -\x0f"Hamlet" Shakespeare\x02 ',
-'X-Ray Vision':'\x02Available to Superman -\x0ffor emergency use only.\x02 ',
-'X-Rays':'\x02X-Rays were discovered in 1895 by the German physicist Wilhelm Conrad Roentgen. \x0fNow if they could just get those X-ray glasses down\x02.',
-'Yellowstone Park':'\x02Home to 3000 geysers and hot springs. \x0fMore gas and hot air than Washington, D.C.\x02 ',
-'Zen':'\x02Japanese form of Buddhism, originated in China. \x0fZen again, maybe not.\x02 ',
-'Zucchini':'\x02A squashed vegetable.',
-'A Cabin In The Woods':'\x02Henry David Thoreau went to Walden Pond for two years. \x0fAll we\'re asking for is one lousy weekend!\x02 ',
-'A Can Of Worms':'\x0fNow you\'ve opened it\x02.',
-'A Few Good Men':'\x0fIs that too much to ask?\x02 ',
-'A Fool & His Money':'\x02Are soon parted... \x0fespecially on Wall Street\x02.',
-'A French Maid':'\x0fOoh, la, la!\x02 ',
-'A Hole In One':'\x0fPar for the course?\x02 ',
-'A Little White Lie':'\x0fIf you can\'t say anything nice...\x02 ',
-'A Million Dollars':'\x0fIf I had a million dollars...\x02 ',
-'A Mummy':'\x02"Walk like an Egyptian." - \x0fThe Bangles\x02 ',
-'A Ringing In My Ears':'\x0fAnswer that, would\'ya?\x02 ',
-'A Spare Tire':'\x02The good news is: we have a spare tire...',
-'Abbot & Costello':'\x02Comedy team who had everyone guessing - \x0f"Who\'s on first?"\x02 ',
-'Adam & Eve':'\x02A relationship of Biblical proportions.',
-'Alan Greenspan':'\x021926-, chairman of the U.S. Federal Reserve Board.',
-'AM & FM':'\x0fMaking waves in radio\x02.',
-'Amsterdam':'\x02The capital of the Netherlands, and one of Europe\'s most beautiful and notorious cities.',
-'Ancient Rome':'\x02In ancient times, all roads led to Rome, \x0fand the traffic has only gotten worse\x02.',
-'Anna & The King':'\x02The 1999 film romanticizing the story of Anna Leonowens and King Mongkut of Siam.',
-'Anna Kournikova':'\x021981-, Russian-born star of the tennis court and internet.',
-'Anthrax':'\x02A potentially deadly infectious disease caused by spore bacteria. Anthrax has been developed as a biological weapon.',
-'Antiques Roadshow':'\x02PBS television program where folks bring oddities for appraisal. \x0fOne person\'s trash is another\'s treasure.\x02 ',
-'Antony & Cleopatra':'\x02Roman general and Egyptian queen. A love affair that wouldn\'t die. \x0fOh, wait, it did\x02.',
-'Apples & Oranges':'\x0fDon\'t even TRY to compare them\x02.',
-'Aristotle':'\x02384-322 B.C., ancient Greek philosopher. His writings formed the foundation for much of today\'s philosophical and political thought.',
-'Arm & A Leg':'\x0fSure, they were free, but just try replacing them\x02.',
-'Armadillo':'\x02Burrowing mammal with armor-like bony plat covering. \x0fRoadkill extraordinaire\x02.',
-'Arnold Schwarzenegger':'\x021947-, Austrian born body-builder turned actor. "My body is like breakfast, lunch, and dinner. I don\'t thinkabout it, I just have it."',
-'Aroma Therapy':'\x02Alternative medicine. \x0fSomething\'s smelly about it\x02.',
-'Arsenic & Old Lace':'\x02The hilarious dark comedy written by Joseph Kesselring, or the 1944 film adaptation by Frank Capra.',
-'Assault & Battery':'\x0fThat would be a single "A" battery\x02.',
-'Bagels And Lox':'\x0fA perfect snack for salmon-chanted evening...\x02 ',
-'Ball & Chain':'\x0fDon\'t let it get you down\x02.',
-'Ballroom Dancing':'\x02Fox-trots, tangos, cha-chas, and more! \x0fAre you ready to rumba?\x02 ',
-'Barbie & Ken':'\x0fAh, to be blond and plastic\x02...',
-'Baseball':'\x02Its one, two, three strikes you\'re out...\x02 ',
-'Batman & Robin':'\x02Superheroes or vigilantes, \x0fyou make the call\x02.',
-'Bats & Balls':'\x02At least \x0fthey\x02 don\'t go on strike.',
-'BB Guns':'\x0fYou\'ll shoot your eye out!"\x02 ',
-'Beanbag Chairs':'\x0fFor beanbag butts...\x02 ',
-'Beauty & The Beast':'\x02A French fairy tale, animated by Disney in 1991.',
-'Beavis & Butt-Head':'\x02He said "butt." \x0fHuh-huh. Huh-huh.\x02 ',
-'Bed & Breakfast':'\x02Not the same as breakfast in bed.',
-'Beer & Pretzels':'\x02"These pretzels are making me thirsty" - Cosmo Kramer, \x0fSeinfeld\x02 ',
-'Being & Nothingness':'\x02Jean Paul Satre\'s 1943 work based on the distinction between things that exist by themselves and those that exist for themselves.',
-'Bells & Whistles':'\x0fIt\'s got everything!\x02 ',
-'Bert & Ernie':'\x02Sesame Street\'s muppet buddies.',
-'Big Bird':'\x02Beloved \x0fSesame Street\x02 character, or the not-necessarily-beloved U.S. spy satellite.',
-'Bill & Ted':'\x02Characters in Keanu Reeves\' excellent time-travel adventure film. \x0fYeah, dude\x02.',
-'Billy Crystal':'\x021947-, American comedian, actor and director. \x0fHe looks maaaaah-velous\x02.',
-'Black Cats':'\x02It\'s bad luck if they cross your path. \x0fYou might step in a hairball!\x02 ',
-'Black Licorice':'\x02Alexander the Great and Julius Caesar both endorsed the beneficial properties of Licorice. \x0fNo word on black jelly beans...\x02 ',
-'Black Lingerie':'\x02Victoria\'s REAL secret: \x0fselling skimpy negligees at hefty price...\x02 ',
-'Blackouts':'\x0fThey can occur at any\x02 ',
-'Blood & Tears':'\x0fDon\'t forget the sweat\x02.',
-'Blue Velvet':'\x02An elegant, textured fabric, Bobby Vinton love song, or David Lynch\'s bizarre 1986 film about the dark side of small-town America.',
-'Boardwalk & Park Place':'\x0fTop of the line in the real estate game\x02.',
-'Body & Soul':'\x0fJust tryin\' to keep it all together\x02.',
-'Body Snatchers':'\x0fWe\'d be worried, but nobody would want to snatch OUR bodies...\x02 ',
-'Bodybuilders':'\x0fIf you build it they will come\x02.',
-'Bonnie & Clyde':'\x02American outlaws of the 1920s, played by Faye Dunaway and Warren Beatty in the 1967 film.',
-'Bora Bora':'\x02Volcanic island in the Pacific. Good oranges and vanilla.',
-'Bow & Arrows':'\x02More effective than sticks and stones.',
-'Bowling':'\x0fThree strikes and you\'re in\x02.',
-'Bread & Water':'\x02Make that a baguette and a bottle of Perrier.',
-'Breaking & Entering':'\x0f"Honest, Officer, I lost my keys."\x02 ',
-'Bride & Groom':'\x02"With this ring..."',
-'Brooks & Dunn':'\x02Extremely successful country & honky-tonk music duo. "If they don\'t dance, you\'re dead." - \x0fRonnie Dunn\x02 ',
-'Brothers & Sisters':'\x0f"You can pick your friends, but..."\x02 ',
-'Bulls & Bears':'\x02On or off Wall Street.',
-'Bumper Cars':'\x0fMuch like rush hour in Chicago\x02.',
-'Burger & Fries':'\x0fYou want flies with that?"\x02 ',
-'Buttons & Bows':'\x02Cute as a button, or a bow.',
-'Calvin & Hobbs':'\x02Bill Waterson\'s late, great comic strip featuring a little boy and his tiger.',
-'Camelot':'\x02"On second though, let\'s not go to Camelot. \'Tis a silly place." - \x0fKing Arthur, Monty Python and the Holy Grail\x02 ',
-'Carlos Santana':'\x021947-, guitar legend and member of the Rock and Roll Hall of Fame. Truly \x0fSupernatural\x02.',
-'Carrot & A Stick':'\x02The ultimate motivator... \x0ffor a donkey\x02.',
-'Cat & Mouse':'\x02It\'s just a game.',
-'Catherine Zeta-Jones':'\x021969-, Welsh born actor, famous for her stunning good looks, as seen in \x0fThe Mask Of Zorro\x02, \x0fEntrapment\x02 and \x0fTraffic\x02.',
-'Cats & Dogs':'\x02Is it raining?',
-'Catsup & Mustard':'\x0fThe salsa revolution brought down their condiment empire\x02.',
-'Cauliflower':'\x0fGoes down easy when it\'s cheesy\x02.',
-'Caviar':'\x02It\'s not JUST fish eggs. \x0fIt\'s... fish eggs... that cost a fortune...\x02 ',
-'Chain Link Fences':'\x0fGood fences make good neighbors\x02.',
-'Charles & Diana':'\x02A right royal marriage.',
-'Chat Rooms':'\x0fElectronic speakeasies for the information age\x02.',
-'Chips & Dip':'\x02No double dipping!',
-'Chips & Salsa':'\x0fNacho average snack!\x02 ',
-'Chutes & Ladders':'\x0fA game of ups and downs\x02.',
-'Circus Peanuts':'\x02Chewy, orange marshmallow things shaped like peanuts. \x0fSeldom found at the circus\x02.',
-'Cleveland':'\x02"Cleveland rocks! Cleveland rocks!" - \x0fThe Drew Carey Show\x02 ',
-'Cloned Sheep':'\x0fDolly good show!\x02 ',
-'Cockles & Mussels':'\x02"Alive--alive-o!" \x0fI think I just lost my appetite\x02.',
-'Colin Powell':'\x021937-, U.S. Secretary of State and Chairman of the Join Chiefs of Staff during the Gulf War. \x0fWe\'d give him four stars\x02.',
-'Comic Books':'\x0fTHIS looks like a job for... somebody who draws Superman!\x02 ',
-'Convenience Stores':'\x02"Thank you come again."',
-'Cops & Robbers':'\x02When fighting crime was just child\'s play.',
-'Corn Fields':'\x0fKnee high by the Fourth of July\x02.',
-'Corned Beef & Cabbage':'\x02It\'s not chopped liver.',
-'Corrugated Cardboard':'\x0fWhen you want to think out of the box...\x02 ',
-'Cottage Cheese':'\x0fIf it\'s so popular, where are all the Cottage Cheeseheads?\x02 ',
-'Coughing & Sneezing':'\x02And no cure in sight.',
-'Cowboys':'\x02Head \'em up and move \'em out!',
-'Cowboys & Indians':'\x02How the west was won... \x0fand lost\x02.',
-'Crabs':'\x02As crustaceans, crabs are related to lobster and shrimp. \x0fWhat do they all have in common? They all go well with butter\x02.',
-'Crash & Burn':'\x02Try, try again.',
-'Cream & Sugar':'\x0fDo you want some coffee with that?\x02 ',
-'Crime & Punishment':'\x02Fyodor Dostoevsky\'s 1917 classic novel following the tormented life of the murderer Rodion Romanovich Roskolnikov.',
-'Cup & Saucer':'\x02Tea Time!',
-'Curds & Whey':'\x0fWhat? It\'s just cottage cheese?\x02 ',
-'Currier & Ives':'\x02The lithography shop operated from 1834 to 1907 and produced over 7500 titles, all of which could have been called \x0f"Life In America."\x02 ',
-'Cut & Curl':'\x0fYou\'ll look mah-velous!\x02 ',
-'D-Day, 1944':'\x02On June 6, 1944 the Allied forces invaded France, employing over 10,000 airplanes, 5,000 ships, and 250,000 servicemen.',
-'Dallas & Fort Worth':'\x02The heart & soul of Texas.',
-'David & Goliath':'\x02Bible story featuring the future king David and the Philistine giant Goliath. \x0fThe bigger they come, the harder they fall\x02.',
-'Day Care Centers':'\x0fPreschool for preschool\x02.',
-'Death & Dying':'\x02The only way out.',
-'Death & Taxes':'\x0fThe two certainties in life\x02.',
-'Dinner & A Movie':'\x0fAnd a mortgage to pay for it\x02.',
-'Doctors & Dentists':'\x02For a long life and healthy teeth.',
-'Dodo Birds':'\x02A large, flightless bird of the island of Mauritius. Discovered by Europeans in 1598, extinct by 1681.',
-'Dog Days':'\x0f101 in the shade.\x02 ',
-'Doing The Hokey-Pokey':'\x0fThat\'s what it\'s all about\x02.',
-'Dollars & Cents':'\x02"If it don\'t make dollars, it don\'t make sense." - \x0fDJ Quik\x02 ',
-'Double Thick Malts':'\x0fFor a double thick ice cream headache\x02.',
-'Dr. Evil':'\x02Arch-nemesis of Austin Powers. \x0fRiiiiiiight\x02.',
-'Dr. Jekyll & Mr. Hyde':'\x02Robert Louis Stevenson\'s 1887 novel revealing the hypocrisy and innate evilness in society. The idea came to him in a dream - \x0fa bad dream\x02.',
-'Dr. Laura':'\x021947-, American conservative talk show host and promoter of family values. \x0fHER family values, that is...\x02 ',
-'Drew Barrymore':'\x021975-, heir to the Barrymore acting dynasty. Drew starred in \x0fET\x02, \x0fThe Wedding Singer\x02, \x0fCharlie\'s Angels\x02, and \x0fcountless tabloid stories\x02.',
-'Drew Carey':'\x021958-, American comedian and television star. \x0fWhose line is it anyway? His\x02.',
-'Drinking & Driving':'\x02Friends don\'t let friends drive drunk.',
-'Drunk Drivers':'\x02Number one highway safety problem.',
-'Dumb Blonde Jokes':'\x0fAre they just naturally funny?\x02 ',
-'Dungeons & Dragons':'\x02Popular role-playing game featuring swords, sorcery and wizards. \x0fRepeat after me: it\'s a game... it\'s only a game...\x02 ',
-'Dustin Hoffman':'\x021937-, highly regarded actor of \x0fThe Graduate\x02, \x0fMidnight Cowboy\x02, and \x0fRainman\x02. He\'s an excellent driver!',
-'Ebony & Ivory':'\x02"Ebony and ivory live together in perfect harmony." \x0fPaul McCartney\x02 ',
-'Eggplant':'\x0fWithout it there would be no Eggplant Parmesan\x02.',
-'Emergency Rooms':'\x0fBrings new meaning to he word "heartthrob."\x02 ',
-'Exterminators':'\x0fBugs, rats and vermin. It\'s time for chemical warfare\x02.',
-'Fairies':'\x02Tiny, mischievous, mythical beings with magic powers. They live in Fairyland. \x0fReally\x02.',
-'Faith Hill':'\x021967-, American crossover country music artist. \x0fYou just gotta have Faith\x02.',
-'Fame & Fortune':'\x02Everybody may have 15 minutes of fame, \x0fbut fortune is another thing altogether\x02.',
-'Fat':'\x0fI can\'t believe I ate the whooooooole thing\x02.',
-'Fear & Loathing':'\x02In Las Vegas, \x0for anywhere else\x02.',
-'Ferdinand & Isabella':'\x02Late 15th century king and queen of Spain. They backed Christopher Columbus \x0fand benefitted royally\x02.',
-'Fertilizer':'\x0fViagra for the garden\x02.',
-'Field & Stream':'\x0fThe hunter\'s best friend\x02.',
-'Fish & Chips':'\x0fJust wrap it in any old newspaper\x02.',
-'Flannel Shirts':'\x0fPick your plaid\x02.',
-'Flash Floods':'\x0fToo late for sandbags!\x02 ',
-'Florence Nightengale':'\x021820-1910, English nurse and health-care reformer. \x0fWe\'ve been singing her praises for years\x02.',
-'Flowers & Candy':'\x02When \x0f"I\'m sorry"\x02 is not enough.',
-'Folk Music':'\x0fWhen you\'re just fiddling around...\x02 ',
-'Food & Shelter':'\x02Gotta have it.',
-'Food Poisoning':'\x0fThis chicken tastes kinda funny...\x02 ',
-'Foot & Mouth':'\x02An infectious disease of animals with hooves. \x0fNot the same as foot-IN-mouth disease which affects everybody at one time or another\x02.',
-'Forever & Ever':'\x02"Oh, baby, I\'m gonna to love you forever/ Forever and ever amen." \x0fRandy Travis\x02 ',
-'Fortune Cookies':'\x0f"You will soon eat a flat, dry, tasteless cookie..."\x02 ',
-'Freaks & Geeks':'\x02The 1999 television show, \x0for those outside the social norm\x02.',
-'Fred & Ginger':'\x02Fred Astair & Ginger Rogers - tap dancing their way into the hearts of millions.',
-'Fred & Wilma':'\x02Meet the Flintstones. \x0f"Yabba-dabba-doooo!"\x02 ',
-'Fred Flintstone':'\x0fYaba-daba-dooooo!\x02 ',
-'Friends & Family':'\x02There when you need them.',
-'Frisbees':'\x02The frisbee was introduced to the market in 1948. \x0fTake one for a spin\x02.',
-'Frog & Toad':'\x02Characters in a series of children\'s books by Arnold Lobel, \x0for any of the millions of frogs and toads who choose not to wear clothes\x02.',
-'Gardening':'\x0fGet in touch with your roots\x02.',
-'George & Jane, His Wife':'\x0fThe Jetsons\x02 television show first aired in 1962. \x0fIn spite of our best efforts, cars still can\'t fly\x02.',
-'Gettysburg, 1863':'\x02The turning point of the American Civil War, \x0fa bit more than four score and seven years ago\x02.',
-'Ghosts & Goblins':'\x02"I see dead people." - \x0fCole Sear, The Sixth Sense\x02 ',
-'Gilligan\'s Island':'\x0fWho would have thought that you could make a radio out of coconuts\x02.',
-'Ginger & Mary Ann':'\x02"Here on Gilligan\'s Isle."',
-'Giraffes':'\x02Giraffes can grow to 18 feet tall and have been known to kill a lion with a single kick. \x0fNot just another pretty face\x02.',
-'Go Karts':'\x0fGo kart, go!\x02 ',
-'Going On A Cruise':'\x0fIceberg, dead ahead!\x02 ',
-'Gold & Silver':'\x02There\'s a good reason Fort Knox is full of gold and not silver.',
-'Good & Plenty':'\x02The licorice candy was first produced in 1893, making it the oldest branded candy in the United States.',
-'Goose & The Gander':'\x0fIf it\'s good for the goose...\x02 ',
-'Gourmet Coffee Shops':'\x0fI\'ll have a tall, double cappuccino, wet, with vanilla, half decaf, - to walk\x02.',
-'Grease':'\x0fPretty slick!\x02 ',
-'Grease & Grime':'\x0fWhat would Martha do?\x02 ',
-'Haiku':'\x02Traditional form of Japanese poetry consisting of three lines, usually containing a reference to nature.',
-'Hammer & Nails':'\x02"If I had a hammer..." - \x0fPeter, Paul and Mary\x02 ',
-'Hammer & Sickle':'\x02An emblem of the Communist movement, now retired... \x0fas is the Soviet Union\x02.',
-'Hang Gliding':'\x0fTrust us. It\'s a breeze\x02.',
-'Hansel & Gretel':'\x0fOne of Grimm\'s grimmer fairy tales\x02.',
-'Hard Boiled Eggs':'\x0fWell, I\'ll be deviled...\x02 ',
-'Harrison Ford':'\x021942-, Iconic American actor. "Hokey religions and ancient weapons are no match for a blaster at your side, kid."',
-'Harry Potter':'\x02The hero in a series of books by J.K. Rowling featuring muggles and wizards.',
-'Harvard & Yale':'\x02"What? Like it\'s hard?" - \x0fReese Witherspoon Legally Blond\x02 ',
-'Hawks & Doves':'\x02The big birds of war and peace.',
-'Head Lice':'\x02Head lice suck blood from the scalp and spread like crazy. \x0fA REAL parasite\x02.',
-'Heart & Soul':'\x0fThey\'re yours. All yours!\x02 ',
-'Heaven & Hell':'\x02The ups and down of the afterlife.',
-'Herb Gardens':'\x02Rosemary, Basil, Chive... \x0fis it a herb garden or the cast from a British drama?\x02 ',
-'Here & There':'\x0fAnd everywhere\x02.',
-'Hills & Valleys':'\x02Nature\'s little ups and down.',
-'Hip Hop':'\x02Musical and cultural movement that gained popularity in the 1980s. \x0fYo, yo, yo\x02.',
-'Hit & Run':'\x02An automobile crash, or a baseball play.',
-'Hollywood & Vine':'\x0fThe Los Angeles street corner where dreams come true\x02.',
-'Hook & Ladder Trucks':'\x02One big reason to become a firefighter.',
-'Hootie & The Blowfish':'\x02One of the most commercially successful pop bands to emerge in the 1990s. \x0fI go blind when I think about them\x02.',
-'Horse & Cart':'\x02Get the order right!',
-'Hospital Gowns':'\x0fOpen all hours\x02.',
-'Hotels & Motels':'\x0fGet a room!\x02 ',
-'House & Home':'\x0fAnd money pit\x02.',
-'Howard Stern':'\x021954-, American shock disc jockey. His autobiography is titled \x0fPrivate Parts\x02. \x0fIf only they WERE private\x02.',
-'Husbands & Wives':'\x0fFor richer... hopefully\x02.',
-'Ice & Snow':'\x02"We come from the land of the ice and snow/ From the midnight sun where the hot springs blow." - \x0fLed Zeppelin\x02 ',
-'In The Doghouse':'\x0fAll told, I\'d rather be in the cathouse\x02.',
-'Irrational Fears':'\x0fWhat\'s that sound?\x02 ',
-'Jenna & Barbara':'\x02President Bush\'s daughters, the \x0f"First Twins."\x02 ',
-'John Wayne':'\x021907-1979, legendary American actor, "The Duke" starred in such classics as \x0fStagecoach\x02, \x0fThe Sands of Iwo Jima\x02 and \x0fTrue Grit\x02.',
-'Johnny Depp':'\x021963-, American actor and heart-throb. From \x0fCry-Baby\x02 to \x0fPirates of the Caribbean\x02 - he\'s as smooth as \x0fChocolat\x02.',
-'Jonah & The Whale':'\x02The greatest fish story ever told, \x0fin the Bible, that is\x02.',
-'Junkyard Dogs':'\x0fNot as mean as bad, bad Leroy Brown\x02.',
-'Jurassic Park':'\x021993 film based on Michael Chrichton\'s book about dinosaurs brought back to life, with Oscar-winning visual effects.',
-'King Tut':'\x02Boy king who ruled Egypt from 1333 to 1323 B.C., known for the great wealth of objects found in his tomb. \x0fHe took it with him\x02.',
-'Kiss & Tell':'\x0fBest to keep your mouth shut\x02.',
-'Knife & Fork':'\x02Knife on the right, fork on the left.',
-'Knitting Needles':'\x02Knit one, pearl two...',
-'Lady & The Tramp':'\x02The 1955 Disney animated film featuring dogs, love and spaghetti.',
-'Lance Armstrong':'\x021971-, American cyclist, cancer survivor and winner of the Tour De France - \x0fbrought new meaning to the phrase "Going Postal."\x02 ',
-'Lassie':'\x02A famous collie, Lassie starred in her own TV show. \x0fWhat\'s that you say Lassie? Little Timmy\'s fallen down the well?\x02 ',
-'Last Night':'\x0fAbout last night...\x02 ',
-'Last Will & Testament':'\x0fIt may be your only chance to get the last work on anything\x02.',
-'Laurel & Hardy':'\x02Classic fat-skinny comedy duo of the 1920s.',
-'Laverne & Shirley':'\x02The 1970s sitcom phenomenon that defined Milwaukee for the world. \x0fAnd Milwaukee\'s still trying to live it down!\x02 ',
-'Law & Order':'\x02The television show, or the concept.',
-'Leather & Lace':'\x02It\'s a texture thing.',
-'Lemon & Lime':'\x0fPucker up\x02.',
-'Lemon Meringue Pie':'\x02Tart, sweet and smooth.',
-'Lethal Injection':'\x02It\'s a killer.',
-'Lewis & Clark':'\x02The early 1800s expedition covered over 8000 miles and confirmed that the Louisiana Purchase \x0fwas a very good deal\x02.',
-'Liberty & Justice':'\x02For all.',
-'Linguine With Clam Sauce':'\x0fPass the parmesan...\x02 ',
-'Lions & Tigers':'\x02And bears...',
-'Liposuction':'\x0fFatty tissue? That sucks...\x02 ',
-'Liver And Onions':'\x0fAn acquired taste\x02.',
-'Loch Ness Monster':'\x02"Nessie," the legendary beast of Loch Ness, Scotland. \x0fIt must be real, they have pictures\x02.',
-'Lock & Key':'\x0fQuit picking on me!\x02 ',
-'Lock & Load':'\x0fIt\'s off to war we go\x02.',
-'Looney Tunes':'\x02Warner Brothers cartoons featuring Porky Pig and Bugs Bunny.',
-'Love & Marriage':'\x0fFirst comes love, then comes marriage...\x02 ',
-'Lox & Bagels':'\x02A deli favorite. \x0fPass the cream cheese!\x02 ',
-'Lucy & Desi':'\x0fThirty years later and we still love Lucy\x02.',
-'M & M\'s':'\x02Candy coated chocolates first sold in 1941. Now available in purple.',
-'Macaroni & Cheese':'\x02It\'s the \x0feasiest\x02.',
-'Mae West':'\x021892-1980, American stage and film comedian. "Too much of a good thing can be wonderful."',
-'Maggots':'\x0fI though it was rice\x02.',
-'Maple Syrup':'\x02Made from the sweet sap of the maple tree or black maple tree, produced only in North America - \x0fa "must have" for pancakes\x02.',
-'Marlon Brando':'\x021924-2004, legendary American actor. Starred in \x0fA Streetcar Named Desire\x02 and won awards for \x0fOn the Waterfront\x02 and \x0fThe Godfather\x02.',
-'Matzo Balls':'\x0fSoul for the chicken soup\x02.',
-'Maui':'\x02Hawaiian volcanic island, 728 square feet in area. \x0fHeaven on Earth\x02.',
-'Maximum Security Prison':'\x0fWhen a regular strength prison just won\'t do\x02.',
-'Me & My Shadow':'\x02"Strolling down the avenue..."',
-'Meat & Potatoes':'\x02A simpler meal for a simpler time.',
-'Meat Markets':'\x0fA cut above the rest\x02.',
-'Mensa High IQ Society':'\x02Members have IQ\'s in the top 2% of the population.',
-'Mickey & Minnie':'\x02Mouse, that is. \x0fDisney\'s dynamic duo\x02.',
-'Migraine Headaches':'\x0fNot just any headache\x02.',
-'Milk & Cookies':'\x0fThe ultimate after-school special\x02.',
-'Milwaukee':'\x0fThey don\'t call their baseball team the "Brewers" for nuthin\'.\x02 ',
-'Minneapolis & St. Paul':'\x02The "Twin Cities" are Minnesota\'s largest population center. \x0fThey may be twins but you can tell the difference\x02.',
-'Mom & Apple Pie':'\x02Worth fighting for.',
-'Mom & Pop':'\x0fHey! Maybe they should open a store!\x02 ',
-'Mom\'s Cooking':'\x0fJust like Mom USED to make\x02.',
-'Monitor & The Merrimac':'\x02American Civil War ironclads, first fought each other in 1862.',
-'Monkeys':'\x0fMonkeys see...\x02 ',
-'Moon & The Stars':'\x0fYou want what?\x02 ',
-'Mount Vesuvius':'\x02Italian volcano that rises above the Bay of Naples and blew its top in 79 A.D., \x0fmuch to Pompeii\'s regret\x02.',
-'Mutual Funds':'\x0fMutually benefits you and your broker\x02.',
-'My Father':'\x0f"Go ask your mother."\x02 ',
-'My Life':'\x02"There are places I\'ll remember/ All my life, though some have changed." \x0fThe Beatles\x02 ',
-'My Memories':'\x0fThanks for the memories...\x02 ',
-'My Mother':'\x0f"Go ask your father."\x02 ',
-'NASA':'\x02National Aeronautics and Space Administration, established in 1958 in part in response to the U.S.S.R. launching Sputnik.',
-'Nashville':'\x02Capital of Tennessee and capital of country music - \x0falso known as Nash Vegas\x02.',
-'New Yorkers':'\x02Brash, brawny and full of bravado.',
-'Nirvana':'\x02A state of supreme spiritual bliss and liberation. \x0fAnd then there\'s the band...\x02 ',
-'North & South Dakota':'\x0fIt\'s all north\x02.',
-'Nosebleeds':'\x0fKeep your chin up\x02.',
-'*NSYNC':'\x02Popular boy band known for their dance routines and harmonies. \x0fBye, Bye, Bye our albums!\x02 ',
-'Nuts & Bolts':'\x02A good way to stay connected.',
-'Odds & Ends':'\x0fIt\'s in the junk drawer\x02.',
-'Oil & Filter':'\x0fLet me top that off for you\x02.',
-'Oil & Vinegar':'\x0fThey don\'t mix, but we keep trying\x02.',
-'Old Age':'\x0fIt looks good when you consider the alternative\x02.',
-'Ordinary People':'\x0fNothing special\x02.',
-'Pail & Shovel':'\x02I can dig it.',
-'Panning For Gold':'\x0fThe dot-coms of the 1840s...\x02 ',
-'Paul McCartney & Wings':'\x02Life after \x0fThe Beatles\x02.',
-'Peace & Love':'\x0fFlower Power!\x02 ',
-'Peace & Quiet':'\x02Truly appreciated during parenthood.',
-'Peaches & Cream':'\x02A great complexion and a great dessert.',
-'Peanut Butter & Jelly':'\x02On white bread; \x0fcut off the crusts\x02.',
-'Peanuts & Popcorn':'\x0fIt\'s a crackerjack combination!\x02 ',
-'Pebbles & Bamm-Bamm':'\x02The cartoon kids from \x0fThe Flintstones\x02. BAM-BAM, BAM-BAM, BAM-BAM.',
-'Pencil & Paper':'\x0fWe\'re drawn to them!\x02 ',
-'Penn & Teller':'\x02Magicians, illusionists, entertainers, and comedians.',
-'Pez Dispensers':'\x02Collectable candy dispensers first being sold in 1952. Believe it or not, there has never been an Elvis Pez dispenser.',
-'Phone & Fax':'\x0fSoon you won\'t need to leave the house at all!\x02 ',
-'Pineapple':'\x02Tropical fruit, or \x0fthe less lush hand grenade\x02.',
-'Pink Flamingos':'\x02Gracing America\'s lawns for more than 40 years - \x0fsold only in pairs\x02.',
-'Pins & Needles':'\x02It\'s all sewed up!',
-'Playing Golf':'\x02For stress reduction. \x0fNow, get that head down and straighten your arm!\x02 ',
-'Pole Vaulting':'\x0fThe sport where you can reach new heights\x02.',
-'Pomp & Circumstance':'\x0fLa-de-da\x02.',
-'Porcupines':'\x02Quill-bearing rodents \x0fthat can leave you in a prickly situation\x02.',
-'Pork & Beans':'\x0fRustle us up some grub, Cookie\x02.',
-'Power & Glory':'\x02The spoils of war.',
-'President Bush':'\x021946-, 43rd president of the United States.',
-'Pride & Prejudice':'\x02Jane Austin\'s 1813 classic novel expounding on the consequences of pride.',
-'Queen Elizabeth II':'\x021926-, Queen of the United Kingdom and Northern Ireland since 1952. \x0fShame about the kids, though...\x02 ',
-'R & B':'\x02Rhythm and Blues.',
-'R & D':'\x02Research and Development.',
-'R & R':'\x02Rest and relaxation, recreation or could be recuperation.',
-'Raves':'\x02Neo-psychedelic all-night dance parties centered around acid, house, and techno music. \x0fAll the rave.\x02 ',
-'Reading & Writing':'\x02Old-fashioned skill, amazingly still useful today.',
-'Regis &...':'\x02Kathy Lee or Kelly - \x0fyour choice\x02.',
-'Rice & Beans':'\x0fThe south-of-the-border meat and potatoes\x02. ',
-'Rice Krispies Treats':'\x02How could you go wrong with Rice Krispies, marshmallows, and butter.',
-'Richard Simmons':'\x021948-, American fitness guru famous for his extroverted style, short shorts and \x0fSweatin\' to the Oldies\x02.',
-'Rio De Janeiro':'\x02Vibrant Brazilian city and home to Carnival. \x0fBlame it on Rio!\x02 ',
-'Road Rage':'\x02Ten years ago we complained about potholes. NOW we\'re dodging pot-shots.',
-'Robin Hood':'\x02Legendary British outlaw who stole from the rich and gave to the poor, known for his courage, skill, and Merry Men.',
-'Rock & Roll':'\x02It\'ll never die. \x0fUnlike Rock and Roll musicians\x02.',
-'Rod & Reel':'\x0fHe took it hook, line, and sinker\x02.',
-'Rogers & Hammerstein':'\x02Kings of the Broadway Musical: \x0fThe Sound of Music, The King and I, South Pacific\x02, and many, many more.',
-'Rope Burns':'\x0fYou were playing WHAT?\x02 ',
-'Rusty Nails':'\x0fGood name for a country western singer\x02.',
-'Salt \'N Pepa':'\x02Extremely successful rap group formed in the 1980s, known for their portrayals of the woman\'s perspective on relationships.',
-'Salt & Pepper':'\x02"Pump it up a notch! \x0fBAM!\x02" - \x0fEmeril Lagasse\x02.',
-'Sand & Surf':'\x0fLife\'s a beach!\x02 ',
-'Sandra Bullock':'\x021964-, American actor who starred in \x0fSpeed\x02, \x0fMiss Congeniality\x02, and \x0fWhile You Were Sleeping\x02. The classic girl-next-door.',
-'Scented Candles':'\x0fYou didn\'t have to BAKE an apple pie - just light a candle\x02.',
-'Shake & Bake':'\x0f... and eat\x02.',
-'Shave & A Haircut':'\x0fTwo bits\x02.',
-'Shipwrecks':'\x02"The lake it is said never gives up her dead..." - \x0fThe Wreck of the Edmund Fitzgerald"\x02 ',
-'Sigmund Freud':'\x021856-1939, Viennese psychologist and the originator of psychoanalysis and \x0fthe Freudian slip\x02.',
-'Sin & Redemption':'\x02Everybody deserves a second chance.',
-'Sitcoms':'\x0fIf they\'re so funny, WHY THE LAUGH TRACK?\x02 ',
-'Skin & Bones':'\x0fWhat would you be without them?\x02 ',
-'Slash & Burn':'\x0fAnd there goes another rain forest...\x02 ',
-'Slasher Films':'\x0fA real nightmare\x02.',
-'Slice & Dice':'\x02A sharp knife is a safe knife.',
-'Slip & Fall':'\x02Watch out for... \x0ftoo late!\x02 ',
-'Slobodan Milosevic':'\x021941-, former leader of Serbia, also known as "the Butcher of the Balkans."',
-'Smith & Wesson':'\x0fFirearms when ready!\x02 ',
-'Smoke & Mirrors':'\x0fThat\'s how we do it!\x02 ',
-'Snips & Snails':'\x02And puppy dog tails.',
-'Snoopy & The Red Barron':'\x02Characters in the \x0fPeanuts\x02 comic strip. \x0fTalk about a dog fight!\x02 ',
-'Space & Time':'\x02Infinite.',
-'Spiders & Snakes':'\x0fCreepy! Legs or no legs\x02.',
-'Spit & Polish':'\x0fWe could do with less spit and more polish\x02.',
-'Stalactites & Stalagmites':'\x0fThe ups and downs of spelunking\x02.',
-'Stamp Collecting':'\x0fIf you can\'t lick \'em, collect \'em\x02.',
-'Stanley & Livingston':'\x02Britons who explored Africa, \x0fI presume\x02.',
-'Stars & Stripes':'\x02Three cheers for the red, white, and blue!',
-'Sticks & Stones':'\x02When words are not enough.',
-'Stocks & Bonds':'\x0fAt least they\'re worth the paper they\'re printed on... We hope\x02.',
-'Stop Signs':'\x0fGee, Officer, I THOUGHT it was green!\x02 ',
-'Strained Peas':'\x0fThe strain comes when you have to eat them\x02.',
-'Street Mimes':'\x02A mime is a terrible thing to waste. \x0fOn second thought...\x02 ',
-'Stretch Limos':'\x0fStretch your legs, stretch your wallet\x02.',
-'Strip Malls':'\x0fAlmost as attractive as strip mines\x02.',
-'Sugar & Spice':'\x02And everything nice.',
-'Suit & Tie':'\x0fIt\'s business as usual!\x02 ',
-'Sumo Wrestlers':'\x02Wrestlers usually weigh 300-400 pounds and win this Japanese form of wrestling by forcing an opponent out of the ring.',
-'Surf & Turf':'\x02Steak \x0fand\x02 lobster. \x0fNo need to choose\x02.',
-'Surprise Parties':'\x0fSURPRISE! Oh. He had a heart condition... that WAS a surprise...\x02 ',
-'Tarred & Feathered':'\x0fIt\'s a sticky situation\x02.',
-'Tarzan & Jane':'\x0fHe went ape over her\x02.',
-'Tattoo Parlors':'\x02"With nothing to show but this brand new tattoo... how I got it here I haven\'t a clue." - \x0fJimmy Buffett\x02 ',
-'Tea & Crumpets':'\x0fUpper-crust toast & jelly\x02.',
-'The 1990s':'\x02Dot-coms, Clinton and designer coffee. \x0fThe good old days\x02.',
-'The Atlantic & Pacific':'\x02Oceans apart.',
-'The Big Dipper':'\x02Group of stars in the Northern sky that form part of the constellation Ursa Major.',
-'The Birds & The Bees':'\x02We\'ll tell you about them sometime.',
-'The Chicken & The Egg':'\x02Which came first? The egg. \x0fLook it up!\x02 ',
-'The Dalai Lama':'\x02Title of the leader of Tibetan Buddhism, in exile since 1959. \x0fHello, Dalai!\x02 ',
-'The Dixie Chicks':'\x02Female country and western band with pop leanings. Winners of multiple Country Music Association awards. \x0fGoodbye, Earl!\x02 ',
-'The Graveyard Shift':'\x0fIt WILL be the death of me...\x02 ',
-'The Great Barrier Reef':'\x02Coral reefs, shoals and islets off the northern coast of Australia. \x0fScuba heaven\x02.',
-'The Great Wall Of China':'\x02A 1500 mile long wall across northern China. Built for fortification but better for tourism.',
-'The Ice Age':'\x02Polarity analysis of deep-sea sediment suggests the Pleistocene age began more than 1.8 million years ago. \x0fBla-bla-bla\x02.',
-'The Judge':'\x0fSmile when you play this card\x02.',
-'The Mounties':'\x02The Royal Canadian Mounted Police. They always get their man.',
-'The North Pole':'\x0fThings can only go south from here...\x02 ',
-'The Princess & The Pea':'\x02The true test of a princess, \x0ffairy tale or otherwise\x02.',
-'The Scarlet Letter':'\x02Hawthorne\'s 1845 novel about Puritan New England, moral conflicts, guilt, and down-right nastiness. \x0f(It was an "A".)\x02 ',
-'The Symphony':'\x0fIt\'s music to our ears\x02.',
-'The Three Stooges':'\x0fNyuk, nyuk, nyuk. A wiseguy, eh?\x02 ',
-'The U.S. Constitution':'\x02We the people...',
-'The Young & The Restless':'\x02Launched in 1973, this soap opera isn\'t young, \x0fbut it\'s still restless\x02.',
-'Thelma & Louise':'\x021991 Ridley Scott film starring Susan Sarandon and Geena Davis as two over-the-edge women.',
-'Three Men & A Baby':'\x02The 1987 comedy film. \x0fYou do the math\x02.',
-'Thunder & Lightning':'\x02Nature\'s fireworks.',
-'Timbuktu':'\x02City of 20,000 located in the West African nation of Mali. The official name if Tombouctou. \x0fFrom here to Timbuktu\x02.',
-'Time Travel':'\x02"What do you mean I missed my connection in the 14th Century?"',
-'Timothy McVey':'\x021961-2001, the Oklahoma City Bomber.',
-'Tom & Jerry':'\x0fA good chaser\x02.',
-'Tony Blair':'\x021951-, British Prime Minister, "We will not rest until this evil is driven from our world." Sept. 11, 2001.',
-'Track & Field':'\x02It\'s eventful.',
-'Tractors':'\x02"She thinks My Tractor\'s Sexy." - \x0fKenny Chesney\x02 ',
-'Treasure Hunting':'\x0fGold Doubloons! Gold Doubloons! AT A YARD SALE?\x02 ',
-'Trekkies':'\x0fBeam them up, PLEASE!\x02 ',
-'Trinidad & Tobago':'\x02Tiny, lush Caribbean republic. One of the most prosperous countries in the area due to petroleum and natural gas production.',
-'Truth & Justice':'\x0fSounds good on paper\x02.',
-'Turkey & Stuffing':'\x0fGet stuffed\x02.',
-'Tyra Banks':'\x021973-, American model, starred in \x0fCoyote Ugly\x02. \x0fProbably the only time you\'ll see the words "ugly" and "Tyra Banks" in the same sentence\x02.',
-'Umbrella Drinks':'\x0fExtra fruit, please!\x02 ',
-'Urban Sprawl':'\x0fOh give me a home where the edge of town roams...\x02 ',
-'Velcro':'\x0fA hook-and-loop fastener that can really grab you\x02.',
-'Venus & Mars':'\x02As different as men & women.',
-'Viagra':'\x0fIt works for Bob Dole and 16 million others, it\'ll work for you.\x02 ',
-'Volcanoes':'\x02Vents in the crust of the earth from which steam, debris and molten rock spew, \x0fwith explosive results\x02.',
-'War & Peace':'\x02Tolstoy\'s 1805 epic novel of the Napoleonic wars, a celebration of Russian spirit.',
-'Washer & Dryer':'\x0fTake them out for a spin\x02.',
-'Waxing The Floor':'\x0fIt\'s a pain in the neck, and back, and knees...\x02 ',
-'Weed & Feed':'\x0fMake sure the grass is greener on YOUR side of the fence\x02.',
-'Weird Al Yankovic':'\x021959-, American musical humorist, born Alfred Matthew Yankovic, \x0fwhich is nothing to laugh about...\x02 ',
-'Whips & Chains':'\x02Popular before prison reform - \x0fthe good old days\x02.',
-'White Collar Crime':'\x0fThree strikes and you\'re OUT... to a cozy little low-level detention facility with a pool and tennis court.\x02 ',
-'Will & Grace':'\x02Popular sitcom debuted in 1998. \x0fNot your average next door neighbors\x02.',
-'Working Out':'\x0fNo pain, no gain\x02.',
-'Xena, Warrior Princess':'\x02Popular TV fantasy, adventure program. Xena, played by Lucy Lawless, and her friend Gabrielle, seek adventure and fight evil.',
-'Yin & Yang':'\x02Two elements that oppose each other and give life balance. \x0fIf you\'re lucky\x02.',
-'Zippers':'\x0fZip it, zip it good\x02.',
-'Zombies':'\x02Undead ghouls that feed off of brains. \x0fSo WE\'RE safe...\x02 ',
-' 4-H Clubs':'\x02Head, Heart, Hands and Health. A youth organization promoting leadership, citizenship, and life skills. \x0fSee you at the fair!\x02 ',
-'A Blackberry':'\x02It\'s a fruit \x0fand\x02 an integrated communications system!',
-'A Blind Date':'\x0fI can\'t see much future in it\x02.',
-'A Broken Nose':'\x02It adds character!',
-'A Comb-Over':'\x0fThe world\'s worst cover-up.\x02 ',
-'A Damsel In Distress':'\x02Where\'s that knight in shining armor?',
-'A French Bakery':'\x02Baguettes, croissants or a nice Gateau St. Honore? \x0fJust don\'t ask for French Toast\x02.',
-'A Galaxy':'\x02A galaxy can range from 1,500 to 300,000 light-years. \x0fIt\'s enough to make your head spin\x02 ',
-'A Genie':'\x02Most grant three wishes...\x0fand then head for the bottle\x02.',
-'A Good Education':'\x02Found at school... or at home.',
-'A Midnight Snack':'\x02Pizza, chips, cereal, ice cream...',
-'A Miracle':'\x0fIt\'s going to take a miracle\x02...',
-'A One-Horse Town':'\x02Half the size of a two-horse town.',
-'A Pool Boy':'\x0fKeeping it clean!\x02 ',
-'A Rump Roast':'\x02The meat of \x0fMeat and Potatoes."\x02 ',
-'Acne':'\x02It\'s not funny - \x0fis zit?\x02 ',
-'Action Figures':'\x02Batteries not included- or needed.',
-'Acupuncture':'\x02This traditional Chinese practice will have you on pins and needles.',
-'Airplane Restrooms':'\x02Small, cramped and smelly - \x0fbut they\'re lining up to get in!\x02 ',
-'Alaskan Pipeline':'\x02At 800 miles long and 48" in diameter, this is one of the largest pipeline systems in the world \x0fCold and crude\x02.',
-'Alcoholism':'\x02The compulsive consumption and dependence on alcoholic beverages.',
-'Alimony':'\x0fWhat was for richer is now for poorer\x02.',
-'Almond Joy':'\x02"Sometimes you feel like a nut..."',
-'Aluminum Siding':'\x02Encase your house in metal - sheer genius!',
-'American Beauty':'\x02It\'s a classic-the rose, the movie, the woman, or the automobile.',
-'American Idol':'\x02FOX network\'s reality program based on a talent competition for 16-28 year-olds. \x0fNo visible tattoos allowed\x02.',
-'An Autopsy':'\x0fOn the plus side, it\'s the last physical you\'ll ever have to take\x02.',
-'Anarchy':'\x0fWho\'s in charge here?\x02 ',
-'Angelina Jolie':'\x021975-, American actor in \x0fGone in Sixty Seconds\x02 and \x0fLara Croft: Tomb Raider\x02. She won an Academy Award for \x0fGirl, Interrupted\x02.',
-'Angels':'\x02"Teacher says every time a bell rings, an angel gets his wings." - Zuzu Baily \x0fIt\'s a Wonderful Life\x02 ',
-'Appalachians':'\x02Get your fiddle and I\'ll bring the banjo. There\'ll be music in the mountains tonight!',
-'Aretha Franklin':'\x021942-, American rock and roll, blues, and gospel singer. \x0fThe Queen of Soul deserves more than a little R-E-S-P-E-C-T.',
-'Avalanches':'\x02Nearly all avalanches that involve people are triggered by the victims themselves. \x0fSo walk softly and carry a cell phone\x02.',
-'Baghdad':'\x02The capital of Iraq. This city was founded in 764 A.D. and called Madinat as-Salam which means "City of Peace."',
-'Barbra Streisand':'\x021942- , American singer, actor, director, and producer. The first ever to win a Grammy, Emmy, Oscar and a Tony. \x0fA star WAS born!\x02 ',
-'Bette Midler':'\x021945-, American actor and popular singer. From the New York bathhouses to the "Divine Miss M."',
-'Big Bellies':'\x0fOften found on chubby hubbies\x02...',
-'Bill Cosby':'\x021937-, American actor and comedian who starred in \x0fI Spy\x02, \x0fThe Cosby Show\x02, and created Fat Albert. \x0fHey, hey, hey-he\'s got a PhD!\x02 ',
-'Bird Flu':'\x02Bird flu is caused by avian influenza viruses. It is highly contagious among birds and has the potential to adapt and spread among humans.',
-'Black Eyed Peas':'\x02Good listening \x0fand good eating!\x02 ',
-'Black Widows':'\x02Large venomous spiders in the American southwest. The male is half the size of the female, and \x0fvery nervous\x02...',
-'Blackmail':'\x02I know what you did last summer...',
-'Boa Constrictor':'\x02Found in the Central and South America, this snake can reach 13 feet in length. \x0fWant a hug?\x02 ',
-'Book Clubs':'\x02It doesn\'t matter if the book is good, as long as there\'s dessert.',
-'Boomerangs':'\x0fThey\'re due for a comeback!\x02 ',
-'Boston Strangler':'\x02Between 1962 and 1964, Albert DiSalvo assaulted and murdered eleven single women in their Boston apartment.',
-'Boston Tea Party':'\x02On December 16, 1773, American patriots boarded ships in the Boston harbor and emptied 342 chests of tea in protest of British taxation.',
-'Botox':'\x02A few shots and you\'ll have no worries for six months - \x0for at least you\'ll look that way\x02.',
-'Bowling Balls':'\x02In 1963 alone, Americans spent over $43 million on bowling balls. \x0fThe bowling industry was on a roll\x02.',
-'Box Cutters':'\x0fTake one on a plane and they\'ll cut you off the passenger list\x02.',
-'Boys Night Out':'\x0fNothing, Honey, just played some card\x02...',
-'Breast Implants':'\x0fA growing industry\x02.',
-'Broccoli':'\x02Fighting cancer for over 2,000 years.',
-'Bruce Lee':'\x021940-1973, American icon of martial arts films. This kung fu master influenced martial arts worldwide. \x0fEnter the Dragon\x02.',
-'Budapest':'\x02Capital of Hungary. This city of almost 2 million is divided into two parts - the hilly \x0fBuda\x02 and the flat \x0fPest\x02.',
-'Buffalo Soldiers':'\x02African American U.S. army units who fought in the Indian Wars and explored vast areas of the southwest.',
-'Bulging Biceps':'\x0fMy, what big muscles you have\x02...',
-'Burger King':'\x0211,000 restaurants serving flame-broiled burgers worldwide. \x0fHave it Your Way\x02.',
-'Butter':'\x0fI can\'t believe it\'s not margarine!\x02 ',
-'Cabin In The Woods':'\x02Relaxing...unless that guy in the hockey mask shows up.',
-'Calculus':'\x02How do I calculate my level of confusion in calculus class?',
-'Cameron Diaz':'\x021972-, American actor in \x0fGangs of New York\x02, and one of Charlie\'s new angels. \x0fThere\'s something about Cameron\x02.',
-'Cannibals':'\x0fWe must have you for dinner sometime!\x02 ',
-'Car Insurance':'\x0fDon\'t leave home without it!\x02 ',
-'Carrots':'\x0fThe root of all carrot cakes\x02.',
-'Cashmere Sweaters':'\x02They should be called \x0fCashMORE\x02 sweaters!',
-'Caterpillars':'\x02Bugs or bulldozers. \x0fThere\'s gonna be some changes \'round here\x02.',
-'Central Park':'\x02Each year, over 25 million people visit these 843 acres of beautiful lawns and woodlands located in Manhattan.',
-'Champagne':'\x02Salud!... Le chaim!... Cheers!... Slainte!...',
-'Chaps':'\x0fUsed to be just for cowboys\x02...',
-'Chick Flicks':'\x0fSteel Magnolias\x02, \x0fBeaches\x02, \x0fWaiting To Exhale\x02... Ratings: ****...and fifteen tissues.',
-'Chicken Dance':'\x02Da, da, da...',
-'Chicken Feed':'\x0fYou can\'t get it for chicken feed.\x02 ',
-'Chicken, Alaska':'\x02Take the Klondike loop from Whitehorse to Dawson City and you\'re almost there. \x0fGet the cluck over here!\x02 ',
-'Chicks':'\x02Fine feathered friends...',
-'Christopher Reeve':'\x021952-2004, American actor, director, author, activist and chairman of the Christopher Reeve Paralysis Foundation. \x0fA real Superman\x02.',
-'Christopher Walken':'\x021943-, American actor and winner of an Academy Award for \x0fThe Deer Hunter\x02. He makes "mentally unbalanced" look so natural.',
-'Cigars':'\x0fPower smoking\x02.',
-'Cinnamon Toast':'\x02Sugar and spice and everything nice.',
-'Cleveland Indians':'\x02This Cleveland baseball team took the name "Indians" in 1915. \x0fIt\'s the tribe\x02 ',
-'Clinical Depression':'\x0fClinical or not - it\'s depressing\x02.',
-'Coastal Erosion':'\x0fWasn\'t California here just a minute ago\x02...',
-'Cockpit Recordings':'\x0fIf those black boxes are so indestructible, why not make the whole plane out of them?\x02 ',
-'Cocktail Parties':'\x02Shake and serve straight up. \x0fIt\'s a drinking game!\x02 ',
-'Conservatives':'\x02To the right of the political spectrum.',
-'Corsets':'\x02From whalebones to latex...still in fashion.',
-'Cowboy Boots':'\x02These boots were made for two-steppin\'.',
-'Cowgirls':'\x02"Even cowgirls get the blues." -\x0fTom Robbins\x02 ',
-'Cream Puffs':'\x02A real lightweight... \x0funless you\'re counting calories\x02.',
-'Cream Rinse':'\x0fPerfect after a milk bath\x02.',
-'Credit Cards':'\x02For everything else there\'s CASH.',
-'Crisis Centers':'\x0fPlease leave a message at the sound of the beep\x02...',
-'Crop Circles':'\x02Worldwide, more than 10,000 crop circles have been reported. \x0fNo crop squares, to date\x02.',
-'Cross Dressing':'\x02A personal statement... or a fashion statement.',
-'Cucumbers':'\x02A little brine and they\'re in a pickle.',
-'Dallas, Texas':'\x02The largest city in Texas. \x0fThe big D\x02.',
-'Danny Glover':'\x021946-, American actor who was appointed goodwill ambassador for the United Nations Development Program. \x0fLethal box office weapon\x02.',
-'Desperate Housewives':'\x02A prime-time soap opera featuring the lives of five suburban housewives. \x0fApparently, millions are desperate to watch\x02...',
-'Diane Keaton':'\x021946-, American actor, known for her personal style and award winning acting in \x0fAnnie Hall\x02, \x0fMarvin\'s Room\x02, and \x0fSomething\'s Gotta Give\x02.',
-'Diet Pills':'\x02Results may vary.',
-'Dirty Dancing':'\x0fNow legal in most states\x02.',
-'DNA Testing':'\x0fI had my DNA tested. It failed\x02.',
-'Domestic Partners':'\x02Not exactly married, not exactly dating.',
-'Don King':'\x021932-, American boxing promoter. He has donated millions to worthy causes, \x0fbut is better known for his knock-out hair\x02.',
-'Donald Trump':'\x021946-, American success story. Chairman of The Trump Organization for real estate development. \x0fIf he says you\'re fired, you\'re fired!\x02 ',
-'Doomsday':'\x0fI reckon it will come\x02.',
-'Down Comforters':'\x02Just ducky when the cold weather gets your goose.',
-'Dr. Phil':'\x02Psychologist Dr. Phil McGraw helps millions "get real" on his TV show... \x0fLife Law #1: Either you get it or you don\'t\x02.',
-'Dreams':'\x02"If you can dream it, you can do it." - \x0fWalt Disney\x02 ',
-'Drive-In Movies':'\x0fThe entertainment\'s not just on the screen\x02.',
-'Drooling':'\x02What a drip!',
-'Duck Decoys':'\x02A bunch of quacks!',
-'Duckbill Platypus':'\x02A furry, egg-laying animal with webbed forefeet. \x0fIt\'s a bird...no, it\'s a reptile, no, it\'s a mammal...actually, it\'s a marsupial\x02.',
-'EBay':'\x02"The World\'s Online Marketplace." \x0fThe bazaar for the bizarre\x02.',
-'Egg Rolls':'\x02Tasty Chinese appetizers. \x0fWe\'re not sure where the egg comes in\x02...',
-'Elvis Impersonators':'\x02Will the real Elvis please stand up?',
-'Emeril LaGasse':'\x021959-, chef, restauranteur and television personality, known for New Orleans regional specialties. \x0fBAM!\x02 ',
-'Empire State Building':'\x02The static electricity buildup on the top of the building is so great \x0fthat kissing can actually create sparks!\x02 ',
-'Energizer Bunny':'\x02The pink, drum beating "Spokes Hare" for Energizer batteries. \x0fIt keeps annoying... and annoying...and annoying\x02...',
-'Engineers':'\x02They have designs on your future...',
-'Enron':'\x02They manipulated the books, stocks plummeted, people lost their jobs and a couple of guys went to jail.',
-'Evolution':'\x02Charles Darwin\'s observations of the variations among plants and animals on the Galapagos Islands led to his theory of evolution.',
-'Exchange Students':'\x0fYou can only exchange them if you\'ve got the receipt\x02.',
-'Facial Hair':'\x02Good news for teenage boys. \x0fBad news for middle-aged women\x02.',
-'Factory Work':'\x0fEveryday working shifts\x02...',
-'Fangs':'\x02Take a bite out of life... \x0fsomeone else\'s, that is\x02.',
-'Farm Animals':'\x02"Four legs good, two legs bad." -\x0fGeorge Orwell Animal Farm\x02 ',
-'Father\'s Day':'\x02Traditionally, more collect calls are made on Father\'s Day than any other day of the year.',
-'FEMA':'\x02Federal Emergency Management Agency, responsible for disaster mitigation, preparedness, response and recovery.',
-'Fight Club':'\x021999 film starring Brad Pitt and Edward Norton. \x0fDon\'t talk about Fight Club\x02.',
-'Fire Ants':'\x0fA hot topic in the extermination business\x02.',
-'Fire Hydrants':'\x02The fire hydrant was invented by Birdsill Holly in 1869. Holly held over 150 U.S. patents, second only to Edison.',
-'Fire-Eaters':'\x0fA hot career move\x02...',
-'Fireside Chats':'\x02From stories around the campfire, to Franklin D. Roosevelt\'s popular 1930s and 1940s radio addresses - \x0fthey\'ll warm your heart\x02.',
-'First Born':'\x02All the attention and no hand-me-downs.',
-'Fjords':'\x02Long narrow inlets from the sea between steep cliffs.',
-'Flannel Sheets':'\x02Some nights call for satin sheets, and some for flannel.',
-'Florida':'\x02Over one thousand miles of beaches to enjoy...if the sharks don\'t get you.',
-'Flounders':'\x02Bottom-feeding flatfish. \x0fThings gotta be looking up\x02.',
-'Flying Saucers':'\x02On July 8, 1947 the U.S. Army reported that flying saucer wreckage was discovered near Roswell, NM. \x0f(Statement retracted on July 9.)\x02 ',
-'Flying Solo':'\x0fYou\'re on your own!\x02 ',
-'Foam Rubber':'\x02Foam rubber is a biodegradable matter produced from rubber trees. \x0fThat\'d be a cushy job\x02.',
-'Focus Groups':'\x02We need to run this card past a few dozen people first...',
-'Fondue':'\x02The taste says fondue...the calories say fonDON\'T...',
-'Foreign Films':'\x0fHow do they expect you to watch the film when you gotta read the subtitles?\x02 ',
-'Four-Inch Heels':'\x02Better to start with one-inch and work your way up.',
-'France':'\x02Not just a country- \x0fit\'s a state of mind!\x02 ',
-'Fraternities':'\x02An organization of male college students. Toga! Toga! Toga!',
-'Free Clinics':'\x0fHey, the disease was free, the clinic should be too!\x02 ',
-'Frogmen':'\x0fWhat do you get if you kiss a frogman?\x02 ',
-'Galactic Noise':'\x02The radio-frequency radiation originating outside the solar system. \x0fIs it just us, or is there somebody else out there?\x02 ',
-'Game Sanctuaries':'\x0fProtection for game players everywhere\x02.',
-'Garage Sales':'\x02Tag sales, yard sales, rummage sales - take your pick, just get there early!',
-'Garlic':'\x02The flavor that lasts, and last, and lasts...',
-'Gas Prices':'\x02What goes up, must...go up again!',
-'Gen. Douglas MacArthur':'\x021880-1964, the most decorated soldier in the history of the U.S. military. MacArthur took part in WWI, WWII and the Korean War.',
-'Gentlemen':'\x0fThey prefer blondes... brunettes...redheads...\x02 ',
-'Geronimo':'\x021829-1909, Apache leader known for his wisdom and courage. He died as a prisoner of war at Fort Sill in Oklahoma.',
-'Getting A Raise':'\x02Asking for one gets a raise... out of your boss.',
-'Girls Night Out':'\x0fDon\'t worry, Honey, it\'s just shopping and dinner\x02.',
-'Gladiators':'\x02Although most of the Roman gladiators were slaves, they were well-fed and given expert medical care.',
-'Going Bald':'\x02"Bald Is Beautiful!" -\x0fBHMA (Bald-Headed Men of America)\x02 ',
-'Graham Crackers':'\x02Developed in 1829, by Sylvester Graham, for the health benefits. He also promoted hard mattresses and cold showers.',
-'Granite':'\x0fYou can take it for granite\x02.',
-'Grass Huts':'\x02People who live in grass huts shouldn\'t throw matches.',
-'Graveyards':'\x0fFinally, a real resting place\x02.',
-'Gravy':'\x02No lumps? \x0fGood gravy!\x02 ',
-'Grease Monkeys':'\x02The boys \x0funder\x02 the hood.',
-'Greece':'\x02Lofty mountains, blue seas and 8,000 miles of coastline. I\'ll take the spanakopita with calamari on the side! OPA!',
-'Green Acres':'\x02It\'s the place to be...',
-'Greenhouse Effect':'\x02Without any greenhouse effect the earth would not be warm enough to sustain life.',
-'Grilled Cheese':'\x02Cooking School 101.',
-'Ground Zero':'\x02A blast area or the target of a missile or bomb.',
-'Group Therapy':'\x02Being analyzed with a group of strangers? \x0fAnd how does that make you feel?\x02 ',
-'Halftime Shows':'\x0fFrom marching bands to "wardrobe malfunctions."\x02 ',
-'Hamburgers':'\x02The all-American sandwich named after a city in Germany.',
-'Hardware Stores':'\x0fI need a thingy to put on the what-cha-ma-call-it\x02...',
-'Hash':'\x02"There is nothing worse for the health, or the palate, than a poor hash." -\x0fMiss Beecher\'s Domestic Receipt Book, 1846\x02 ',
-'Hitchhikers':'\x02Going my way?',
-'Home Alone':'\x02Kids like it. Parents love it!',
-'Home Run':'\x02Get up...get up...get outta here...GONE! -\x0fBob Uecker\x02 ',
-'Hospitals':'\x02The nation\'s first hospital, opened in the 1750s, was established for the "sick, poor and insane" in Philadelphia.',
-'Hostages':'\x0fIt looks like we\'ll be tied up for awhile!"\x02 ',
-'Hot Tub Parties':'\x02Warning: the use of drugs or alcohol before or during spa use could lead to unconsciousness.',
-'Hugh Grant':'\x021960-, British actor of numerous romantic comedies including \x0fFour Weddings and a Funeral\x02, \x0fNotting Hill\x02, and \x0fAbout a Boy\x02.',
-'Hugh Hefner':'\x021926-, founded Playboy magazine in 1953 and went on to build an empire based on celebrating sex.',
-'Hula-Hoops':'\x0fThe fad that keeps going round and around\x02.',
-'Hummers':'\x0fCombat carrier turned kid carrier\x02.',
-'Hurricane Katrina':'\x02Katrina made landfall in August of 2005, and caused major damage to the coastal regions of Louisiana, Mississippi and Alabama.',
-'Husbands':'\x02"When a husband brings his wife flowers for no reason, there\'s a reason." -\x0fMolly McGee\x02 ',
-'Idaho':'\x02Scenic beauty, rugged wilderness, and more than enough potatoes.',
-'Identity Crisis':'\x02Who? Me?',
-'Identity Theft':'\x0fWhat if nobody wants your identity?\x02 ',
-'Illegal Aliens':'\x0fInternational or interplanetary\x02.',
-'Income Tax':'\x0fNothing "in-coming" about it\x02.',
-'Inflation':'\x02Back in my day, mansions used to cost a nickel. \x0fA NICKEL!\x02 ',
-'Injustice':'\x02It\'s just not fair.',
-'Intelligent Design':'\x02The name given to the concept that the universe, and all living things, are a result of an intelligent creator.',
-'International Spies':'\x02Cool gadgets.',
-'Internet Dating':'\x02Turn-ones: candlelight dinners and walks on the beach. Turn-offs: \x0fthe computer crashing\x02...',
-'Iraq':'\x02Iraq attained its independence in 1932 and was declared a republic in 1958. Population: 26 million',
-'Irish Setters':'\x02High-energy bird dog known for its silky red coat and playful personality. \x0fErin go woof\x02.',
-'Iron Chef':'\x02Japanese television program. World-class chefs compete to create 3-course meals. \x0fGalloping Gourmet meets World Wrestling Federation\x02.',
-'Island Retreat':'\x02Look, Honey, \x0fThe Island of Dr. Moreau,\x02 doesn\'t that sound nice?...',
-'Jail':'\x02Do not pass Go. Do not collect $200.',
-'James Woods':'\x021947-, American actor nominated for Academy Awards for \x0fGhosts of Mississippi\x02 and \x0fSalvador\x02. He dropped out of M.I.T. to pursue acting.',
-'Jane Fonda':'\x021937-, American actor who made 40 films and won Academy Awards for \x0fKlute\x02 and \x0fComing Home\x02. A.k.a. Hanoi Jane.',
-'Janet Jackson':'\x021966-, American singer, composer and actor. Early in her career she played Penny on \x0fGood Times\x02 and Charlene on \x0fDiff\'rent Strokes\x02.',
-'Jennifer Anistor':'\x021969-, American film and television actress, best known for the highly successful comedy series, \x0fFriends\x02.',
-'Jet Lag':'\x02Some travel experts estimate that it takes a day of recovery for each time zone passed.',
-'John Doe':'\x02Who?',
-'Jahn Malkovich':'\x021953-, American movie actor and director. Known for \x0fIn the Line of Fire\x02, \x0fPlaces in the Heart\x02 and, of course, \x0fBeing John Malkovich\x02.',
-'Jugglers':'\x0fThey\'ve got their hands full\x02.',
-'Julia Child':'\x021912-2004, American chef, author and television personality. She popularized French cooking in the United States. Bon Appetit!',
-'Justin Timberlake':'\x021981-, American singer whose career began on \x0fStar Search\x02 at age 11, then on to \x0fThe Mickey Mouse Club\x02, and \'N Sync. \x0fCurly Spice!\x02 ',
-'Karaoke':'\x0fSing...sing a song... sing it badly, to last your whole life long\x02...',
-'Kentucky':'\x02Bordering seven states, Kentucky is known for horses, mountains and bourbon. \x0fNot a bad combination\x02.',
-'Kevin Bacon':'\x021958-, American actor of \x0fMystic River\x02, \x0fA Few Good Men\x02, \x0fThe River Wild\x02 and \x0fJFK\x02. \x0fFootloose\x02 from the start...',
-'Kevin Costner':'\x021955-, American actor and director who starred in \x0fJFK\x02 and \x0fField of Dreams\x02. His \x0fDances With Wolves\x02 won an Academy Award for Best Picture.',
-'Knights In Shining Armor':'\x02"You\'re my knight in shining armor. Don\'t you forget it." - Ethel Thayer \x0fOn Golden Pond\x02 ',
-'Krispy Kreme':'\x02Making doughnuts since 1937. If the light\'s on you\'ll get hot doughnuts. HOT NOW!',
-'Labor Pains':'\x0fDon\'t push me!\x02 ',
-'Lap dogs':'\x0fPortable pooches\x02.',
-'Larry King':'\x021933-, television talk show host. He began broadcasting in 1957 and 40,000 interviews later, he\'s considered "Master of the Mike."',
-'Lavender':'\x02Hearty shrub with spikes of small purple flowers which smell just like...lavender.',
-'Law School':'\x02"\x0fYou\x02 got into Harvard Law?" "What? \x0fLike, it\'s hard?\x02" - Elle Woods, \x0fLegally Blonde\x02 ',
-'Leaky Faucets':'\x02Your own personal water torture.',
-'Learning Latin':'\x0fI came, I saw, I flunked\x02.',
-'Lemmings':'\x02Native to Scandinavia, lemmings have round furry bodies, short legs, and small eyes...\x0fand a loyal following!\x02 ',
-'Lethal Weapons':'\x0fToo many kinds to list\x02...',
-'Lettuce':'\x02Two heads are better than one!',
-'Liberals':'\x02To the left of the political spectrum.',
-'Librarians':'\x02"How to make an atomic bomb? No problem, we have a book on that."',
-'Lima Beans':'\x02Lima beans have been cultivated in Peru since 6000 B.C. - that\'s a whole lotta limas.',
-'Limosines':'\x02Stretch out and enjoy the ride.',
-'Live Bait':'\x02GONE FISHIN\'',
-'Long Division':'\x0fThat\'s why calculators were invented\x02.',
-'Losing Your Luggage':'\x02If only your luggage got frequent flyer miles.',
-'Lowriders':'\x02The modified suspension decreases ground clearance on these customized vehicles. \x0fEast L.A. to New York to Japan...they\'re hoppin\'\x02.',
-'Lumberjack':'\x02"I\'m a lumberjack and I\'m okay..." - \x0fMonty Python\x02 ',
-'Luncheon Meat':'\x0fWhat a bunch of baloney!\x02 ',
-'M. C. Escher':'\x021898-1972, Dutch artist known for his "impossible structures" including \x0fAscending and Descending\x02. I can\'t tell if he\'s coming or going!',
-'Magicians':'\x02Now you see \'em... \x0fnow you see \'em again\x02.',
-'Magnetic Fields':'\x02Strangely attractive!',
-'Malcolm X':'\x021925-65, American civil rights leader, was assassinated on the first day of National Brotherhood Week.',
-'Mammoth Cave':'\x02The longest recorded cave system in the world, over 360 mapped miles. \x0fStay with your group\x02...',
-'Married Men':'\x02Statistics show that married men live longer, healthier, happier, and wealthier lives. \x0fOf course, there are exceptions\x02.',
-'Mayonnaise':'\x02In 1905, Richard Hellman, a German immigrant, opened a delicatessen selling salads made with his wife\'s mayonnaise.',
-'Medicinal Plants':'\x0fFor medical use only\x02.',
-'Meteorologists':'\x0fThey\'re so predictable\x02...',
-'Miami Beach':'\x0fSo hot and yet so cool\x02.',
-'Michael Moore':'\x021954-, American documentary film maker of \x0fRoger and Me\x02 and \x0fFahrenheit 9/11\x02 He won an Academy Award for \x0fBowling for Columbine\x02.',
-'Mimes':'\x02[No words, just two four-fingered gloves.]',
-'Mint Jelly':'\x02Good with lamb... \x0fand that\'s about it\x02.',
-'Mistletoe':'\x02The Druids believe that mistletoe could improve fertility...\x0fso be careful who you kiss\x02.',
-'Model Prisoner':'\x02He made the \x0fBEST\x02 license plates.',
-'Mona Lisa':'\x02Leonardo da Vinci\'s painting of the most famous smile in the world.',
-'Mondays':'\x02"Monday, Monday, can\'t trust that day..." - \x0fThe Mamas and the Papas\x02 ',
-'Monopoly':'\x02The longest game of Monopoly ever played lasted 1,680 hours.',
-'Morgan Freeman':'\x021937-, American actor who won Academy Awards for \x0fMillion Dollar Baby\x02 and \x0fDriving Miss Daisy\x02. He\'s \x0fStreet Smart\x02 and much more.',
-'Mother\'s Day':'\x0fOh, honey...you made... it...all by yourself\x02...',
-'Mu Shu Pork':'\x02Pancakes - Chinese style.',
-'Mushrooms':'\x0fNobody knows the truffles I\'ve seen\x02...',
-'My Blue Jeans':'\x02When I wake up in the mornin\' light, I pull on my jeans and I feel all right." - \x0fKeith Urban\x02 ',
-'My Car':'\x0fMy other car is a beater too.\x02 ',
-'My Dad\'s Car':'\x02"Oh, man, he\'s going to kill me!"',
-'My Inheritance':'\x02It\'s all in the family...',
-'My Obituary':'\x02"The report of my death was an exaggeration.: - \x0fMark Twain\x02 ',
-'My Sweetheart':'\x02"No, I love YOU more!" "\x0fNo, I love YOU more!\x02"',
-'Nachos':'\x02"Nacho, nacho man. I want to be a nacho man,: - \x0fHomer Simpson\x02 ',
-'Napoleon Dynamite':'\x022004 upbeat comedy film starring Jon Heder as an alienated teenager in a small western high school. \x0fGosh!\x02 ',
-'National Debt':'\x02We\'ll let our kids worry about that...',
-'Nebraska':'\x02Famous Nebraskans: Willa Cather, Crazy Horse, Fred Astaire, and Marlon Brando.',
-'Nelson Mandela':'\x021918-, South African, awarded the 1993 Nobel Peace Prize for his leadership in the peaceful termination of apartheid.',
-'New Year\'s Resolution':'\x0fThis year\'s going to be different\x02...',
-'New York Times':'\x02"The grey lady" was one of the last newspapers to adopt color photography. \x0fSeems like they were a bit behind the times\x02...',
-'Nicole Kidman':'\x021967-, actor, American born but raised in Australia. She won Academy Awards for \x0fThe Hours\x02 and \x0fMoulin Rouge\x02.',
-'Norway Spruce':'\x02This fast-growing conifer is native to central and northern Europe and quickly reaches 80 feet in \height.',
-'Notre Dame Football':'\x02Not just football-it\'s Notre Dame Football! WE-ARE-N-D, GO-IRISH!',
-'Nurses':'\x02"After two days in the hospital I took a turn for the nurse." - \x0fW. C. Fields\x02 ',
-'Oklahoma City Bombing':'\x02On April 19, 1995 a massive explosion was set off, destroying a federal building, killing 168 people, and injuring 850 others.',
-'Oktoberfest':'\x0fLace up your lederhosen and roll out the barrel!\x02 ',
-'Optic Nerves':'\x0fYou\'re getting on your optic nerves, man!\x02 ',
-'Orlando, Florida':'\x02Cypress Gardens, Universal Studios, Sea World and Disney World. Something for everyone- \x0feveryone who likes theme parks, that is.\x02 ',
-'Owen Wilson':'\x021968-, American actor, appeared in \x0fRushmore\x02, \x0fThe Royal Tenenbaums\x02 and \x0fWedding Crashers\x02. He\'s a self-proclaimed trouble-maker.',
-'Owning Land':'\x02"Why, land is the only thing in the world worth workin\' for, worth fightin\' for, worth dyin\' for..." - Gerald O\'Hara \x0fGone with the Wind\x02 ',
-'Pamela Anderson':'\x021967-, Canadian actor. From \x0fHome Improvement\x02 to \x0fBaywatch\x02 and \x0fStripperella\x02, with five Playboy covers along the way.',
-'Paper Shredders':'\x0fWhat bill from Tiffany\'s? I didn\'t see any bill from Tiffany\'s\x02...',
-'Parachutes':'\x02Golden or otherwise...',
-'Paradise':'\x02"They paved paradise and put up a parking lot." - \x0fJoni Mitchell\x02 ',
-'Paranoid':'\x0fI don\'t trust them!\x02 ',
-'Paris Hilton':'\x021981-, American model, actor and TV personality. \x0fWe\'ll always have Paris\x02.',
-'Park Rangers':'\x02"What pic-a-nic basket, Ranger Smith?" - \x0fYogi Bear\x02 ',
-'Patriot Act':'\x02Public Law No. 107-56, introduced in 2001. "To deter and punish terrorist acts in the U.S. and around the world..."',
-'Penthouse Apartment':'\x02A deluxe apartment in the sky! - \x0fThe Jeffersons\x02 ',
-'Phantom Limb':'\x02The sensation that an amputated limb is still there. Also known as "stump hallucination."',
-'Pie Charts':'\x0fFor people with an appetite for numbers\x02...',
-'Ping-Pong':'\x02The game was first played with a rubber ball \x0f(too fast)\x02, then a cork ball \x0f(too slow)\x02, and then a celluloid ball \x0f(just right)\x02.',
-'Pneumonia':'\x02Serious inflammation of the lung caused by bacteria or a virus.',
-'Pockets':'\x02Pick one!',
-'Political Debates':'\x02They ARE political- the rest is debatable.',
-'Pomegranates':'\x02The size of an apple, this fruit is covered with a dark red, leathery rind. The seeds and juice are the only edible parts.',
-'Ponchos':'\x02They\'re totally armless!',
-'Poverty':'\x02Who won the war on poverty, anyway?',
-'Prescription Drugs':'\x02WARNING: Do not operate heavy machinery...',
-'Prickly Pears':'\x02Type of cactus with flat, oval pads and large spikes.',
-'Primrose Path':'\x02Come on down!',
-'Private Schools':'\x02An expensive lesson.',
-'Puerto Rico':'\x02As a territory of the United States, Puerto Rico\'s 4 million people have their own constitution and their own Olympic team.',
-'Puppet Shows':'\x02Just pull a few strings...',
-'Pussy Willows':'\x02A type of willow tree distinguished, in the spring, by silky, grey catkins.',
-'Pythons':'\x0fI\'ll name mine Monty!\x02 ',
-'Radishes':'\x02The root of a good salad.',
-'Rain Forests':'\x02Endangered ecosystems, or trendy cafes.',
-'Rare Coins':'\x02One old coin can cost \x0fseveral thousand new ones\x02.',
-'Ray Charles':'\x021930-2004, American singer and songwriter of Jazz, Rhythm & Blues, and Rock & Roll. Awarded the National Medal of Arts in 1993.',
-'Razorbacks':'\x02A 250 pound wild boar, or the University of Arkansas athletic teams. \x0f"Time to call in the pigs. Woo...Pig...Sooiee!"\x02 ',
-'Reality':'\x02It\'s overrated!',
-'Red Peppers':'\x02You\'ll warm up to \'em...',
-'Renee Zellweger':'\x021969-, American actor, starred in \x0fBridget Jones\'s Diary\x02, and \x0fChicago\x02, and won an Oscar for her portrayal of Ruby in \x0fCold Mountain\x02.',
-'Retirement':'\x02Youth may be wasted on the young but retirement is wasted on the old.',
-'Richard Gere':'\x021949-, American actor. He\'s been an \x0fAmerican Gigolo\x02 and \x0fAn Officer and a Gentleman\x02 and sang and danced his way through \x0fChicago\x02.',
-'Ring-Necked Pheasants':'\x02The male is easily identified by the distinct green head, red facial skin, white neck ring, and long golden tail feathers. \x0fAll dressed up\x02...',
-'Risky Business':'\x02Risky business is risky business except when it\'s a sure thing like the 1983 film starring a young Tom Cruise.',
-'Road Maps':'\x02You have to know when to hold \'em and when to fold \'em...',
-'Roadies':'\x02...check...check... testing...check... check...',
-'Roadside Cafes':'\x02You want pie? \x0fWe got pie\x02.',
-'Robert Redford':'\x021937-, American movie man. Produced 23 films, directed 7, acted in 39, and supports emerging film makers through the Sundance Institute.',
-'Rogaine':'\x02A non-prescription formula developer to help regrow hair. \x0fHair today, hair tomorrow\x02.',
-'Saber-Tooth Tigers':'\x02Now extinct, the saber-tooth tiger used large canine teeth to rip into the throat or belly of it\'s prey. It\'s the California State Fossil.',
-'Safety Pins':'\x0fFor diapers\x02. \x0fOr punks\x02. \x0fOr old punks\' diapers\x02.',
-'Sand Dollars':'\x02Members of the class of marine animals known as echinoids. Save enough and you can buy a sand castle.',
-'Sand Dunes':'\x02The are five basic dune shapes: linear, dome, crescent, star and parabola.',
-'Saturday Night Live':'\x02The award-winning comedy show featuring top musical performances and guest hosts. \x0f"Live from New York..."\x02 ',
-'Sauerkraut':'\x02Cabbage, salt and the magic of fermentation...',
-'Saunas':'\x02Just sweat it out...!',
-'School Prayer':'\x02Please, God, let me pass this test...',
-'School Uniforms':'\x02You might not be smarter but you\'ll look smarter...',
-'Scientific Knowledge':'\x02Prove it!',
-'Scorpions':'\x02The big sting!',
-'Segregation':'\x02The discriminatory policy, or practice, of imposing the separation of people based on race.',
-'September 11':'\x02The date in 2001 when terrorists attacked the U.S. by flying hijacked jetliners into the World Trade Center and the Pentagon.',
-'Sermons':'\x0fI think he was talking to you\x02...',
-'Sex And The City':'\x02The critically acclaimed HBO television series based on the lives of four single women in New York City...\x0fand sex\x02.',
-'Sharon Stone':'\x021958-, American actor known for her portrayal of smart and aggressive characters in such films as \x0fCasino\x02 and \x0fBasic Instinct\x02.',
-'Sheep':'\x0fWhat do sheep count when THEY can\'t sleep?\x02 ',
-'Sherwood Forest':'\x02At one time, Sherwood Forest was the largest of England\'s royal forests. Legendary home of Robin Hood and his Merry Men \x0f(in tights)\x02.',
-'Shoplifting':'\x02The gateway to a life of crime.',
-'Shrek':'\x02The Academy Award winning 2001 animated film featuring an ogre and a donkey rescuing a princess.',
-'Silicon Valley':'\x02Great place to live... they\'re all virus protected.',
-'Single Women':'\x0fGirls just want to have fun!\x02 ',
-'Sleep':'\x02"I have never taken any exercise except sleeping and resting." - \x0fMark Twain\x02 ',
-'Slot Machines':'\x02Think you\'ll win? The they\'re pulling YOUR arm...',
-'Snoop Dogg':'\x021971-, American popular gangsta-rapper known for his distinctive style, as well as his albums, soundtracks, and TV and film appearances.',
-'Social Workers':'\x0fGoing down to the water cooler doesn\'t make you a social worker\x02.',
-'Sockeye Salmon':'\x02Found in the Pacific and Arctic oceans, the sockeye salmon can be identified by the distinct gill rakers, \x0for the sublime tarragon sauce\x02.',
-'Sororities':'\x02Organizations of female college students. Sisters to the end...\x0for at least until graduation\x02.',
-'Soul Mate':'\x02Even soul mates won\'t put up with \x0fsome\x02 things.',
-'Spending Money':'\x0fBut it was on sale\x02...',
-'Spider-Man':'\x02Peter Parker, a young orphan, was bitten by a genetically altered spider...\x0fyou can find him hanging out on the web\x02.',
-'Sponges':'\x02They\'ll soak it up.',
-'Spyware':'\x02They\'re watching you.',
-'Starbucks':'\x02"They\'re opening a Starbucks in my living room." - \x0fJaneane Garofalo\x02 ',
-'Steak & Eggs':'\x02The breakfast of champions...\x0fAtkins champions, anyway\x02.',
-'Stem Cell Research':'\x02Potential scientific breakthrough...\x0fand political hot button\x02.',
-'Steroids':'\x0fDude...didn\'t you used to have a NECK?\x02 ',
-'Steven Seagal':'\x021951-, American action film star of \x0fUnder Siege\x02, \x0fExecutive Decision\x02 and many more. He holds the rank of 7th dan in aikido.',
-'Substitute Teachers':'\x02"I\'m a substitute Spanish teacher. Los estudiantes son mis amigos." - Peggy, \x0fKing of the Hill\x02 ',
-'Sugar Daddy':'\x02"She used to have a sugar daddy and a candy-apple caddy." - \x0fTom Waits\x02 ',
-'Super Powers':'\x02That\'s Incredibles!',
-'Susan Sarandon':'\x021946-, American actor and social activist. Won an Academy Award for \x0fDead Man Walking\x02 and much critical acclaim for \x0fThelma and Louise\x02.',
-'Sweet Potatoes':'\x0fNow available in chip form\x02.',
-'Swordfish':'\x0fA cut above other fish\x02.',
-'Target Stores':'\x02Stores in 47 states... \x0fTarget the one near you\x02.',
-'Tater Tots':'\x02"Are you gonna eat your tots?" - \x0fNapoleon Dynamite\x02 ',
-'Ted Kennedy':'\x021932-, U.S. Democratic Senator representing Massachusetts since 1962. \x0fOne of the clan\x02.',
-'Teleporters':'\x0fBeam me up!\x02 ',
-'The Atkins Diet':'\x02Steak and potatoes... \x0fminus the potatoes\x02...',
-'The Attic':'\x0fIt\'s up there somewhere\x02...',
-'The Axis Of Evil':'\x02The term used by President Bush to describe regimes that sponsor terror.',
-'The Beach Boys':'\x02The band\'s first hit, "Surfin" came out in 1961, \x0fbut beach boys have been around almost as long as California\x02.',
-'The Daily Show':'\x02The award-winning comedy-news program featuring Jon Stewart as anchor. \x0fAnd now for your moment of Zen\x02...',
-'The Economy':'\x02"It\'s the economy, stupid." - James Carville \x0fPolitical Strategist for Bill Clinton\x02 ',
-'The Frozen Tundra':'\x02Derived from the Finnish word for barren, a tundra has long, cold winters and strong dry winds. \x0fMuskoxen and Packer fans seem to like it\x02.',
-'The Hamptons':'\x02Where the elite meet to summer...',
-'The Infantry':'\x02Branch of the army trained to fight on foot. \x0fThe front line\x02...',
-'The Louisianna Purchase':'\x02In 1803, the U.S. purchased about 600 million acres of land from France for less than three cents per acre. \x0fNow, there\'s a bargain!\x02 ',
-'The Marines':'\x02The United States Marine Corps. The Few. The Proud. \x0fSemper Fi\x02.',
-'The Meaning Of Life':'\x02Go ask your mother.',
-'The Milk Man':'\x02Door-to-door dairy.',
-'The Mob':'\x02A.k.a. the Mafia. \x0fThe only mob that IS organized\x02.',
-'The Moral Majority':'\x02A U.S. political action group founded in 1979 by Jerry Falwell to promote a conservative, fundamentalist Christian agenda.',
-'The Pope':'\x02The spiritual leader of the Roman Catholic Church.',
-'The Purple Heart':'\x02Awarded to members of the U.S. armed forces who are wounded or killed as a result of combat.',
-'The Real World':'\x02In 1992, MTV launched a new genre of TV - the documentary/soap opera. Seven young people move in together and the world watches.',
-'The Rodeo':'\x02Real cowboys... \x0fsurrounded by a bunch of clowns\x02...',
-'The Secret Service':'\x0fThey\'re so cool, they wear sunglasses at night\x02.',
-'The Seven Dwarfs':'\x02From the classic 1937 Disney film, \x0fSnow White and the Seven Dwarfs\x02. Snow White\'s posse.',
-'The Speed Of Light':'\x02According to Einstein, nothing in the Universe can exceed the sped of light. \x0fIt\'s the cosmic speed limit!\x02 ',
-'The Starship Enterprise':'\x02A galaxy-class, extended duration, starship from \x0fStar Trek\x02. \x0f"The engines can\'nae take it, Captain!"\x02 ',
-'The Suburbs':'\x02"Another Pleasant Valley Sunday, charcoal burning everywhere, rows of houses that are all the same..." - \x0fThe Monkees\x02 ',
-'The Village People':'\x02Disco band formed in the 1970s. Y...M...C...A...',
-'Thistles':'\x02The thistle has been a symbol of Scotland for over 500 years - \x0fthe rest of its history is a bit thorny\x02.',
-'Thomas Jefferson':'\x021743-1826, author of the Declaration of American Independence and third president of the United States. He died on the 4th of July.',
-'Three Bears':'\x02Is this Chicago? \x0fThen it\'d be "Da Three Bears."\x02 ',
-'Toe Rings':'\x02Foot Bling.',
-'Tony Bennett':'\x021926-, American singer whose music is love across generations and continents. The United Nations honored him as a \x0f""Citizen of the World."\x02 ',
-'Tony Hawk':'\x021968-, American Skateboarding superhero. He led the way as skateboarding went from street sport to big business.',
-'Tourists':'\x02Increase traffic flow... and cash flow.',
-'Train Depots':'\x02A hundred years later and it\'s an upscale restaurant and gift shop.',
-'Trench Coat':'\x02The classic trench coat was designed by Thomas Burberry in 1901 for army officers in the U.K. \x0fIt\'s a flashin\' statement\x02.',
-'Trout Fishing':'\x0fEverybody\'s got an angler\x02.',
-'Tsunami':'\x02The Japanese word meaning "harbor wave." The wave heightens when the speed diminishes as the wave travels into shallower water.',
-'U.S. Air Force':'\x02U.S. air and space power. The most technologically sophisticated of the military branches. \x0fCross Into The Blue\x02.',
-'Usama Bin Laden':'\x021957-, Saudi Arabian suspected of masterminding terrorist attacks throughout the world.',
-'Utah':'\x02The name, Utah, came from the American Indian tribe Ute, and means \x0f"people of the mountains."\x02 ',
-'V8':'\x02Super charged: the tomato juice or the engine. \x0fWow, I could have had a V8!\x02 ',
-'Vegetarians':'\x0fI\'ll take the tofu burger with the soy bacon strips\x02.',
-'Wall Drug':'\x02Mega-tourist stop on Interstate 90, located in Wall, South Dakota. \x0fFree Ice Water! Only 978 miles to go\x02...',
-'Wal-Mart':'\x02The very first Wal-Mart opened in 1962. They\'re now the world\'s largest retailer. \x0fThey\'re on a roll...back!\x02 ',
-'Waxing':'\x02Mustache, eyebrows or the floor...\x0fit\'s all a pain\x02.',
-'Weapons':'\x02Of mass destruction, \x0for just minor destruction\x02.',
-'Wedding Cake':'\x02"You may now kiss the bride..." \x0fAnd lovingly stuff cake into each other\'s face\x02.',
-'Weight Training':'\x0fI can hardly weight\x02.',
-'White Castles':'\x02Square hamburgers... 24 hours a day. \x0fI\'ll take four "slyders" with onions!\x02 ',
-'Will Ferrell':'\x021967-, American television and movie actor and winner of the American Comedy Award for \x0fSaturday Night Live\x02. \x0fThree cheers for Will!\x02 ',
-'Wine Country':'\x0fA delightful Pinot Grigio\x02...',
-'Wisconsin':'\x02Somewhere between Illinois and Canada. Fishing, cheese, and beer. \x0fOn Wisconsin!\x02 ',
-'Witness Protection Program':'\x02Get a life...a new life.',
-'Wives':'\x0f"What\'s for dinner, Honey?"\x02 ',
-'Wizards':'\x02"Meddle not in the affairs of wizards, for they are subtle and quick to anger." - \x0fJ.J.R. Tolkien\x02 ',
-}
+# Note: When sending messages, codes such as "\x034" refer to IRC
+# colors, and "\x0F" cancels all formatting. In this game, 
+# red cards are output red, and green cards are output green.
+# Player names are output in blue when deemed important (such as
+# when they are judging or just won a card)
 
 class ApplesToApples(BasePlugin):
+    # Run on plugin initialization
     def __init__(self, bot, options):
+        # Hook the base plugin
         BasePlugin.__init__(self, bot, options)
+        # Control output
         self.output = True
+        # Initialize variables
         self.resetdata()
-        
+    
+    # Run every second
     def timer_tick(self):
+        # Timer only needs to happen while the game is running
         if self.gamestate == "InProgress":
+            # Increment timer.
             self.timer = self.timer + 1
+            # Once a minute, prompt users to take their actions and reset the timer.
             if self.timer == 60:
                 self.timer = 0
                 self.cmd_prompt([], self.channel, self.bot.nickname)
 
+    # Run for every public message the bot sees
     def msg_channel(self, channel, user, message):
+        # ":" is commonly used to direct messages on IRC
+        # Split the message over :...
         a = string.split(message, ":", 1)
+        # ..and see if it's directed to the bot
         if len(a) > 1 and a[0].lower() == self.bot.nickname.lower():
+            # It is! Run the command.
             self.do_command(channel, user, string.strip(a[1]))
-        elif message[0]=='!' and (len(message) > 1) and message[1]!='!':
+        # "!" is also used as a bot trigger.
+        # See if the message starts with a "!", and isn't only that char.
+        elif message[0]=='!' and (len(message) > 1):
+            # It does! Run the command.
             self.do_command(channel, user, string.strip(message[1:]))
-            
+    
+    # Run for every private message the bot sees
     def msg_private(self, user, message):
+        # Pass the username as the channel to denote a private message
         self.do_command(user, user, message)
 
+    # Reply in the same fashion a command was issued in
     def reply(self, channel, user, text):
+        # If the 'channel' field isn't the user, it's a public message...
         if channel != user:
             self.bot.pubout(channel, "%s: %s" % (user, text))
+        # ...if it is the user, it's a private message
         else:
             self.bot.noteout(user, text)
-
+    
+    # Always reply privately
     def privreply(self, user, text):
         self.bot.noteout(user, text)
+        
+    # Run when the bot sees a user change names
+    def user_nickchange(self, old, new):
+        # Replace the old nick with the new one in every variable that
+        # references a player.
+        for list_ in (self.players, self.live_players, self.round_players):
+            if old in list_:
+                list_[list_.index(old)] = new
+        for value in (self.playedcards):
+            if value[0] == old:
+                value[0] = new
+        for map_ in (self.hands, self.woncards):
+            if map_.has_key(old):
+                map_[new] = map_[old]
+                del map_[old]
 
+    # Initialize or reset all game variables
     def resetdata(self):
-        self.gamestate = "None"
-        self.players = []
-        self.live_players = []
-        self.greendeck = GREENCARDS.keys()
-        random.shuffle(self.greendeck)
-        self.reddeck = REDCARDS.keys()
-        random.shuffle(self.reddeck)
-        self.judgeindex = 0
-        self.hands={}
-        self.greencard = None
-        self.playedcards = []
-        self.woncards = {}
-        self.cardstowin = 0
-        self.channel = None
-        self.timer = 0
-        self.judging = False
+        # All self-instantiated variables.
+        # References to data structure are not actual variable names!
+        
+        self.gamestate = "None" # Used to track if game is not in progress, in setup, or not running.
+        self.players = [] # Array of all players to participate
+        self.live_players = [] # Array of all players currently in the game
+        self.round_players = [] # Array of players that participated in a round
+        self.greendeck = GREENCARDS.keys() # Instance of the green cards
+        random.shuffle(self.greendeck) # Shuffle 'em up!
+        self.reddeck = REDCARDS.keys() # Instance of the red cards
+        random.shuffle(self.reddeck) # Shuffle 'em up!
+        self.judgeindex = 0 # Player array index for the current judge
+        self.hands={} # Dictionary of user:[hand]
+        self.greencard = None # Current green card
+        self.playedcards = [] # Array of [user], [card]
+        self.woncards = {} # Dictonary of user:[cards won]
+        self.cardstowin = 0 # How many cards a player must earn to win; based on starting user count
+        self.channel = None # IRC channel to run the game in
+        self.timer = 0 # Timer counter
+        self.judging = False # Judging phase flag
 
+    # Set the game up
     def startgame(self):
+        # The game started; change phase
         self.gamestate = "InProgress"
+        # Inform players 
         self.bot.pubout(self.channel, "A new game is starting! Please wait, dealing cards... (use !peek to see card descriptions)")
+        # Add joined players to the player history
         self.players = list(self.live_players)
+        # Shuffle the joined players up
         random.shuffle(self.live_players)
+        # Everyone gets a blank slate
         for user in self.live_players:
             self.woncards[user] = []
             self.hands[user] = []
+        # Now everyone gets seven cards to start with. Don't need the 
+        # extra card text, and it takes too long to send seven messages per
+        # player on most IRC servers.
         for i in range(1, 8):
             for user in self.live_players:
                 self.hands[user].append(self.reddeck.pop(0))
+        # Sort the cards for each user, and tell them what they have
         for user in self.live_players:
             self.hands[user].sort()
             hand = []
             for i in range (1, 8):
                 hand.append("%i: \x034%s\x0F" % (i, self.hands[user][i-1]))
             self.privreply(user, "Your hand: %s" % ", ".join(hand))
+        # Decide how many green cards are needed for victory
         if len(self.live_players) >= 8:
             self.cardstowin = 4
         else:
             self.cardstowin = 12 - len(self.live_players)
+        # Assign judge index to the last player
         self.judgeindex = len(self.live_players) - 1
+        # Initiate the first round
         self.newround()
 
+    # Tear the game down
     def endgame(self):
         self.bot.pubout(self.channel, "The game is over.")
+        # If the game was in progress, tell the users what the score was.
         if self.gamestate == "InProgress":
+            # Temporary array to build a string
             greenbuild = []
+            # Append "user - cards won" to the building string.
             for user in self.players:
                 if len(self.woncards[user]) != 0:
                     greenbuild.append("%s - %i" % (user, len(self.woncards[user])))
+            # Don't output if there are no cards won
             if greenbuild != []:
                 self.bot.pubout(self.channel, "Green cards per players: %s" % ", ".join(greenbuild))
-            for user in self.players:
+            # Run a "greens" command for each user in the game
+            # so they can see which cards they won
+            for user in self.live_players:
                 self.cmd_greens([], user, user)
+        # Clean the board
         self.resetdata()
         
+    # Start a new round
     def newround(self):
+        # Reset the judge flag and timers
         self.judging = False
         self.timer = 0
+        # Display the score
         self.cmd_scores([], self.channel, self.bot.nickname)
         
+        # Reset the cards played
         self.playedcards = []
+        # Increment the judge index, unless it needs to wrap around, and 
+        # tell the players who's judging
         if self.judgeindex == len(self.live_players) - 1:
             self.judgeindex = 0
         else:
             self.judgeindex = self.judgeindex + 1
         self.bot.pubout(self.channel, "This round's judge is \x02\x0312%s\x0F." % self.live_players[self.judgeindex])
         
+        # Select a new green card and tell the players what it is along
+        # with a short syntax reminder
         self.greencard = self.greendeck.pop(0)
         self.bot.pubout(self.channel, "The new green card is: \x02\x033%s\x0F - %s. Please play cards from your hand using '!play <number>'." % (self.greencard, GREENCARDS[self.greencard]))
-        
+    
+    # Check if the round is over
     def checkroundover(self):
-        if len(self.playedcards) == len(self.live_players) - 1:
+        # Assume everyone has played; if someone hasn't, set to false
+        allplayed = True
+        for player in self.live_players:
+            if player != self.live_players[self.judgeindex]:
+                playerplayed = False
+                for card in self.playedcards:
+                    if player == card[0]:
+                        playerplayed = True
+                if playerplayed == False:
+                    allplayed = False
+                    
+        # Has everyone played a card? If yes, it's time to judge.
+        if allplayed and not self.judging:
             self.bot.pubout(self.channel, "All cards have been played.")
             self.judging = True
             self.beginjudging()
-            
+    
+    # Begin the judging phase
     def beginjudging(self):
-        if self.judging == True:
-            self.timer = 0
-            self.bot.pubout(self.channel, "Green card is: \x02\x033%s\x0F - %s" % (self.greencard, GREENCARDS[self.greencard]))
-            random.shuffle(self.playedcards)
-            for i in range (0, len(self.playedcards)):
-                self.bot.pubout(self.channel, "%i. \x034%s\x0F: %s" % (i+1, self.playedcards[i][1], REDCARDS[self.playedcards[i][1]]))
-            self.bot.pubout(self.channel, "\x02\x0312%s\x0F: Please make your decision now using the '!pick <number>' command." % self.live_players[self.judgeindex])
-        
+        # Reset timer, and remind the judge what the green card is
+        self.timer = 0
+        self.bot.pubout(self.channel, "Green card is: \x02\x033%s\x0F - %s" % (self.greencard, GREENCARDS[self.greencard]))
+        # Shuffle the played cards, and send them out with the card descriptions
+        random.shuffle(self.playedcards)
+        for i in range (0, len(self.playedcards)):
+            self.bot.pubout(self.channel, "%i. \x034%s\x0F: %s" % (i+1, self.playedcards[i][1], REDCARDS[self.playedcards[i][1]]))
+        # Judge prompt and syntax reminder
+        self.bot.pubout(self.channel, "\x02\x0312%s\x0F: Please make your decision now using the '!pick <number>' command." % self.live_players[self.judgeindex])
+    
+    # End the round
     def cardwin(self, winningcard):
+        # The winner, as picked by the judge; inform the players
         winner = self.playedcards[winningcard][0]
         self.bot.pubout(self.channel, "The judge picked \x034%s\x0F! \x02\x0312%s\x0F played that red card, and gets to keep the green card." % (self.playedcards[winningcard][1], winner))
+        # Give the player the victory card
         self.woncards[winner].append(self.greencard)
+        # Is the game over?
         if not self.checkgamewin():
+            # Nope. Keep going.
             self.deal()
             self.newround()
         
+    # Check if the game is over
     def checkgamewin(self):
+        # Has anyone hit the card limit?
         for user in self.players:
             if len(self.woncards[user]) >= self.cardstowin:
+                # Yep! Congratulate the victor and end the game
                 self.bot.pubout(self.channel, "%s now has %i green cards. %s wins!" % (user, len(self.woncards[user]), user))
                 self.endgame()
                 return True
         else:
+            # Nope. Keep going.
             return False
-
+    
+    # Deal cards as required
     def deal(self):
+        # If any player doesn't have 7 cards, give them cards until they do.
         for user in self.live_players:
             while len(self.hands[user]) < 7:
                 self.hands[user].append(self.reddeck.pop(0))
+                # Tell them what card they just drew, with extra text
                 self.privreply(user, "You draw: \x034%s\x0F: %s" % (self.hands[user][len(self.hands[user])-1], REDCARDS[self.hands[user][len(self.hands[user])-1]]))
+        # For every player, build a string and send them their hand
         for user in self.live_players:
             self.hands[user].sort()
             hand = []
             for i in range (1, 8):
                 hand.append("%i: \x034%s\x0F" % (i, self.hands[user][i-1]))
             self.privreply(user, "Your hand: %s" % ", ".join(hand))
-        
+    
+    # User command: Play a card
     def cmd_play(self, args, channel, user):
+        #Only works in game
         if self.gamestate == "InProgress":
-            if user in self.live_players and user not in self.playedcards and user != self.live_players[self.judgeindex] and self.judging == False:
+            # If the player's in the game, and isn't
+            # the judge, and it's not time to judge...
+            if user in self.live_players and user != self.live_players[self.judgeindex] and self.judging == False:
+                # Very easy for input to mess up here, and we don't want
+                # the bot to crash.
                 try:
+                    # Is it in the valid  card range?
                     if int(args[0]) > 0 and int(args[0]) < 8:
+                        # Assume they haven't played, and run a check.
                         cardplayed = False
                         for cards in self.playedcards:
+                            # Oops! They already have.
                             if cards[0] == user:
                                 cardplayed = True
                         if cardplayed:
+                            # Don't let them play another, of course.
                             self.reply(channel, user, "You have already played a card this round.")
                         else:
+                            # Only valid path. 
                             self.playedcards.append([user, self.hands[user].pop(int(args[0])-1)])
                             self.reply(channel, user, "You have played a card.")
                             self.checkroundover()
                     else:
+                        # "What do you mean, card 11?"
                         self.reply(channel, user, "Please pick a valid card number (1-7).")
                 except:
+                    # "What do you mean, card Q?"
                     self.reply(channel, user, "Please use the card's number.")
             elif user not in self.live_players:
+                # They aren't even in the game!
                 self.reply(channel, user, "You are not in this game.")
-            elif user in self.playedcards:
-                self.reply(channel, user, "You have already played a card this round.")
             elif user == self.live_players[self.judgeindex]:
+                # Judge doesn't get to play.
                 self.reply(channel, user, "You are judging this round.")
             elif self.judging == True:
+                # Everyone's played by now.
                 self.reply(channel, user, "Judging has already begun, wait for the next round.")
         else:
+            # We're not even playing!
             self.reply(channel, user, "There is no game in progress.")
 
+    # User command: Judge a card
     def cmd_pick(self, args, channel, user):
         if self.gamestate == "InProgress":
+            # Are we judging? Is this the judge?
             if self.judging == True and user == self.live_players[self.judgeindex]:
+                # Did they pick a valid number?
                 try:
                     if int(args[0]) > 0 and int(args[0]) <= len(self.playedcards):
+                        # Yep! That card just won!
                         self.reply(channel, user, "You have chosen.")
                         self.cardwin(int(args[0]) - 1)
                     else:
+                        # "What do you mean, card 11?"
                         self.reply(channel, user, "Please pick a valid card number.")
                 except ValueError:
+                    # "What do you mean, card Q?"
                     self.reply(channel, user, "Please use the card's number.")
             elif user != self.live_players[self.judgeindex]:
+                # Not the judge
                 self.reply(channel, user, "You are not the judge this round.")
             elif len(self.playedcards) != len(self.live_players) - 1:
+                # Not time to judge yet
                 self.reply(channel, user, "Not everyone has played a card yet.")
             elif user not in self.live_players:
+                # Not a player
                 self.reply(channel, user, "You are not in this game.")
         else:
+            # We're not even playing!
             self.reply(channel, user, "There is no game in progress.")
-            
+    
+    # User command: Read card text
     def cmd_peek(self, args, channel, user):
         if self.gamestate == "InProgress":
+            # Is the user in the game?
             if user in self.live_players:
+                # Is it a valid card?
                 try:
                     if int(args[0]) > 0 and int(args[0]) <= len(self.hands[user]):
+                        # Privately tell them the card text
                         self.privreply(user, "\x034%s\x0F - %s" % (self.hands[user][int(args[0])-1], REDCARDS[self.hands[user][int(args[0])-1]]))
                     else:
+                        # "What do you mean, card 11?"
                         self.reply(channel, user, "Please pick a valid card number.")
                 except:
+                    # "What do you mean, card Q?"
                     self.reply(channel, user, "Please use the card's number.")
             else:
+                # Not a player
                 self.reply(channel, user, "You are not in this game.")
         else:
+            # Not a game
             self.reply(channel, user, "There is no game in progress.")
 
+    # User command: Start a game
     def cmd_start(self, args, channel, user):
+        # No game in progress, begin setup
         if self.gamestate == "None":
             self.gamestate = "Starting"
             self.bot.pubout(channel, "A new game has been started!")
             self.live_players.append(user)
             self.channel = channel
+        # Game is in setup, begin game
         elif self.gamestate == "Starting":
             if user in self.live_players and len(self.live_players) > 3:
+                # Game's ready to start!
                 self.startgame()
+            # User isn't a player, probably trying to join
             elif user not in self.live_players:
                 self.reply(channel, user, "There is a game starting already. Please join instead.")
+            # Not enough players
             else:
                 self.reply(channel, user, "Not enough players to start a game. Minimum of 4 required. Currently: %i" % len(self.live_players))
+        # Game in progress, no function
         elif self.gamestate == "InProgress":
             self.reply(channel, user, "There is a game in progress. Please wait for it to end.")
 
+    # User command: Check game status
     def cmd_stats(self, args, channel, user):
+        # No game, not status
         if self.gamestate == "None":
             self.reply(channel, user, "No game in progress.")
+        # Game is starting, output currently joined players
         elif self.gamestate == "Starting":
             self.reply(channel, user, "A new game is starting. Currently %i players: %s" % (len(self.live_players), ", ".join(self.live_players)))
+        # Game is in progress, output players, score, green card
         elif self.gamestate == "InProgress":
             self.bot.pubout(self.channel, "Player order: %s. %s is the current judge. Current green card is: \x033%s\x0F" % (", ".join(self.live_players), self.live_players[self.judgeindex], self.greencard))
             greenbuild = []
@@ -2412,13 +416,17 @@ class ApplesToApples(BasePlugin):
                 self.bot.pubout(self.channel, "Green cards per players: %s. Cards to win: %i." % (", ".join(greenbuild), self.cardstowin))
             else:
                 self.bot.pubout(self.channel, "No scores yet. Cards to win: %i." % self.cardstowin)
-                
+    
+    # User command: Alias to cmd_stats
     def cmd_status(self, args, channel, user):
         self.cmd_stats(args, channel, user)
-
+    
+    # User command: Check game score
     def cmd_scores(self, args, channel, user):
+        # No game or in setup, no score
         if self.gamestate == "None" or self.gamestate == "Starting":
             self.reply(channel, user, "No game in progress.")
+        # Output players and score list
         elif self.gamestate == "InProgress":
             greenbuild = []
             for player in self.players:
@@ -2430,19 +438,24 @@ class ApplesToApples(BasePlugin):
             else:
                 self.bot.pubout(self.channel, "No scores yet. Cards to win: %i." % self.cardstowin)
 
+    # User command: Join the game
     def cmd_join(self, args, channel, user):
+        # No game, can't join one
         if self.gamestate == "None":
             self.reply(channel, user, "No game in progress. Please start one.")
+        # Game in setup, go ahead and join
         elif self.gamestate == "Starting":
             if user not in self.live_players:
                 self.live_players.append(user)
                 self.bot.pubout(self.channel, "%s is now in the game." % user)
             else:
                 self.reply(channel, user, "You are already in the game.")
+        # Game in progress, join, and generate a blank slate for the player
         elif self.gamestate == "InProgress":
             if user not in self.live_players:
                 self.bot.pubout(self.channel, "%s is now in the game." % user)
-                self.players.append(user)
+                if user not in self.players:
+                    self.players.append(user)
                 if user not in self.woncards:
                     self.woncards[user] = []
                 self.live_players.insert(self.judgeindex, user)
@@ -2452,47 +465,64 @@ class ApplesToApples(BasePlugin):
                     for i in range(1, 8):
                         self.hands[user].append(self.reddeck.pop(0))
                     self.hands[user].sort()
-                    hand = []
-                    for i in range (1, 8):
-                        hand.append("%i: \x034%s\x0F" % (i, self.hands[user][i-1]))
                 else:
                     while len(self.hands[user]) < 7:
                         self.hands[user].append(self.reddeck.pop(0))
                         self.privreply(user, "You draw: \x034%s\x0F: %s" % (self.hands[user][len(self.hands[user])-1], REDCARDS[self.hands[user][len(self.hands[user])-1]]))
+                hand = []
+                for i in range (1, 8):
+                    hand.append("%i: \x034%s\x0F" % (i, self.hands[user][i-1]))
                 self.privreply(user, "Your hand: %s" % ", ".join(hand))
             else:
                 self.reply(channel, user, "You are already in the game.")
-
+    
+    # User command: View hand
     def cmd_hand(self, args, channel, user):
+        # Is the game in progress?
         if self.gamestate == "InProgress":
+            # Is the player in the game?
             if user in self.live_players:
+                # Yep, here's their hand!
                 hand = []
                 for i in range (1, len(self.hands[user]) + 1):
                     hand.append("%i: \x034%s\x0F" % (i, self.hands[user][i-1]))
                 self.privreply(user, "Your hand: %s" % ", ".join(hand))
             else:
+                # Not a player, no hand.
                 self.reply(channel, user, "You are not in this game.")
         else:
+            # No game, no hands.
             self.reply(channel, user, "There is no game in progress.")
-            
+    
+    # User command: View cards won
     def cmd_greens(self, args, channel, user):
+        # Is the game in progress?
         if self.gamestate == "InProgress":
+            # Is the user in the game?
             if user in self.live_players:
+                # Yep! Output the cards they've won
                 if len(self.woncards[user]) != 0:
                     hand = []
                     for i in range (1, len(self.woncards[user]) + 1):
                         hand.append("%i: \x02\x033%s\x0F" % (i, self.woncards[user][i-1]))
                     self.privreply(user, "Your green cards: %s" % ", ".join(hand))
                 else:
+                    # No won cards :(
                     self.privreply(user, "You do not have any green cards.")
             else:
+                # Not a player
                 self.reply(channel, user, "You are not in this game.")
         else:
+            # Not a game
             self.reply(channel, user, "There is no game in progress.")
-            
+    
+    # User command: Prompt inactive players
     def cmd_prompt(self, args, channel, user):
+        # Is the game in progress?
         if self.gamestate == "InProgress":
-            if len(self.playedcards) != len(self.live_players) - 1:
+            # Are we in judge phase?
+            if self.judging == False:
+                # Find the players holding up the game, and tell them to play
                 finishedplayers = [self.judgeindex]
                 for card in self.playedcards:
                     finishedplayers.append(card[0])
@@ -2503,124 +533,190 @@ class ApplesToApples(BasePlugin):
                 unfinishedplayers.remove(self.live_players[self.judgeindex])
                 self.bot.pubout(channel, "%s: Please play a card." % ", ".join(unfinishedplayers))
             else:
+                # Tell the judge to pick
                 self.bot.pubout(channel, "%s: Please pick a card to win." % self.live_players[self.judgeindex])
         else:
+            # No game
             self.reply(channel, user, "There is no game in progress.")
-
+            
+    # User command: Quit the game
     def cmd_quit(self, args, channel, user):
+        # Game in progress, remove user and deal with aftermath
         if self.gamestate == "InProgress":
+            # Is the user playing?
             if user in self.live_players:
+                # Store current judge for later checks
                 judge = self.live_players[self.judgeindex]
+                
+                # Remove the player and inform other players
                 self.bot.pubout(self.channel, "%s has quit the game." % user)
                 self.live_players.remove(user)
+                
+                # 2 players is too little to keep going.
                 if len(self.live_players) < 3:
                     self.bot.pubout(self.channel, "There are now too few players to continue the game.")
                     self.endgame()
                 else:
+                    # Normal judge wraparound if the removed player was last in line
                     if self.judgeindex == len(self.live_players):
                         self.judgeindex = 0
+                    # Is the quitter the judge?
                     if user == judge:
+                        # Select a new judge
                         self.bot.pubout(self.channel, "The judge is now %s." % self.live_players[self.judgeindex])
                         judge = self.live_players[self.judgeindex]
+                        # Remove the new judge's card
                         for i in range(0, len(self.playedcards)):
                             if self.playedcards[i-1][0] == judge:
                                 self.playedcards.remove(self.playedcards[i-1])
                     else:
-                      self.judgeindex = self.live_players.index(judge)  
+                      # Find the old judge in the modified array
+                      self.judgeindex = self.live_players.index(judge)
+                # Necessary if the player who quit was either the last
+                # who needed to play, or the judge (to restart judging)
                 self.checkroundover()
             else:
+                # How can you quit something you aren't doing?
                 self.reply(channel, user, "You are not in this game.")
+        # Game setup, remove user's intent to join
         elif self.gamestate == "Starting":
+            # Take them out of the game
             if user in self.live_players:
                 self.bot.pubout(self.channel, "%s has quit the game." % user)
                 self.live_players.remove(user)
+                # If it's empty, just end it
                 if len(self.live_players) == 0:
                     self.bot.pubout(self.channel, "Game is now empty.")
                     self.endgame()
             else:
+                # Not in the game
                 self.reply(channel, user, "You are not in this game.")
         else:
+            # No game, nothing to quit
             self.reply(channel, user, "There is no game in progress.")
-            
+    
+    # Moderator command: Delete a player
     def cmd_del(self, args, channel, user):
+        # Create a handler for authorization
         auth = self.bot.plugins['system.Auth']
+        # Is the user authorized to do this?
         userlevel = auth.get_userlevel(user)
         if userlevel > 50:
+            # Game in progress, remove the player
             if self.gamestate == "InProgress":
                 try:
+                    # Does the player exist?
                     player = args[0]
                     if player in self.live_players:
+                        # Hold the judge for later checks
                         judge = self.live_players[self.judgeindex]
+                        # Remove the player
                         self.bot.pubout(self.channel, "%s has quit the game." % player)
                         self.live_players.remove(player)
+                        # 2 is too few to continue
                         if len(self.live_players) < 3:
                             self.bot.pubout(self.channel, "There are now too few players to continue the game.")
                             self.endgame()
                         else:
+                            # Normal judge array wraparound
                             if self.judgeindex == len(self.live_players):
                                 self.judgeindex = 0
+                            # Was the deleted player the judge?
                             if player == judge:
+                                # Assign a new judge and remove their card if in play
                                 self.bot.pubout(self.channel, "The judge is now %s." % self.live_players[self.judgeindex])
                                 judge = self.live_players[self.judgeindex]
                                 for i in range(0, len(self.playedcards)):
                                     if self.playedcards[i][0] == judge:
                                         self.playedcards.remove(self.playedcards[i])
-                                self.beginjudging()
                             else:
-                              self.judgeindex = self.live_players.index(judge)  
+                                # Find the old judge in the modified array
+                                self.judgeindex = self.live_players.index(judge)
+                        # Necessary if deleted player is last required to play
+                        # or the judge (to restart judging).
                         self.checkroundover()
                     else:
+                        # Not alive
                         self.reply(channel, user, "That player is not in this game.")
                 except IndexError:
-                    self.reply(channel, user, "Please specify the player to delete.")
-            elif self.gamestate == "Starting":
-                try:
-                    player = args[0]
-                    if player in self.live_players:
-                        self.bot.pubout(self.channel, "%s has been deleted from the game." % player)
-                        self.live_players.remove(player)
-                        if len(self.live_players) == 0:
-                            self.bot.pubout(self.channel, "Game is now empty.")
-                            self.endgame()
-                    else:
-                        self.reply(channel, user, "That player is not in this game.")
-                except IndexError:
+                    # Not a player
                     self.reply(channel, user, "Please specify the player to delete.")
             else:
+                # Not a game
                 self.reply(channel, user, "There is no game in progress.")
+        # Game is starting, remove player's intent to join
+        elif self.gamestate == "Starting":
+            try:
+                # Does this player exist?
+                player = args[0]
+                if player in self.live_players:
+                    # Remove them.
+                    self.bot.pubout(self.channel, "%s has been deleted from the game." % player)
+                    self.live_players.remove(player)
+                    if len(self.live_players) == 0:
+                        # The game is empty, end it.
+                        self.bot.pubout(self.channel, "Game is now empty.")
+                        self.endgame()
+                else:
+                    # Not in the game
+                    self.reply(channel, user, "That player is not in this game.")
+            except IndexError:
+                # Not a player
+                self.reply(channel, user, "Please specify the player to delete.")
         else:
+            # Not authorized
             self.reply(channel, user, "You need to be at least a botmod to use that command.")
-            
+    
+    # Moderator command: End the game
     def cmd_end(self, args, channel, user):
+        # Create a handler for authentication
         auth = self.bot.plugins['system.Auth']
+        # Is the user authorized to do this?
         userlevel = auth.get_userlevel(user)
         if userlevel > 50:
+            # Is a game running?
             if self.gamestate is not "None":
+                # Yep, close it down.
                 self.endgame()
             else:
+                # Nope. Why is this being run?
                 self.reply(channel, user, "There is no game in progress.")
         else:
+            # Not authorized
             self.reply(channel, user, "You need to be at least a botmod to use that command during a game.")
-
+    
+    # User command: List commands.
     def cmd_help(self, args, channel, user):
+        # Put all commands into an array
         cmds = [i[4:] for i in dir(self) if i.startswith('cmd_')]
+        # Send to user
         self.reply(channel, user, "Valid commands: '%s'" % "', '".join(cmds))
 
+    # User command: View rules.
     def cmd_rules(self, args, channel, user):
+        # Output a simple game description.
         self.reply(channel, user, "Apples to Apples is a very simple, yet surprisingly fun, party game. Playing is easy! Just say !join to join a game, or !start to begin one if there are none starting. Every player gets 7 cards, replenished at the start of each round. A green card is also selected at the start of each round.")
         self.reply(channel, user, "If you are not judging, use !play [number from your hand] to play a card, preferably related to the green card. If you are judging, wait for everyone to play. You can use !prompt to see who has not yet played a card. If you forget your hand, use !hand to see it again. If you want to read a card, use !peek [number from your hand]. To see the green cards you have one, say !greens.")
         self.reply(channel, user, "After all players have put down a card, the Judge gets to choose the winner, with !pick [number]. There is no set criteria to determine the 'best' card. The judge simpy picks the card they like the most! It could be the one that fits the green card best, or the one they find the funniest. It's up to the judge! Players can only learn what the judges like, and use that to their advantage.")
-
+    
+    # Run a user command on correct input
     def do_command(self, channel, user, cmd):
+        # No command, nothing to do
         if cmd=='': return
+        
+        # Split the input into [command, arguments] and make lowercase
         cmds = cmd.strip().split(" ")
         cmds[0]=cmds[0].lower()
-
+        
+        # Does this command exist?
         try:
+            # Search for the command function and make a handler
             cmd_handler = getattr(self, "cmd_" + cmds[0])
         except AttributeError:
+            # Doesn't exist
             cmd_handler = None
 
+        # If it exists, pass args and run the command.
         if cmd_handler:
             cmd_handler(cmds[1:], channel, user)
             return
