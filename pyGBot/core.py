@@ -43,28 +43,32 @@ class GBot(irc.IRCClient):
     ''' No longer just an IRC Texas Holdem tournament  dealer'''
 
     def pubout(self, channel, msg):
-        self.say(channel=channel, message=msg)
+        msgOut = encodeOut(msg)
+        self.say(channel=channel, message=msgOut)
         
         # strip color codes
-        log.chatlog.info('[PUB->%s]%s' % (channel, stripcolors(msg)))
+        log.chatlog.info('[PUB->%s]%s' % (channel, stripcolors(msgOut)))
 
     def privout(self, user, msg):
-        self.msg(user=user, message=msg)
+        msgOut = encodeOut(msg)
+        self.msg(user=user, message=msgOut)
         
         # strip color codes
-        log.chatlog.info('[PRV->%s]%s' % (user, stripcolors(msg)))
+        log.chatlog.info('[PRV->%s]%s' % (user, stripcolors(msgOut)))
 
     def replyout(self, channel, user, msg):
+        msgOut = encodeOut(msg)
         if (channel is None):
-            self.privout(user, msg)
+            self.privout(user, msgOut)
         else:
-            self.pubout(channel, msg)
+            self.pubout(channel, msgOut)
 
     def noteout(self, user, msg):
-        self.notice(user=user, message=msg)
+        msgOut = encodeOut(msg)
+        self.notice(user=user, message=msgOut)
 
         # strip color codes
-        log.chatlog.info('[NTE->%s]%s' % (user, stripcolors(msg)))
+        log.chatlog.info('[NTE->%s]%s' % (user, stripcolors(msgOut)))
         
     def invite(self, user, channel):
         self.sendLine("INVITE %s %s" % (user, channel))
@@ -72,10 +76,11 @@ class GBot(irc.IRCClient):
         log.chatlog.info('[INVITE->%s] %s' % (user, channel))
 
     def actout(self,channel, msg):
-        self.me(channel=channel, action=msg)
+        msgOut = encodeOut(msg)
+        self.me(channel=channel, action=msgOut)
 
         # strip color codes
-        log.chatlog.info('[ACT->%s]%s' % (channel, stripcolors(msg)))
+        log.chatlog.info('[ACT->%s]%s' % (channel, stripcolors(msgOut)))
 
     def modestring(self, target, modestring):
         self.sendLine("MODE %s %s" % (target, modestring))
@@ -281,40 +286,44 @@ class GBot(irc.IRCClient):
         log.chatlog.info('[NTE<-]<%s> %s' % (user, msg))
 
         # Call Event Handler
-        self.events.msg_notice(user, msg)
+        msgIn = decodeIn(msg)
+        self.events.msg_notice(user, msgIn)
 
     def privmsg(self, user, channel, msg):
         """This will get called when the bot receives a message.
         """
+        msgIn = decodeIn(msg)
         user = user.split('!', 1)[0]
 
         # Private message to me
         if channel.upper() == self.nickname.upper():
-            if msg.startswith('auth'):
-                outmsg = msg.split(' ')
-                if len(outmsg) > 2:
-                    outmsg[2] = '*' * 8
-                outmsg = ' '.join(outmsg)
-                log.chatlog.info('[PRV<-]<%s> %s' % (user, outmsg))
+            # If auth msg has password, censor it for logging
+            if msgIn.startswith('auth'):
+                msgNoPwd = msgIn.split(' ')
+                if len(msgNoPwd) > 2:
+                    msgNoPwd[2] = '*' * 8
+                msgNoPwd = ' '.join(msgNoPwd)
+                log.chatlog.info('[PRV<-]<%s> %s' % (user, msgNoPwd))
             else:
                 log.chatlog.info('[PRV<-]<%s> %s' % (user, msg))
             # Call Event Handler
-            self.events.msg_private(user, msg)
+            self.events.msg_private(user, msgIn)
 
         # Public message
         else:
             log.chatlog.info('[PUB<-]<%s> %s' % (user, msg))
             # Call Event Handler
-            self.events.msg_channel(channel, user, msg)
+            self.events.msg_channel(channel, user, msgIn)
 
     def action(self, user, channel, msg):
         """This will get called when the bot sees someone do an action.
         """
+        msgIn = decodeIn(msg)
         user = user.split('!', 1)[0]
         log.chatlog.info('* %s %s' % (user, msg))
 
         # Call Event Handler
-        self.events.msg_action(channel, user, msg)
+        self.events.msg_action(channel, user, msgIn)
 
     def topicUpdated(self, user, channel, newTopic):
         """This will get called when the bot sees the channel topic change.
@@ -323,7 +332,8 @@ class GBot(irc.IRCClient):
         log.chatlog.info('Topic for %s set by %s: %s' % (channel, user, newTopic))
 
         # Call Event Handler
-        self.events.channel_topic(channel, user, newTopic)
+        newTopicDec = decodeIn(newTopic)
+        self.events.channel_topic(channel, user, newTopicDec)
 
     def userJoined(self, user, channel):
         """Called when I see another user joining a channel.
@@ -355,10 +365,11 @@ class GBot(irc.IRCClient):
         """Called when I see another user disconnect from the network.
         """
         user = user.split('!', 1)[0]
-        log.chatlog.info("%s has quit" % (user))
+        log.chatlog.info("%s has quit [%s]" % (user, quitMessage))
 
         # Call Event Handler
-        self.events.user_quit(user, quitMessage)
+        quitMsgIn = decodeIn(quitMessage)
+        self.events.user_quit(user, quitMsgIn)
 
     def userRenamed(self, oldname, newname):
         """A user changed their name from oldname to newname.
@@ -425,8 +436,7 @@ class GBotFactory(protocol.ClientFactory):
         reactor.stop()
 
 def stripcolors(inmsg):
-
-    # strip color codes
+    """ Strip color codes from a string """
     inmsg = inmsg.replace("\x02\x0301,00", '')
     inmsg = inmsg.replace("\x02\x0302,00", '')
     inmsg = inmsg.replace("\x02\x0303,00", '')
@@ -434,16 +444,33 @@ def stripcolors(inmsg):
     inmsg = inmsg.replace("\x0F", '')
     return inmsg
 
+def encodeOut(msg):
+    """ Encode output text as a UTF-8 byte-string, replacing any invalid characters. This allows
+    correct output of ASCII and Unicode characters. """
+    if isinstance(msg, unicode):
+        encMsg = msg.encode('utf-8', 'replace')
+    else:
+        encMsg = msg
+    return encMsg
+
+def decodeIn(msg):
+    """ Decode input text as UTF-8 and return a unicode string. This allows plugins to
+    correctly receive and handle Unicode. """
+    if isinstance(msg, unicode):
+        decMsg = msg
+    else:
+        decMsg = msg.decode('utf-8', 'replace')
+    return decMsg
 
 def run():
     try:
         conf = ConfigObj('pyGBot.ini')
     except IOError, msg:
-        print "Cant open config file: ", msg
+        print "Can't open config file: ", msg
         sys.exit(1)
 
     if conf.has_key('IRC') == False:
-        print "Config file does not contain IRC connection information"
+        print "Config file does not contain IRC connection information."
         sys.exit(1)
 
     try:
@@ -453,7 +480,6 @@ def run():
     except ConfigObjError:
         print "Required IRC connection info missing or invalid."
         sys.exit(1)
-
 
     localport = None
     localaddr = None
