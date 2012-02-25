@@ -61,10 +61,10 @@ class _EventSlot:
          except: # log exceptions in event targets
             eclass, e, etrace = exc_info()
             efile, eline, efunc, esource = extract_tb(etrace)[-1]
-            log.logger.error("%s: %s raised in '%s', file '%s', line %i:",\
+            log.logger.error("%s: %s raised in '%s', file '%s', line %i",\
                 eclass.__name__, str(e), efunc, efile, eline)
-            log.logger.error("    %s", esource)
-            log.logger.error("Traceback (most recent call last):\n" + ''.join(format_tb(etrace)))
+            log.logger.debug("    %s", esource)
+            log.logger.debug("Traceback (most recent call last):\n" + ''.join(format_tb(etrace)))
    def __iadd__(self, f):
       self.targets.append(f)
       return self
