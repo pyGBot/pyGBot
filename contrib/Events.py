@@ -1,5 +1,6 @@
 # from http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/410686
 # Copyright (c) 2005 Zoran Isailovski
+# Modification for pyGBot, Copyright (c) 2012 Marc-Alexandre Chan
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +26,10 @@
 ## 
 ######################################################################
 
+from pyGBot import log
+from sys import exc_info
+from traceback import extract_tb, format_tb
+
 class Events:
    def __getattr__(self, name):
       if hasattr(self.__class__, '__events__'):
@@ -49,7 +54,17 @@ class _EventSlot:
    def __repr__(self):
       return 'event ' + self.__name__
    def __call__(self, *a, **kw):
-      for f in self.targets: f(*a, **kw)
+      for f in self.targets:
+         # pyGBot-specific: try/except block to catch and log exceptions
+         try:
+            f(*a, **kw)
+         except: # log exceptions in event targets
+            eclass, e, etrace = exc_info()
+            efile, eline, efunc, esource = extract_tb(etrace)[-1]
+            log.logger.error("%s: %s raised in '%s', file '%s', line %i:",\
+                eclass.__name__, str(e), efunc, efile, eline)
+            log.logger.error("    %s", esource)
+            log.logger.error("Traceback (most recent call last):\n" + ''.join(format_tb(etrace)))
    def __iadd__(self, f):
       self.targets.append(f)
       return self
