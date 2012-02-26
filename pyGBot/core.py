@@ -215,8 +215,6 @@ class GBot(irc.IRCClient):
         log.logger.info("[connected at %s]" %\
                         time.asctime(time.localtime(time.time())))
 
-        self.modestring(self.nickname, self.usermodes)
-
         self.timertask.start(1.0) # 1-second timer granularity
 
         # Call Event Handler
@@ -237,9 +235,12 @@ class GBot(irc.IRCClient):
     def signedOn(self):
         """Called when bot has succesfully signed on to server.
         """
+        self.regNickServ()
+        
+        self.modestring(self.nickname, self.usermodes)
+        
         for channel in self.factory.channel:
             self.join(channel)
-        self.regNickServ()
 
     def regNickServ(self):
         if hasattr(self, 'opernick') and hasattr(self, 'operpass'):
