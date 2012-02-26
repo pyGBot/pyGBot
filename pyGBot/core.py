@@ -237,7 +237,8 @@ class GBot(irc.IRCClient):
     def signedOn(self):
         """Called when bot has succesfully signed on to server.
         """
-        self.join(self.factory.channel)
+        for channel in self.factory.channel:
+            self.join(channel)
         self.regNickServ()
 
     def regNickServ(self):
@@ -447,7 +448,7 @@ def run():
         sys.exit(1)
 
     try:
-        channel = conf['IRC']['channel']
+        channel = conf['IRC']['channel'].split(" ")
         host = conf['IRC']['host']
         port = int(conf['IRC']['port'])
     except ConfigObjError:
@@ -498,5 +499,3 @@ def run():
     except:
         print "Unexpected error:", sys.exc_info()[0]
         raise
-
-
