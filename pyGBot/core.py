@@ -40,7 +40,7 @@ from pyGBot import log
 from pyGBot.PluginEvents import PluginEvents
 
 class GBot(irc.IRCClient):
-    ''' No longer just an IRC Texas Holdem tournament  dealer'''
+    ''' No longer just an IRC Texas Holdem tournament dealer'''
 
     def pubout(self, channel, msg):
         msgOut = encodeOut(msg)
@@ -99,7 +99,7 @@ class GBot(irc.IRCClient):
             self.plugins[name] = plugin
 
     def loadPluginFromFile(self, pluginmodule, pluginname, conf):
-        log.logger.info("Loading plugin " + pluginname)
+        log.logger.info("Loading plugin %s", pluginname)
 
         if conf.has_key('Plugins.' + pluginmodule + '.' + pluginname):
             options = conf['Plugins.' + pluginmodule + '.' + pluginname]
@@ -112,20 +112,20 @@ class GBot(irc.IRCClient):
 
     def activatePlugin(self, pluginname, channel=None):
         if self.plugins.has_key(pluginname) == False:
-            log.logger.info('Error: Unable to activate plugin ' + pluginname)
+            log.logger.error('Unable to activate plugin %s: plugin not loaded.', pluginname)
             return
 
         log.logger.info("Activating %s" % pluginname)
         plugin = self.plugins[pluginname]
 
         if plugin.activate(channel) == False:
-            log.logger.info('Error: Plugin %s returned false on activation.' % pluginname)
+            log.logger.error('Plugin %s returned false on activation.', pluginname)
             return False
 
         for eventname in self.events.__events__:
-            log.logger.debug("Testing for event handler " + eventname)
+            log.logger.debug("Testing for event handler %s", eventname)
             if hasattr(plugin, eventname) == True:
-                log.logger.debug("Adding event handler " + eventname + " from plugin " + pluginname)
+                log.logger.debug("Adding event handler %s from plugin %s.", eventname, pluginname)
                 event = getattr(self.events, eventname)
                 event += getattr(plugin, eventname)
 
@@ -134,7 +134,7 @@ class GBot(irc.IRCClient):
 
     def deactivatePlugin(self, pluginname, channel=None):
         if self.plugins.has_key(pluginname) == False:
-            log.logger.info('Error: Unable to deactivate plugin ' + pluginname)
+            log.logger.error('Unable to deactivate plugin ' + pluginname)
             return        
 
         log.logger.info("Deactivating %s" % pluginname)
@@ -148,7 +148,7 @@ class GBot(irc.IRCClient):
                 event -= getattr(plugin, eventname)
 
         if plugin.deactivate(channel) == False:
-            log.logger.info('Error: Plugin %s returned false on deactivation.' % pluginname)
+            log.logger.error('Plugin %s returned false on deactivation.' % pluginname)
             return False
         else:
             self.activeplugins.remove(pluginname)
@@ -404,27 +404,27 @@ class GBotFactory(protocol.ClientFactory):
         conf = ConfigObj('pyGBot.ini')
         
         try:
-            print "Opening log file..."
+            print "Opening pyGBot log file..."
             log.addScreenHandler(log.logger, log.formatter)
-            log.addLogFileHandler(log.logger,conf['IRC']['logfile'],log.formatter)
+            log.addLogFileHandler(log.logger,conf['IRC']['logfile'], log.formatter)
         except IOError, msg:
             print "Unable to open log file: ", msg
-            print "Defaulting to local."
-            log.addLogFileHandler(log.logger,'pyGBot.log',log.formatter)
+            print "Defaulting to 'pyGBot.log'."
+            log.addLogFileHandler(log.logger,'pyGBot.log', log.formatter)
         except KeyError:
-            print "No log file config found. Defaulting to local."
-            log.addLogFileHandler(log.logger,'pyGBot.log',log.formatter)
+            print "No log file specified in config. Defaulting to 'pyGBot.log'."
+            log.addLogFileHandler(log.logger,'pyGBot.log', log.formatter)
 
         try:
-            print "Opening log file..."
-            log.addLogFileHandler(log.chatlog,conf['IRC']['chatlogfile'],log.cformat)
+            print "Opening chat log file..."
+            log.addLogFileHandler(log.chatlog,conf['IRC']['chatlogfile'], log.cformat)
         except IOError, msg:
             print "Unable to open log file: ", msg
-            print "Defaulting to local."
-            log.addLogFileHandler(log.chatlog,'chat.log',log.cformat)
+            print "Defaulting to 'chat.log'."
+            log.addLogFileHandler(log.chatlog,'chat.log', log.cformat)
         except KeyError:
-            print "No log file config found. Defaulting to local."
-            log.addLogFileHandler(log.chatlog,'chat.log',log.cformat)
+            print "No log file config found. Defaulting to 'chat.log'."
+            log.addLogFileHandler(log.chatlog,'chat.log', log.cformat)
 
     def clientConnectionLost(self, connector, reason):
         """If we get disconnected, reconnect to server."""
