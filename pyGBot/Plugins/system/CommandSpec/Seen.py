@@ -24,12 +24,12 @@ from pyGBot.Plugins.system.Auth import AuthLevels as AL
 
 def pubout(bot):
     def _out(target, message):
-        bot.pubout(target, unicode(message).encode('ascii','replace'))
+        bot.pubout(target, unicode(message).encode('utf-8','replace'))
     return _out
 
 def privout(bot):
     def _out(target, message):
-        bot.privout(target, unicode(message).encode('ascii','replace'))
+        bot.privout(target, unicode(message).encode('utf-8','replace'))
     return _out 
 
 class Seen(BaseCommand):
