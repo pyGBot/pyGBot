@@ -44,43 +44,51 @@ class GBot(irc.IRCClient):
 
     def pubout(self, channel, msg):
         msgOut = encodeOut(msg)
-        self.say(channel=channel, message=msgOut)
+        channelOut = encodeOut(channel)
+        self.say(channel=channelOut, message=msgOut)
         
         # strip color codes
-        log.chatlog.info('[PUB->%s]%s' % (channel, stripcolors(msgOut)))
+        log.chatlog.info('[PUB->%s]%s' % (channelOut, stripcolors(msgOut)))
 
     def privout(self, user, msg):
         msgOut = encodeOut(msg)
-        self.msg(user=user, message=msgOut)
+        userOut = encodeOut(user)
+        self.msg(user=userOut, message=msgOut)
         
         # strip color codes
-        log.chatlog.info('[PRV->%s]%s' % (user, stripcolors(msgOut)))
+        log.chatlog.info('[PRV->%s]%s' % (userOut, stripcolors(msgOut)))
 
     def replyout(self, channel, user, msg):
         msgOut = encodeOut(msg)
+        userOut = encodeOut(user)
+        channelOut = encodeOut(channel)
         if (channel is None):
-            self.privout(user, msgOut)
+            self.privout(userOut, msgOut)
         else:
-            self.pubout(channel, msgOut)
+            self.pubout(channelOut, msgOut)
 
     def noteout(self, user, msg):
         msgOut = encodeOut(msg)
-        self.notice(user=user, message=msgOut)
+        userOut = encodeOut(user)
+        self.notice(user=userOut, message=msgOut)
 
         # strip color codes
-        log.chatlog.info('[NTE->%s]%s' % (user, stripcolors(msgOut)))
+        log.chatlog.info('[NTE->%s]%s' % (userOut, stripcolors(msgOut)))
         
     def invite(self, user, channel):
-        self.sendLine("INVITE %s %s" % (user, channel))
+        userOut = encodeOut(user)
+        channelOut = encodeOut(channel)
+        self.sendLine("INVITE %s %s" % (userOut, channelOut))
         
-        log.chatlog.info('[INVITE->%s] %s' % (user, channel))
+        log.chatlog.info('[INVITE->%s] %s' % (userOut, channelOut))
 
     def actout(self,channel, msg):
         msgOut = encodeOut(msg)
-        self.me(channel=channel, action=msgOut)
+        channelOut = encodeOut(channel)
+        self.me(channel=channelOut, action=msgOut)
 
         # strip color codes
-        log.chatlog.info('[ACT->%s]%s' % (channel, stripcolors(msgOut)))
+        log.chatlog.info('[ACT->%s]%s' % (channelOut, stripcolors(msgOut)))
 
     def modestring(self, target, modestring):
         self.sendLine("MODE %s %s" % (target, modestring))
