@@ -159,8 +159,12 @@ class GBot(irc.IRCClient):
         else:
             options = []
 
-        exec "from Plugins." + pluginmodule + "." + pluginname + " import " + pluginname
-        exec "plugin = " + pluginname + "(self, options)"
+        # imports and returns the Plugins.{pluginmodule}.{pluginname} module object
+        plugins_modobj = __import__('Plugins.{0}.{1}'.format(pluginmodule, pluginname),
+                                    fromlist=[pluginname])
+        # get the class object and then instantiate it
+        plugin_class = getattr(plugin_modobj, pluginname)
+        plugin = plugin_class(self, options)
         return plugin
 
     def activatePlugin(self, pluginname, channel=None):
