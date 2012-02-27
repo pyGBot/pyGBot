@@ -105,9 +105,9 @@ class Auth(BasePlugin):
                 self.bot.privout("nickserv", "acc %s *" % user)
                 log.logger.info('Auth: Attempting to auth %s' % user)
             if self.authtype == "pygbot":
-                try:
+                if len(message.rsplit(' ',2)) == 3:
                     cmd, uname, password = message.rsplit(' ',2)
-                    if self.get_passhash(uname) == hashlib.sha1(password + 'pygb0t').hexdigest():
+                    if self.get_passhash(uname) == hashlib.sha1((password + u'pygb0t').encode('utf-8', 'replace')).hexdigest():
                         authlevel = self.get_authlevel(uname)
                         if authlevel != None:
                             self.set_userlevel(user, self.get_authlevel(uname))
@@ -118,7 +118,7 @@ class Auth(BasePlugin):
                             log.logger.info('Auth: Invalid user level for user %s' % user)
                     else:
                         self.bot.noteout(user, 'Incorrect user name or password.')
-                except:
+                else:
                     self.bot.noteout(user, "Incorrect syntax. Usage: auth <username> <password>")
 
     def msg_notice(self, user, message):

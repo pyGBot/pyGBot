@@ -566,7 +566,6 @@ def run():
 
     try:
         channel = conf['IRC']['channel'].split(" ")
-        print channel
         host = conf['IRC']['host']
         port = int(conf['IRC']['port'])
     except ConfigObjError:
