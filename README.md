@@ -1,5 +1,8 @@
-README FOR pyGBot 0.1.2 - Alpha release
+pyGBot 0.x.x
+============
 
+Licence, copyright and attribution
+----------------------------------
     pyGBot - Versatile IRC Bot
     Copyright (C) 2008 Morgan Lokhorst-Blight, Alex Soborov, Paul Rotering
 
@@ -33,27 +36,33 @@ Simple Disclaimer:
 THIS IS AN ALPHA RELEASE. It it provided AS-IS, with no warranty or support.
 If it breaks your computer, it's not our fault.
 
-Requirements:
+
+Requirements
+------------
  - Python >= 2.5
  - Twisted >= 2.0 (including twisted.words)
 
-To run:
+To run
+------
 Uncompress, go to src/ , rename pyGBot.ini.default to pygbot.ini and 
 users.ini.default to users.ini, and modify the values in pyGBot.ini. The main 
 ones you're interested in are host, port, nick, and channel. Once that's done, 
 run pyGBot.py.
 
-To add users to the Auth system:
+To add users to the Auth system
+-------------------------------
 Run hashpw.py, it will prompt you for the relevant details.
 
-To modify:
+To modify
+---------
 Your best bet is to look at the existing plugins, as well as src/BasePlugin.py.
 All plugins must subclass BasePlugin. If you design a new plugin, you'll have
 to add it to the list of plugins to be loaded and started in pyGBot.ini.
 [Plugins] is plugins to load, and [Plugins.system.Startup] is plugins which
 will be activated immediately.
 
-Command system:
+Command system
+--------------
 The system.Commands plugin provides a set of commands (extensible of course!)
 which are single-line calls made by users to enact some immediate response or
 action. The existing ones are primarily related to controlling the bot (join /
@@ -62,10 +71,12 @@ conceivably be implemented here. Have a look at the existing commands in
 src/Plugins/system/CommandSpec, and the BaseCommand class in
 src/Plugins/system/Commands.py.
 
-If you have any further questions please respond via email or the forums, both
-can be found at the project page:
+Homepage
+--------
+http://github.com/chaos95/pyGBot
 
-http://sourceforge.net/projects/pygbot
+Please use the issue tracker on the homepage to report any problems with the
+software. For assistance, visit #pyGBot on the foonetic IRC network.
 
 Enjoy!
 - The pyGBot team
