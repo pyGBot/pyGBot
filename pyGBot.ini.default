@@ -43,13 +43,15 @@ realname = pyGBot
 
 usermodes = 
 
-# This value controls the channel the bot will join. At the moment, it only 
-# accepts one value. You can make the bot join additional channels by issuing
-# the 'join' command in the channel.
+# This value controls the channel the bot will join. Use a space-seperated
+# list of channels. You can make the bot join additional channels by issuing
+# the 'join' command to the bot.
 #
 # Do not insert a '#' mark for the channel name. If you want the bot to join
 # channel #pyGBot, make sure this reads:
 # channel = pyGBot
+# For multiple channels:
+# channel = one two three etc
 
 channel = pyGBot
 

@@ -31,9 +31,9 @@ class JoinChannel(BaseCommand):
             if args[0] not in bot.channels:
                 log.logger.info('Attempting to join channel %s' % args[0])
                 if len(args) > 1:
-                    bot.join(args[0], key=args[1])
+                    bot.joinChannel(args[0], key=args[1])
                 else:
-                    bot.join(args[0])
+                    bot.joinChannel(args[0])
             else:
                 bot.noteout(user, 'I am already connected to that channel.')
         else:
