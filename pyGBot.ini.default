@@ -145,7 +145,7 @@ usermode = UserMode
 #statsroll = StatsRoll
 
 [version]
-number = 0.1.5
+number = 0.3.0
 name = pyGBot
 
 [Plugins.system.Auth]
