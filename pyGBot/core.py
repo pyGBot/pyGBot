@@ -155,14 +155,18 @@ class GBot(irc.IRCClient):
             return True
 
     def __init__(self):
+        # to delineate each launch in log file
+        log.logger.info("Starting pyGBot...")
+
+        log.logger.info("Loading config file...")
         try:
             conf = ConfigObj('pyGBot.ini')
         except IOError, msg:
-            print "Cant open config file: ", msg
+            print "Cannot open config file: ", msg
             sys.exit(1)
 
         if conf.has_key('IRC') == False:
-            print "Config file does not contain IRC connection information"
+            print "Config file does not contain IRC connection information."
             sys.exit(1)
 
         if conf['IRC'].has_key('nick'):
@@ -207,7 +211,11 @@ class GBot(irc.IRCClient):
 
         self.plugins = {}
         self.activeplugins = []
+        
+        log.logger.info("Loading plugins...")
         self.loadPlugins(conf)
+        
+        log.logger.info("Activating startup plugins...")
         self.activatePlugin('system.Startup')
 
         self.timertask = task.LoopingCall(self.events.timer_tick)
@@ -466,7 +474,7 @@ def run():
     try:
         conf = ConfigObj('pyGBot.ini')
     except IOError, msg:
-        print "Can't open config file: ", msg
+        print "Cannot open config file: ", msg
         sys.exit(1)
 
     if conf.has_key('IRC') == False:
