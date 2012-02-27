@@ -42,7 +42,11 @@ from pyGBot.PluginEvents import PluginEvents
 class GBot(irc.IRCClient):
     ''' No longer just an IRC Texas Holdem tournament dealer'''
 
+    ############################################################################
+    # Public Plugin API Methods
+    ############################################################################
     def pubout(self, channel, msg):
+        """ Send a message to a channel. """
         msgOut = encodeOut(msg)
         channelOut = encodeOut(channel)
         self.say(channel=channelOut, message=msgOut)
@@ -51,6 +55,7 @@ class GBot(irc.IRCClient):
         log.chatlog.info('[PUB->%s]%s' % (channelOut, stripcolors(msgOut)))
 
     def privout(self, user, msg):
+        """ Send a message to a user. """
         msgOut = encodeOut(msg)
         userOut = encodeOut(user)
         self.msg(user=userOut, message=msgOut)
@@ -59,6 +64,11 @@ class GBot(irc.IRCClient):
         log.chatlog.info('[PRV->%s]%s' % (userOut, stripcolors(msgOut)))
 
     def replyout(self, channel, user, msg):
+        """ Send a reply. If channel is None, the reply is sent to the user;
+        otherwise, it is sent to the channel. Use this in plugins or commands
+        when an incoming message can be either from a channel or a user and the
+        outgoing message should be resent to the source. """
+        
         msgOut = encodeOut(msg)
         userOut = encodeOut(user)
         channelOut = encodeOut(channel)
@@ -68,6 +78,7 @@ class GBot(irc.IRCClient):
             self.pubout(channelOut, msgOut)
 
     def noteout(self, user, msg):
+        """ Send a notice to a user. """
         msgOut = encodeOut(msg)
         userOut = encodeOut(user)
         self.notice(user=userOut, message=msgOut)
@@ -76,21 +87,23 @@ class GBot(irc.IRCClient):
         log.chatlog.info('[NTE->%s]%s' % (userOut, stripcolors(msgOut)))
         
     def invite(self, user, channel):
+        """ Send a channel invite to a user. """
         userOut = encodeOut(user)
         channelOut = encodeOut(channel)
         self.sendLine("INVITE %s %s" % (userOut, channelOut))
         
         log.chatlog.info('[INVITE->%s] %s' % (userOut, channelOut))
         
-    def joinChannel(self, channel, key=None):
-        channelOut = encodeOut(channel)
+    def join(self, channel, key=None):
+        """ Join a channel. """
         if key:
             keyOut = encodeOut(key)
-            self.join(channel=channelOut, key=keyOut)
+            irc.IRCClient.join(channelOut, keyOut)
         else:
-            self.join(channel=channelOut)
+            irc.IRCClient.join(channelOut)
 
     def actout(self,channel, msg):
+        """ Send an action (/me) to a channel. """
         msgOut = encodeOut(msg)
         channelOut = encodeOut(channel)
         self.me(channel=channelOut, action=msgOut)
@@ -99,11 +112,34 @@ class GBot(irc.IRCClient):
         log.chatlog.info('[ACT->%s]%s' % (channelOut, stripcolors(msgOut)))
 
     def modestring(self, target, modestring):
+        """ Set a mode string on a user or channel. """
         self.sendLine("MODE %s %s" % (target, modestring))
 
         log.chatlog.info('[MODE] %s %s' % (target, modestring))
 
+    def cprivmsg(self, channel, user, message):
+        """ Send a CPRIVMSG. This allows channel ops to bypass server flood
+        limits when messaging users in their channel. """
+        msgOut = encodeOut(msg)
+        userOut = encodeOut(user)
+        channelOut = encodeOut(channel)
+        fmt = "CPRIVMSG %s %s :%%s" % (userOut, channelOut)
+        self.sendLine(fmt % (message,))
+
+    def cnotice(self, channel, user, message):
+        """ Send a CNOTICE. THis allows channel ops to bypass server flood
+        limits when sending a notice to users in their channel. """
+        msgOut = encodeOut(msg)
+        userOut = encodeOut(user)
+        channelOut = encodeOut(channel)
+        fmt = "CNOTICE %s %s :%%s" % (userOut, channelOut)
+        self.sendLine(fmt % (messageOut,))
+
+    ############################################################################
+    # Plugin Handling Methods
+    ############################################################################
     def loadPlugins(self, conf):
+        """ (private) Load all registered plugins. """
         if conf.has_key('Plugins') == False:
             return
 
@@ -115,6 +151,7 @@ class GBot(irc.IRCClient):
             self.plugins[name] = plugin
 
     def loadPluginFromFile(self, pluginmodule, pluginname, conf):
+        """ (private) Load a plugin from its file and initialise it. """
         log.logger.info("Loading plugin %s", pluginname)
 
         if conf.has_key('Plugins.' + pluginmodule + '.' + pluginname):
@@ -127,11 +164,12 @@ class GBot(irc.IRCClient):
         return plugin
 
     def activatePlugin(self, pluginname, channel=None):
+        """ (private) Activate a loaded plugin. """
         if self.plugins.has_key(pluginname) == False:
             log.logger.error('Unable to activate plugin %s: plugin not loaded.', pluginname)
             return
 
-        log.logger.info("Activating %s" % pluginname)
+        log.logger.info("Activating %s", pluginname)
         plugin = self.plugins[pluginname]
 
         if plugin.activate(channel) == False:
@@ -149,6 +187,7 @@ class GBot(irc.IRCClient):
         return True
 
     def deactivatePlugin(self, pluginname, channel=None):
+        """ (private) Deactivates a loaded plugin. """
         if self.plugins.has_key(pluginname) == False:
             log.logger.error('Unable to deactivate plugin ' + pluginname)
             return        
@@ -171,6 +210,9 @@ class GBot(irc.IRCClient):
             return True
 
     def __init__(self):
+        """ Initialise GBot: load IRC connection info from the configuration,
+        load plugins from the configuration, activate startup plugins, and
+        initialise the plugin timer task."""
         # to delineate each launch in log file
         log.logger.info("Starting pyGBot...")
 
@@ -238,8 +280,11 @@ class GBot(irc.IRCClient):
 
         self.versionEnv = sys.platform
 
-    #### connection callbacks
+    ############################################################################
+    # Connection Callbacks
+    ############################################################################
     def connectionMade(self):
+        """ Called when a connection is made. """
         irc.IRCClient.connectionMade(self)
         log.logger.info("[connected at %s]" %\
                         time.asctime(time.localtime(time.time())))
@@ -250,6 +295,7 @@ class GBot(irc.IRCClient):
         self.events.bot_connect()
 
     def connectionLost(self, reason):
+        """ Called when a connection is shut down. """
         irc.IRCClient.connectionLost(self, reason)
         log.logger.info("[disconnected at %s:%s]" %\
               (time.asctime(time.localtime(time.time())), reason))
@@ -259,19 +305,20 @@ class GBot(irc.IRCClient):
         # Call Event Handler
         self.events.bot_disconnect()
 
-
-    #### event callbacks
+    ############################################################################
+    # Event Callbacks
+    ############################################################################
     def signedOn(self):
-        """Called when bot has succesfully signed on to server.
-        """
+        """Called when bot has succesfully signed on to the server. """
         self.regNickServ()
         
         self.modestring(self.nickname, self.usermodes)
         
         for channel in self.factory.channel:
-            self.joinChannel(channel)
+            self.join(channel)
 
     def regNickServ(self):
+        """ (private) Identify with NickServ from the configuration info. """
         if hasattr(self, 'opernick') and hasattr(self, 'operpass'):
             self.sendLine('OPER %s %s' % (self.opernick, self.operpass))
         
@@ -281,8 +328,7 @@ class GBot(irc.IRCClient):
 
 
     def joined(self, channel):
-        """This will get called when the bot joins the channel.
-        """
+        """ Called when the bot joins a channel. """
         log.logger.info('[I have joined %s]' % (channel,))
         self.channels.append(channel)
 
@@ -297,10 +343,12 @@ class GBot(irc.IRCClient):
         self.events.bot_join(channelIn)
 
     def left(self, channel):
+        """ Called when the bot leaves a channel. """
         if channel in self.channels:
             self.channels.remove(channel)
 
     def kickedFrom(self, channel, kicker, message):
+        """ Called when the bot is kicked from a channel. """
         if channel in self.channels:
             self.channels.remove(channel)
 
@@ -310,8 +358,7 @@ class GBot(irc.IRCClient):
         self.events.bot_kicked(channelIn, kickerIn, messageIn)
 
     def noticed(self, user, channel, msg):
-        """This will get called when the bot receives a NOTICE.
-        """
+        """ Called when the bot receives a NOTICE. """
         user = user.split('!', 1)[0]
         userIn = decodeIn(user)
         channelIn = decodeIn(channel)
@@ -322,8 +369,7 @@ class GBot(irc.IRCClient):
         self.events.msg_notice(userIn, msgIn)
 
     def privmsg(self, user, channel, msg):
-        """This will get called when the bot receives a message.
-        """
+        """ Called when the bot receives a message (from channel or user). """
         user = user.split('!', 1)[0]
         userIn = decodeIn(user)
         channelIn = decodeIn(channel)
@@ -350,8 +396,7 @@ class GBot(irc.IRCClient):
             self.events.msg_channel(channelIn, userIn, msgIn)
 
     def action(self, user, channel, msg):
-        """This will get called when the bot sees someone do an action.
-        """
+        """ Called when the bot sees someone do an action (/me). """
         user = user.split('!', 1)[0]
         userIn = decodeIn(user)
         channelIn = decodeIn(channel)
@@ -362,8 +407,7 @@ class GBot(irc.IRCClient):
         self.events.msg_action(channelIn, userIn, msgIn)
 
     def topicUpdated(self, user, channel, newTopic):
-        """This will get called when the bot sees the channel topic change.
-        """
+        """ Called when the bot sees the channel topic change. """
         user = user.split('!', 1)[0]
         userIn = decodeIn(user)
         channelIn = decodeIn(channel)
@@ -374,8 +418,7 @@ class GBot(irc.IRCClient):
         self.events.channel_topic(channelIn, userIn, newTopicIn)
 
     def userJoined(self, user, channel):
-        """Called when I see another user joining a channel.
-        """
+        """Called when the bot sees a user joining a channel. """
         user = user.split('!', 1)[0]
         userIn = decodeIn(user)
         channelIn = decodeIn(channel)
@@ -385,8 +428,7 @@ class GBot(irc.IRCClient):
         self.events.user_join(channelIn, userIn)
 
     def userLeft(self, user, channel):
-        """Called when I see another user leaving a channel.
-        """
+        """Called when the bot sees a user leaving a channel. """
         user = user.split('!', 1)[0]
         userIn = decodeIn(user)
         channelIn = decodeIn(channel)
@@ -396,8 +438,7 @@ class GBot(irc.IRCClient):
         self.events.user_part(channelIn, userIn)
 
     def userKicked(self, user, channel, kicker, message):
-        """Called when I see another user get kicked.
-        """
+        """ Called when the bot sees a user get kicked. """
         user = user.split('!', 1)[0]
         userIn = decodeIn(user)
         channelIn = decodeIn(channel)
@@ -409,8 +450,7 @@ class GBot(irc.IRCClient):
         self.events.user_kicked(channelIn, userIn, kickerIn, messageIn)
 
     def userQuit(self, user, quitMessage):
-        """Called when I see another user disconnect from the network.
-        """
+        """ Called when the bot sees a user disconnect from the network. """
         user = user.split('!', 1)[0]
         userIn = decodeIn(user)
         quitMsgIn = decodeIn(quitMessage)
@@ -421,32 +461,18 @@ class GBot(irc.IRCClient):
         self.events.user_quit(userIn, quitMsgIn)
 
     def userRenamed(self, oldname, newname):
-        """A user changed their name from oldname to newname.
-        """
+        """Called when the bot sees a user change their nickname from oldname to
+        newname. """
         oldnameIn = decodeIn(oldname)
         newnameIn = decodeIn(newname)
         log.chatlog.info('%s is now known as %s' % (oldname, newname))
         # Call Event Handler
         self.events.user_nickchange(oldnameIn, newnameIn)
 
-    def cprivmsg(self, channel, user, message):
-        msgOut = encodeOut(msg)
-        userOut = encodeOut(user)
-        channelOut = encodeOut(channel)
-        fmt = "CPRIVMSG %s %s :%%s" % (userOut, channelOut)
-        self.sendLine(fmt % (message,))
-
-    def cnotice(self, channel, user, message):
-        msgOut = encodeOut(msg)
-        userOut = encodeOut(user)
-        channelOut = encodeOut(channel)
-        fmt = "CNOTICE %s %s :%%s" % (userOut, channelOut)
-        self.sendLine(fmt % (messageOut,))
-
 class GBotFactory(protocol.ClientFactory):
     """A factory for tbots.
 
-    A new protocol instance will be created each time we connect to the server.
+    A new protocol instance is created each time we connect to the server.
     """
 
     # the class of the protocol to build when new connection is made
@@ -481,16 +507,19 @@ class GBotFactory(protocol.ClientFactory):
             log.addLogFileHandler(log.chatlog,'chat.log', log.cformat)
 
     def clientConnectionLost(self, connector, reason):
-        """If we get disconnected, reconnect to server."""
+        """ Called when a client's connection is shut down. Attempts to
+        reconnect to the server. """
 
         connector.connect()
 
     def clientConnectionFailed(self, connector, reason):
+        """ Called when a client's connection fails. Log the error and exit. """
         log.logger.critical('connection failed: %s', (str(reason),))
         reactor.stop()
 
 def stripcolors(inmsg):
-    """ Strip color codes from a string """
+    """ Strip color codes from a string. """
+    # TODO: Fix this
     inmsg = inmsg.replace("\x02\x0301,00", '')
     inmsg = inmsg.replace("\x02\x0302,00", '')
     inmsg = inmsg.replace("\x02\x0303,00", '')
@@ -499,8 +528,9 @@ def stripcolors(inmsg):
     return inmsg
 
 def encodeOut(msg):
-    """ Encode output text as a UTF-8 byte-string, replacing any invalid characters. This allows
-    correct output of ASCII and Unicode characters. """
+    """ Encode output text as a UTF-8 byte-string, replacing any invalid
+    characters with '?'. If the msg argument is not a unicode string, return
+    the argument. This allows correct output of Unicode characters. """
     if isinstance(msg, unicode):
         encMsg = msg.encode('utf-8', 'replace')
     else:
@@ -508,8 +538,10 @@ def encodeOut(msg):
     return encMsg
 
 def decodeIn(msg):
-    """ Decode input text as UTF-8 and return a unicode string. This allows plugins to
-    correctly receive and handle Unicode. """
+    """ Decode input text as UTF-8, replacing any invalid characters with '?',
+    and return a unicode string. If the msg argument is already a unicode
+    string, return the argument. This allows plugins to correctly receive and
+    handle unicode-type strings internally. """
     if isinstance(msg, unicode):
         decMsg = msg
     else:
@@ -517,6 +549,7 @@ def decodeIn(msg):
     return decMsg
 
 def run():
+    """ Run GBot. Called from the pyGBot bootstrap script. """
     try:
         conf = ConfigObj('pyGBot.ini')
     except IOError, msg:
