@@ -105,18 +105,21 @@ class Auth(BasePlugin):
                 self.bot.privout("nickserv", "acc %s *" % user)
                 log.logger.info('Auth: Attempting to auth %s' % user)
             if self.authtype == "pygbot":
-                cmd, uname, password = message.rsplit(' ',2)
-                if self.get_passhash(uname) == hashlib.sha1(password + 'pygb0t').hexdigest():
-                    authlevel = self.get_authlevel(uname)
-                    if authlevel != None:
-                        self.set_userlevel(user, self.get_authlevel(uname))
-                        self.bot.noteout(user, 'Successfully authed.')
-                        log.logger.info('Auth: Authorized user %s at level %d.' % (user, authlevel))
+                try:
+                    cmd, uname, password = message.rsplit(' ',2)
+                    if self.get_passhash(uname) == hashlib.sha1(password + 'pygb0t').hexdigest():
+                        authlevel = self.get_authlevel(uname)
+                        if authlevel != None:
+                            self.set_userlevel(user, self.get_authlevel(uname))
+                            self.bot.noteout(user, 'Successfully authed.')
+                            log.logger.info('Auth: Authorized user %s at level %d.' % (user, authlevel))
+                        else:
+                            self.bot.noteout(user, 'Invalid user level.')
+                            log.logger.info('Auth: Invalid user level for user %s' % user)
                     else:
-                        self.bot.noteout(user, 'Invalid user level.')
-                        log.logger.info('Auth: Invalid user level for user %s' % user)
-                else:
-                    self.bot.noteout(user, 'Incorrect user name or password.')
+                        self.bot.noteout(user, 'Incorrect user name or password.')
+                except:
+                    self.bot.noteout(user, "Incorrect syntax. Usage: auth <username> <password>")
 
     def msg_notice(self, user, message):
         if self.authtype == "nickserv":
