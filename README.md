@@ -1,4 +1,4 @@
-pyGBot 0.x.x
+pyGBot 0.3.0
 ============
 
 Licence, copyright and attribution
