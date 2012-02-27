@@ -278,7 +278,6 @@ class GBot(irc.IRCClient):
         """This will get called when the bot joins the channel.
         """
         log.logger.info('[I have joined %s]' % (channel,))
-        self.channels.append(channel)
 
         # Set modes
         if hasattr(self, 'plusmodes'):
@@ -288,19 +287,20 @@ class GBot(irc.IRCClient):
         
         # Call Event Handler
         channelIn = decodeIn(channel)
+        self.channels.append(channelIn)
         self.events.bot_join(channelIn)
 
     def left(self, channel):
-        if channel in self.channels:
+        channelIn = decodeIn(channel)
+        if channelIn in self.channels:
             self.channels.remove(channel)
 
     def kickedFrom(self, channel, kicker, message):
-        if channel in self.channels:
-            self.channels.remove(channel)
-
         channelIn = decodeIn(channel)
         kickerIn = decodeIn(kicker)
         messageIn = decodeIn(message)
+        if channelIn in self.channels:
+            self.channels.remove(channelIn)
         self.events.bot_kicked(channelIn, kickerIn, messageIn)
 
     def noticed(self, user, channel, msg):
@@ -522,7 +522,7 @@ def run():
         sys.exit(1)
 
     try:
-        channel = conf['IRC']['channel'].split(" ")
+        channel = decodeIn(conf['IRC']['channel']).split(" ")
         host = conf['IRC']['host']
         port = int(conf['IRC']['port'])
     except ConfigObjError:
