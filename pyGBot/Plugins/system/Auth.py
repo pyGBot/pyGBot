@@ -39,7 +39,7 @@ class Auth(BasePlugin):
         self.users = {}
         self.conf = ConfigObj("users.ini")
         try:
-            if options["authtype"] == "nickserv":
+            if options["authtype"].lower() == "nickserv":
                 self.authtype = "nickserv"
             else:
                 self.authtype = "pygbot"
