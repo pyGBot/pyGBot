@@ -15,37 +15,302 @@
 ##    You should have received a copy of the GNU General Public License
 ##    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
-
+import collections, math, operator, re, string
+from random import randint
+from sys import exc_info
 from pyGBot.Plugins.system.Commands import BaseCommand
 from pyGBot.Plugins.system.Auth import AuthLevels as AL
 
-import ast, math, operator
-from sys import exc_info
-from random import randint
-from re import sub
+VALID_ID = re.compile('[a-zA-Z$_][a-zA-Z0-9$_]*$')
 
-class Calc(BaseCommand):    
+BASIC_TOKENS = [
+    (2, ['**']),
+    (1, ['+', '-', '*', '/', '%', 'd', '^', '(', ')', ',']),
+]
+
+class Token(object):
+    def __init__(self, kind, value):
+        self.value = value
+        self.kind = kind
+
+    @property
+    def is_unary(self):
+        return self.kind in ['-']
+    
+    @property
+    def is_roll(self):
+        return self.kind in ['d']
+
+    @property
+    def is_exponential(self):
+        return self.kind in ['**', '^']
+
+    @property
+    def is_multiplicative(self):
+        return self.kind in ['*', '/', '%']
+
+    @property
+    def is_additive(self):
+        return self.kind in ['+', '-']
+
+BinOp = collections.namedtuple('BinOp', ('op', 'lhs', 'rhs'))
+UnaryOp = collections.namedtuple('UnaryOp', ('op', 'rhs'))
+FunctionCall = collections.namedtuple('FunctionCall', ('name', 'args'))
+Constant = collections.namedtuple('Constant', 'name')
+
+class Lexer(object):
+    def __init__(self, stream):
+        self.current = 0
+        self.stream = stream
+
+    def chew(self, ignore_whitespace=True):
+        v = self.stream[self.current]
+        self.current += 1
+
+        while ignore_whitespace and v in ' \r\n\t':
+            v = self.stream[self.current]
+            self.current += 1
+
+        return v
+
+    def unchew(self):
+        self.current -= 1
+
+    def peek(self):
+        return self.stream[self.current]
+
+    def peek_string(self, amount=1, first_char_chewed=True):
+        offset = -1 if first_char_chewed else 0
+        return self.stream[self.current+offset:self.current+offset+amount]
+
+    def identifier(self, start):
+        cache = start
+        while True:
+            try:
+                char = self.chew()
+            except IndexError:
+                return cache
+
+            cache += char
+
+            if not VALID_ID.match(cache):
+                # put back the last token that didn't match
+                # and strip it from the results
+                self.unchew()
+                return cache[:-1]
+
+    def numexp(self, start):
+        val = start
+        sign = True
+        while True:
+            try:
+                char = self.chew()
+            except IndexError:
+                return val
+
+            if char in string.digits:
+                val += char
+            elif sign and char in '+-':
+                val += char
+            else:
+                # put the token back
+                self.unchew()
+                return val
+            sign = False
+        return float(val)
+
+    def numdec(self, start):
+        val = start
+        while True:
+            try:
+                char = self.chew()
+            except IndexError:
+                return val
+
+            if char in string.digits:
+                val += char
+            elif char in 'eE':
+                val += char
+            else:
+                # put the token back
+                self.unchew()
+                return val
+        return val
+
+    def number(self, start):
+        val = start
+        while True:
+            try:
+                char = self.chew()
+            except IndexError:
+                return int(val, 10)
+
+            if char in string.digits:
+                val += char
+            elif char == '.':
+                return float(self.numdec(val + char))
+            elif char in 'eE':
+                return float(self.numexp(val + char))
+            else:
+                self.unchew()
+                return int(val, 10)
+
+    def __iter__(self):
+        return self
+
+    def next(self):
+        while True:
+            try:
+                char = self.chew()
+            except IndexError:
+                raise StopIteration
+
+            if char in string.digits:
+                return Token('number', self.number(char))
+
+            for length, tokens in BASIC_TOKENS:
+                lexeme = self.peek_string(length)
+                if lexeme in tokens:
+                    self.current += length - 1
+                    return Token(lexeme, lexeme)
+
+            return Token('identifier', self.identifier(char))
+
+class Parser(object):
+    def __init__(self, tokens):
+        self.current = 0
+        self.tokens = tokens
+
+    def has_next(self):
+        return self.current < len(self.tokens)
+
+    def peek(self):
+        try:
+            return self.tokens[self.current]
+        except IndexError:
+            return Token('eos', None)
+
+    def chew(self):
+        v = self.peek()
+        self.current += 1
+        return v
+
+    def unchew(self):
+        self.current -= 1
+    
+
+    def expects_any(self, kinds):
+        got = self.chew()
+        if got.kind not in kinds:
+            raise SyntaxError("Wanted a kind in %r, got %r" % (kinds, got.kind))
+        return got
+
+    def expects(self, kind):
+        return self.expects_any((kind,))
+
+    def hd(self):
+        return self.peek().kind
+
+    def atom(self):
+        tok = self.chew()
+        if tok.kind == 'number':
+            return tok
+        elif tok.kind == '(':
+            return self.paren_expression()
+        elif tok.kind == 'identifier':
+            if self.hd() == '(':
+                return self.function_call(tok)
+            else:
+                return Constant(tok)
+        raise SyntaxError
+
+    def paren_expression(self):
+        # lparen chewed
+        expr = self.toplevel()
+        self.expects(')')
+        return expr
+
+    def arglist(self):
+        arglist = []
+        while self.hd() != ')':
+            arglist.append(self.toplevel())
+            if self.hd() != ',':
+                break
+
+        return arglist
+
+    def function_call(self, tok):
+        self.expects('(')
+        arglist = self.arglist()
+        self.expects(')')
+        return FunctionCall(tok, arglist)
+
+    def unary_expression(self):
+        if self.peek().is_unary:
+            tok = self.chew()
+            return UnaryOp(tok, self.unary_expression())
+        else:
+            return self.atom()
+        
+    def roll_expression(self):
+        expr = self.unary_expression()
+        while self.peek().is_roll:
+            tok = self.chew()
+            expr = BinOp(tok, expr, self.unary_expression())
+        return expr
+
+    def exponential_expression(self):
+        expr = self.roll_expression()
+        while self.peek().is_exponential:
+            tok = self.chew()
+            expr = BinOp(tok, expr, self.roll_expression())
+        return expr
+
+    def multiplicative_expression(self):
+        expr = self.exponential_expression()
+        while self.peek().is_multiplicative:
+            tok = self.chew()
+            expr = BinOp(tok, expr, self.exponential_expression())
+        return expr
+
+    def additive_expression(self):
+        expr = self.multiplicative_expression()
+        while self.peek().is_additive:
+            tok = self.chew()
+            expr = BinOp(tok, expr, self.multiplicative_expression())
+        return expr
+
+    def toplevel(self):
+        return self.additive_expression()
+
+class Calc(BaseCommand):
     level = AL.User
     def __init__(self, bot, channel, user, args):
-        self.OPERS = {
-            ast.Add: operator.add,
-            ast.Sub: operator.sub,
-            ast.Mult: operator.mul,
-            ast.Div: operator.truediv, # int / int = float
-            ast.Pow: operator.pow, # use ^ for powers instead of **
-            ast.FloorDiv: self.roll, # hijacked operator for dicerolls
+        self.BINARY_OPERATORS = {
+            '+': operator.add,
+            '-': operator.sub,
+            '*': operator.mul,
+            '/': operator.truediv,
+            '%': operator.mod,
+            '**': operator.pow,
+            '^': operator.pow,
+            'd': self.roll,
+        }
+        
+        self.UNARY_OPERATORS = {
+            '-': operator.neg,
         }
         
         self.CONSTANTS = {
-            'pi': math.pi,
-            'e': math.e,
+            'pi': math.pi, 
+            'e': math.e, 
+            'F': -1 # Fudge dice
         }
         
         self.FUNCTIONS = {
             # Selected Python functions
             'abs': abs,
             'round': round,
-            
             # Math functions
             'ceil': math.ceil,
             'copysign': math.copysign,
@@ -89,71 +354,45 @@ class Calc(BaseCommand):
             'erfc': math.erfc,
             'gamma': math.gamma,
             'lgamma': math.lgamma,
-            # Custom functions
-            'roll': self.roll,
         }
-    
+        
+        l = Lexer("".join(args))
+        p = Parser(list(l))
+        
         try:
-            # Note the regex. #d gets replaced with #** to hijack the default POW operator for dicerolls. 
-            bot.replyout(channel, user, "%g" % self.eval_str(sub("(\d)d","\g<1>//","".join(args).replace("^","**"))))
+            bot.replyout(channel, user, "%g" % self.eval_node(p.toplevel()))
+        except KeyError:
+            bot.replyout(channel, user, "Unknown constant or function: %s" % exc_info()[1][0])
         except:
-            bot.replyout(channel, user, "Error: %s" % exc_info()[1])
-    
-    def eval_binop(self, node):
-        op_type = type(node.op)
-        if op_type in self.OPERS:
-            return self.OPERS[op_type](self.eval_node(node.left), self.eval_node(node.right))
-        else:
-            raise ValueError("Unsupported binary operation %r" % (type(node.op).__name__,))
-    
-    def eval_function_call(self, node):
-        if not isinstance(node.func, ast.Name):
-            raise ValueError("Unsupported function")
-    
-        func_name = node.func.id.replace("&", "d")
-    
-        if func_name in self.FUNCTIONS:
-            func = self.FUNCTIONS[func_name]
-        else:
-            raise ValueError("Unsupported function %r" % (node.func.id,))
-    
-        if node.args is not None:
-            args = [self.eval_node(v) for v in node.args]
-        else:
-            args = []
-    
-        if node.kwargs is not None:
-            kwargs = dict((k, eval_node(v)) for (k, v) in node.kwargs.iteritems())
-        else:
-            kwargs = {}
-    
-        return func(*args, **kwargs)
-    
-    def eval_constant(self, node):
-        const = node.id
-        if const in self.CONSTANTS:
-            return self.CONSTANTS[const]
-        else:
-            raise ValueError("Unknown variable: %s" % const)
-    
+            bot.replyout(channel, user, "Error")
+        
     def eval_node(self, node):
-        if isinstance(node, ast.Expression):
-            return self.eval_node(node.body)
-        elif isinstance(node, ast.Num):
-            return node.n
-        elif isinstance(node, ast.BinOp):
-            return self.eval_binop(node)
-        elif isinstance(node, ast.Call):
-            return self.eval_function_call(node)
-        elif isinstance(node, ast.Name):
-            return self.eval_constant(node)
-        raise ValueError("Unsupported node type %r" % (type(node).__name__,))
-    
-    def eval_str(self, expr):
-        return self.eval_node(ast.parse(expr, mode='eval'))
-    
-    def roll(self, rolls, sides):
+        if isinstance(node, Token):
+            return node.value
+        elif isinstance(node, BinOp):
+            op = self.BINARY_OPERATORS[node.op.value]
+            return op(self.eval_node(node.lhs), self.eval_node(node.rhs))
+        elif isinstance(node, UnaryOp):
+            op = self.UNARY_OPERATORS[node.op.value]
+            return op(self.eval_node(node.rhs))
+        elif isinstance(node, Constant):
+            return self.CONSTANTS[node.name.value]
+        elif isinstance(node, FunctionCall):
+            args = [self.eval_node(n) for n in node.args]
+            func = self.FUNCTIONS[node.name.value]
+            return func(*args)
+        raise SyntaxError
+        
+    def roll(self, dice, sides):
+        if dice < 1 or sides < -1 or sides == 0:
+            raise SyntaxError
+        
         sum = 0
-        for i in range(0, rolls):
-            sum = sum + randint(1, sides)
+        
+        for die in range(0, dice):
+            if sides == -1:
+                sum = sum + randint(-1, 1) # Fudge dice!
+            else:
+                sum = sum + randint(1, sides)
+            
         return sum
