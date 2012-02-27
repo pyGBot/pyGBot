@@ -22,30 +22,13 @@ from pyGBot import log
 from pyGBot.Plugins.system.Commands import BaseCommand
 from pyGBot.Plugins.system.Auth import AuthLevels as AL
 
-def pubout(bot):
-    def _out(target, message):
-        bot.pubout(target, unicode(message).encode('utf-8','replace'))
-    return _out
-
-def privout(bot):
-    def _out(target, message):
-        bot.privout(target, unicode(message).encode('utf-8','replace'))
-    return _out 
-
 class Seen(BaseCommand):
     level = AL.User
 
     def __init__(self, bot, channel, user, args):
-        if channel is None:
-            out = privout(bot)
-            target = user
-        else:
-            out = pubout(bot)
-            target = channel
-
         args = args.strip().split()
         if not args:
-            out(target, 'Command usage: seen <user> [channel]')
+            bot.replyout(channel, user, 'Command usage: seen <user> [channel]')
             return
 
         username = args[0]
@@ -57,7 +40,7 @@ class Seen(BaseCommand):
         try:
             event = bot.plugins['features.Seen'].get_latest(username, channel)
         except IndexError, e:
-            out(target, e)
+            bot.replyout(channel, user, e)
             return
 
         outmessage = "The user, %s, was last seen " % event.user
@@ -106,5 +89,5 @@ class Seen(BaseCommand):
             outmessage += "changing nick to %s." % event.message
         elif event.type == "NickFrom":
             outmessage += "changing nick from %s." % event.message
-        out(target, outmessage)
+        bot.replyout(channel, user, outmessage)
 
