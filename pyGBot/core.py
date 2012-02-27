@@ -43,39 +43,60 @@ class GBot(irc.IRCClient):
     ''' No longer just an IRC Texas Holdem tournament  dealer'''
 
     def pubout(self, channel, msg):
-        self.say(channel=channel, message=msg)
+        msgOut = encodeOut(msg)
+        channelOut = encodeOut(channel)
+        self.say(channel=channelOut, message=msgOut)
         
         # strip color codes
-        log.chatlog.info('[PUB->%s]%s' % (channel, stripcolors(msg)))
+        log.chatlog.info('[PUB->%s]%s' % (channelOut, stripcolors(msgOut)))
 
     def privout(self, user, msg):
-        self.msg(user=user, message=msg)
+        msgOut = encodeOut(msg)
+        userOut = encodeOut(user)
+        self.msg(user=userOut, message=msgOut)
         
         # strip color codes
-        log.chatlog.info('[PRV->%s]%s' % (user, stripcolors(msg)))
+        log.chatlog.info('[PRV->%s]%s' % (userOut, stripcolors(msgOut)))
 
     def replyout(self, channel, user, msg):
+        msgOut = encodeOut(msg)
+        userOut = encodeOut(user)
+        channelOut = encodeOut(channel)
         if (channel is None):
-            self.privout(user, msg)
+            self.privout(userOut, msgOut)
         else:
-            self.pubout(channel, msg)
+            self.pubout(channelOut, msgOut)
 
     def noteout(self, user, msg):
-        self.notice(user=user, message=msg)
+        msgOut = encodeOut(msg)
+        userOut = encodeOut(user)
+        self.notice(user=userOut, message=msgOut)
 
         # strip color codes
-        log.chatlog.info('[NTE->%s]%s' % (user, stripcolors(msg)))
+        log.chatlog.info('[NTE->%s]%s' % (userOut, stripcolors(msgOut)))
         
     def invite(self, user, channel):
-        self.sendLine("INVITE %s %s" % (user, channel))
+        userOut = encodeOut(user)
+        channelOut = encodeOut(channel)
+        self.sendLine("INVITE %s %s" % (userOut, channelOut))
         
-        log.chatlog.info('[INVITE->%s] %s' % (user, channel))
+        log.chatlog.info('[INVITE->%s] %s' % (userOut, channelOut))
+        
+    def joinChannel(self, channel, key=None):
+        channelOut = encodeOut(channel)
+        if key:
+            keyOut = encodeOut(key)
+            self.join(channel=channelOut, key=keyOut)
+        else:
+            self.join(channel=channelOut)
 
     def actout(self,channel, msg):
-        self.me(channel=channel, action=msg)
+        msgOut = encodeOut(msg)
+        channelOut = encodeOut(channel)
+        self.me(channel=channelOut, action=msgOut)
 
         # strip color codes
-        log.chatlog.info('[ACT->%s]%s' % (channel, stripcolors(msg)))
+        log.chatlog.info('[ACT->%s]%s' % (channelOut, stripcolors(msgOut)))
 
     def modestring(self, target, modestring):
         self.sendLine("MODE %s %s" % (target, modestring))
@@ -215,8 +236,6 @@ class GBot(irc.IRCClient):
         log.logger.info("[connected at %s]" %\
                         time.asctime(time.localtime(time.time())))
 
-        self.modestring(self.nickname, self.usermodes)
-
         self.timertask.start(1.0) # 1-second timer granularity
 
         # Call Event Handler
@@ -237,8 +256,12 @@ class GBot(irc.IRCClient):
     def signedOn(self):
         """Called when bot has succesfully signed on to server.
         """
-        self.join(self.factory.channel)
         self.regNickServ()
+        
+        self.modestring(self.nickname, self.usermodes)
+        
+        for channel in self.factory.channel:
+            self.joinChannel(channel)
 
     def regNickServ(self):
         if hasattr(self, 'opernick') and hasattr(self, 'operpass'):
@@ -260,9 +283,10 @@ class GBot(irc.IRCClient):
             self.mode(channel, True, self.plusmodes)
         if hasattr(self, 'minusmodes'):
             self.mode(channel, False, self.minusmodes)
-            
+        
         # Call Event Handler
-        self.events.bot_join(channel)
+        channelIn = decodeIn(channel)
+        self.events.bot_join(channelIn)
 
     def left(self, channel):
         if channel in self.channels:
@@ -272,111 +296,144 @@ class GBot(irc.IRCClient):
         if channel in self.channels:
             self.channels.remove(channel)
 
-        self.events.bot_kicked(channel, kicker, message)
+        channelIn = decodeIn(channel)
+        kickerIn = decodeIn(kicker)
+        messageIn = decodeIn(message)
+        self.events.bot_kicked(channelIn, kickerIn, messageIn)
 
     def noticed(self, user, channel, msg):
         """This will get called when the bot receives a NOTICE.
         """
         user = user.split('!', 1)[0]
+        userIn = decodeIn(user)
+        channelIn = decodeIn(channel)
+        msgIn = decodeIn(msg)
         log.chatlog.info('[NTE<-]<%s> %s' % (user, msg))
 
         # Call Event Handler
-        self.events.msg_notice(user, msg)
+        self.events.msg_notice(userIn, msgIn)
 
     def privmsg(self, user, channel, msg):
         """This will get called when the bot receives a message.
         """
         user = user.split('!', 1)[0]
+        userIn = decodeIn(user)
+        channelIn = decodeIn(channel)
+        msgIn = decodeIn(msg)
 
         # Private message to me
         if channel.upper() == self.nickname.upper():
-            if msg.startswith('auth'):
-                outmsg = msg.split(' ')
-                if len(outmsg) > 2:
-                    outmsg[2] = '*' * 8
-                outmsg = ' '.join(outmsg)
-                log.chatlog.info('[PRV<-]<%s> %s' % (user, outmsg))
+            # If auth msg has password, censor it for logging
+            if msgIn.startswith('auth'):
+                msgNoPwd = msgIn.split(' ')
+                if len(msgNoPwd) > 2:
+                    msgNoPwd[2] = '*' * 8
+                msgNoPwd = ' '.join(msgNoPwd)
+                log.chatlog.info('[PRV<-]<%s> %s' % (user, msgNoPwd))
             else:
                 log.chatlog.info('[PRV<-]<%s> %s' % (user, msg))
             # Call Event Handler
-            self.events.msg_private(user, msg)
+            self.events.msg_private(userIn, msgIn)
 
         # Public message
         else:
             log.chatlog.info('[PUB<-]<%s> %s' % (user, msg))
             # Call Event Handler
-            self.events.msg_channel(channel, user, msg)
+            self.events.msg_channel(channelIn, userIn, msgIn)
 
     def action(self, user, channel, msg):
         """This will get called when the bot sees someone do an action.
         """
         user = user.split('!', 1)[0]
+        userIn = decodeIn(user)
+        channelIn = decodeIn(channel)
+        msgIn = decodeIn(msg)
         log.chatlog.info('* %s %s' % (user, msg))
 
         # Call Event Handler
-        self.events.msg_action(channel, user, msg)
+        self.events.msg_action(channelIn, userIn, msgIn)
 
     def topicUpdated(self, user, channel, newTopic):
         """This will get called when the bot sees the channel topic change.
         """
         user = user.split('!', 1)[0]
+        userIn = decodeIn(user)
+        channelIn = decodeIn(channel)
+        newTopicIn = decodeIn(newTopic)
         log.chatlog.info('Topic for %s set by %s: %s' % (channel, user, newTopic))
 
         # Call Event Handler
-        self.events.channel_topic(channel, user, newTopic)
+        self.events.channel_topic(channelIn, userIn, newTopicIn)
 
     def userJoined(self, user, channel):
         """Called when I see another user joining a channel.
         """
         user = user.split('!', 1)[0]
+        userIn = decodeIn(user)
+        channelIn = decodeIn(channel)
         log.chatlog.info('%s joined %s' % (user, channel))
 
         # Call Event Handler
-        self.events.user_join(channel, user)
+        self.events.user_join(channelIn, userIn)
 
     def userLeft(self, user, channel):
         """Called when I see another user leaving a channel.
         """
         user = user.split('!', 1)[0]
+        userIn = decodeIn(user)
+        channelIn = decodeIn(channel)
         log.chatlog.info('%s has left %s' % (user, channel))
 
         # Call Event Handler
-        self.events.user_part(channel, user)
+        self.events.user_part(channelIn, userIn)
 
     def userKicked(self, user, channel, kicker, message):
         """Called when I see another user get kicked.
         """
         user = user.split('!', 1)[0]
+        userIn = decodeIn(user)
+        channelIn = decodeIn(channel)
+        kickerIn = decodeIn(kicker)
+        messageIn = decodeIn(message)
+        
         log.chatlog.info('%s was kicked from %s by %s (reason: %s)' % (user, channel, kicker, message))
 
-        self.events.user_kicked(channel, user, kicker, message)
+        self.events.user_kicked(channelIn, userIn, kickerIn, messageIn)
 
     def userQuit(self, user, quitMessage):
         """Called when I see another user disconnect from the network.
         """
         user = user.split('!', 1)[0]
-        log.chatlog.info("%s has quit" % (user))
-
+        userIn = decodeIn(user)
+        quitMsgIn = decodeIn(quitMessage)
+        
+        log.chatlog.info("%s has quit [%s]" % (user, quitMessage))
+        
         # Call Event Handler
-        self.events.user_quit(user, quitMessage)
+        self.events.user_quit(userIn, quitMsgIn)
 
     def userRenamed(self, oldname, newname):
         """A user changed their name from oldname to newname.
         """
+        oldnameIn = decodeIn(oldname)
+        newnameIn = decodeIn(newname)
         log.chatlog.info('%s is now known as %s' % (oldname, newname))
-
         # Call Event Handler
-        self.events.user_nickchange(oldname, newname)
+        self.events.user_nickchange(oldnameIn, newnameIn)
 
-    def cprivmsg(self, chan, user, message):
-
-        fmt = "CPRIVMSG %s %s :%%s" % (user, chan)
+    def cprivmsg(self, channel, user, message):
+        msgOut = encodeOut(msg)
+        userOut = encodeOut(user)
+        channelOut = encodeOut(channel)
+        fmt = "CPRIVMSG %s %s :%%s" % (userOut, channelOut)
         self.sendLine(fmt % (message,))
 
-    def cnotice(self, chan, user, message):
-
-        fmt = "CNOTICE %s %s :%%s" % (user, chan)
-        self.sendLine(fmt % (message,))
+    def cnotice(self, channel, user, message):
+        msgOut = encodeOut(msg)
+        userOut = encodeOut(user)
+        channelOut = encodeOut(channel)
+        fmt = "CNOTICE %s %s :%%s" % (userOut, channelOut)
+        self.sendLine(fmt % (messageOut,))
 
 class GBotFactory(protocol.ClientFactory):
     """A factory for tbots.
@@ -425,8 +482,7 @@ class GBotFactory(protocol.ClientFactory):
         reactor.stop()
 
 def stripcolors(inmsg):
-
-    # strip color codes
+    """ Strip color codes from a string """
     inmsg = inmsg.replace("\x02\x0301,00", '')
     inmsg = inmsg.replace("\x02\x0302,00", '')
     inmsg = inmsg.replace("\x02\x0303,00", '')
@@ -434,26 +490,43 @@ def stripcolors(inmsg):
     inmsg = inmsg.replace("\x0F", '')
     return inmsg
 
+def encodeOut(msg):
+    """ Encode output text as a UTF-8 byte-string, replacing any invalid characters. This allows
+    correct output of ASCII and Unicode characters. """
+    if isinstance(msg, unicode):
+        encMsg = msg.encode('utf-8', 'replace')
+    else:
+        encMsg = msg
+    return encMsg
+
+def decodeIn(msg):
+    """ Decode input text as UTF-8 and return a unicode string. This allows plugins to
+    correctly receive and handle Unicode. """
+    if isinstance(msg, unicode):
+        decMsg = msg
+    else:
+        decMsg = msg.decode('utf-8', 'replace')
+    return decMsg
 
 def run():
     try:
         conf = ConfigObj('pyGBot.ini')
     except IOError, msg:
-        print "Cant open config file: ", msg
+        print "Can't open config file: ", msg
         sys.exit(1)
 
     if conf.has_key('IRC') == False:
-        print "Config file does not contain IRC connection information"
+        print "Config file does not contain IRC connection information."
         sys.exit(1)
 
     try:
-        channel = conf['IRC']['channel']
+        channel = conf['IRC']['channel'].split(" ")
+        print channel
         host = conf['IRC']['host']
         port = int(conf['IRC']['port'])
     except ConfigObjError:
         print "Required IRC connection info missing or invalid."
         sys.exit(1)
-
 
     localport = None
     localaddr = None
@@ -498,5 +571,3 @@ def run():
     except:
         print "Unexpected error:", sys.exc_info()[0]
         raise
-
-
