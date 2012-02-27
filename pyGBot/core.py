@@ -247,6 +247,8 @@ class GBot(irc.IRCClient):
               (time.asctime(time.localtime(time.time())), reason))
 
         self.timertask.stop()
+        
+        time.sleep(2)
 
         # Call Event Handler
         self.events.bot_disconnect()
@@ -534,26 +536,24 @@ def run():
         localport = int(conf['IRC']['localport'])
     if conf['IRC'].has_key('localaddr'):
         localaddr = conf['IRC']['localaddr']
-        
-    # hacked in SSL config option
-    sslconnect = False
-    if conf['IRC'].has_key('ssl'):
-        if conf['IRC']['ssl'].lower() == "true":
-            sslconnect = True
-            from twisted.internet import ssl
 
     print "Initialising Factory..."
     # create factory protocol and application
     fact = GBotFactory(channel, 'UNUSED')
-    # "Doctor, how does SSL work?" "I HAVE NO IDEA!"
-    if sslconnect:
-        cfact = ssl.ClientContextFactory()
+    
+    # SSL support
+    sslconnect = None
+    if conf['IRC'].has_key('ssl'):
+        if conf['IRC']['ssl'].lower() == "true":
+            from twisted.internet import ssl
+            # create SSL factory
+            cfact = ssl.ClientContextFactory()
+            sslconnect = True
 
     print "Connecting..."
 
     try:
-        # connect factory to this host and port
-        # now with SSL hack!
+        # connect factory to this host and port, with SSL if enabled
         if sslconnect:
             if localaddr and localport:
                 reactor.connectSSL(host, port, fact, cfact, bindAddress=(localaddr, localport))
