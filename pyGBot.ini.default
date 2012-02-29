@@ -55,11 +55,6 @@ usermodes =
 
 channel = pyGBot
 
-# These values can be changed to allow the bot to become an IRCop. Discouraged.
-
-# opernick = anircop
-# operpass = thepassword
-
 # These values can be used to identify the bot with Nickserv on servers that
 # run that particular IRC Service. The 'idnick' field should name the service
 # (usually 'Nickserv' is appropriate, but some have unstandard names), and the
@@ -68,6 +63,11 @@ channel = pyGBot
 
 # idnick = NickServ
 # idpass = Nickserv-password
+
+# These values can be changed to allow the bot to become an IRCop. Discouraged.
+
+# opernick = anircop
+# operpass = thepassword
 
 # If your server requires a password upon connection, uncomment the following
 # value and insert the password. Otherwise, leave it commented out.
@@ -92,6 +92,18 @@ flooddelay = 2
 
 # logfile = /opt/pygbot/pygbot.log
 # chatlogfile = /opt/pygbot/chat.log
+
+# Logging level affects how much information is logged. Three modes available:
+# 'info', 'warning', 'debug'.
+#
+# 'info' is the default and logs basic status messages that indicate successful
+# actions (like connecting to the server, joining a channel, a game plugin
+# starting a game), along with errors that occur. 'warning' will only log errors
+# and warnings, not normal behaviour. 'debug' will log more information from
+# pyGBot and plugins that might be useful in finding bugs or technical problems.
+# MOST USERS DON'T NEED TO USE 'debug' MODE.
+
+# loglevel = debug
 
 # Unless otherwise noted, you should ignore all the following values unless
 # you are positive you know how they work. Changes to this list will not be

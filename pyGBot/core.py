@@ -487,6 +487,7 @@ class GBotFactory(protocol.ClientFactory):
         self.filename = filename
         conf = ConfigObj('pyGBot.ini')
         
+        # Open GBot log
         try:
             print "Opening pyGBot log file..."
             log.addScreenHandler(log.logger, log.formatter)
@@ -498,7 +499,18 @@ class GBotFactory(protocol.ClientFactory):
         except KeyError:
             print "No log file specified in config. Defaulting to 'pyGBot.log'."
             log.addLogFileHandler(log.logger,'pyGBot.log', log.formatter)
-
+        
+        # set logging level
+        try:
+            if conf['IRC']['loglevel'].lower() == 'debug':
+                log.logger.setLevel(logging.DEBUG)
+            else if conf['IRC']['loglevel'].lower() == 'warning':
+                log.logger.setLevel(logging.WARNING)
+            # otherwise use the default level of INFO
+        except KeyError:
+            pass # no 'loglevel' key? use default level of INFO
+        
+        # open chat log
         try:
             print "Opening chat log file..."
             log.addLogFileHandler(log.chatlog,conf['IRC']['chatlogfile'], log.cformat)
