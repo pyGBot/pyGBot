@@ -41,7 +41,7 @@ if twistedmajor >= 2:
 from twisted.internet import reactor, protocol, task
 
 class GBot(irc.IRCClient):
-    ''' No longer just an IRC Texas Holdem tournament dealer'''
+    ''' No longer just an IRC Texas Holdem tournament dealer. '''
 
     ############################################################################
     # Public Plugin API Methods
@@ -104,7 +104,7 @@ class GBot(irc.IRCClient):
             irc.IRCClient.join(channelOut)
 
     def actout(self,channel, msg):
-        """ Send an action (/me) to a channel. """
+        """ Send an action (/me command) to a channel. """
         msgOut = format.encodeOut(msg)
         channelOut = format.encodeOut(channel)
         self.me(channel=channelOut, action=msgOut)
