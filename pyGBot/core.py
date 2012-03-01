@@ -18,8 +18,7 @@
 
 # pyGBot imports
 from contrib.configobj import ConfigObj, ConfigObjError
-
-from pyGBot import log
+from pyGBot import log, format
 from pyGBot.PluginEvents import PluginEvents
 
 # Twisted imports
@@ -49,21 +48,21 @@ class GBot(irc.IRCClient):
     ############################################################################
     def pubout(self, channel, msg):
         """ Send a message to a channel. """
-        msgOut = encodeOut(msg)
-        channelOut = encodeOut(channel)
+        msgOut = format.encodeOut(msg)
+        channelOut = format.encodeOut(channel)
         self.say(channel=channelOut, message=msgOut)
         
         # strip color codes
-        log.chatlog.info('[PUB->%s]%s' % (channelOut, stripcolors(msgOut)))
+        log.chatlog.info('[PUB->%s]%s' % (channelOut, format.stripFormat(msgOut)))
 
     def privout(self, user, msg):
         """ Send a message to a user. """
-        msgOut = encodeOut(msg)
-        userOut = encodeOut(user)
+        msgOut = format.encodeOut(msg)
+        userOut = format.encodeOut(user)
         self.msg(user=userOut, message=msgOut)
         
         # strip color codes
-        log.chatlog.info('[PRV->%s]%s' % (userOut, stripcolors(msgOut)))
+        log.chatlog.info('[PRV->%s]%s' % (userOut, format.stripFormat(msgOut)))
 
     def replyout(self, channel, user, msg):
         """ Send a reply. If channel is None, the reply is sent to the user;
@@ -71,9 +70,9 @@ class GBot(irc.IRCClient):
         when an incoming message can be either from a channel or a user and the
         outgoing message should be resent to the source. """
         
-        msgOut = encodeOut(msg)
-        userOut = encodeOut(user)
-        channelOut = encodeOut(channel)
+        msgOut = format.encodeOut(msg)
+        userOut = format.encodeOut(user)
+        channelOut = format.encodeOut(channel)
         if (channel is None):
             self.privout(userOut, msgOut)
         else:
@@ -81,17 +80,17 @@ class GBot(irc.IRCClient):
 
     def noteout(self, user, msg):
         """ Send a notice to a user. """
-        msgOut = encodeOut(msg)
-        userOut = encodeOut(user)
+        msgOut = format.encodeOut(msg)
+        userOut = format.encodeOut(user)
         self.notice(user=userOut, message=msgOut)
 
         # strip color codes
-        log.chatlog.info('[NTE->%s]%s' % (userOut, stripcolors(msgOut)))
+        log.chatlog.info('[NTE->%s]%s' % (userOut, format.stripFormat(msgOut)))
         
     def invite(self, user, channel):
         """ Send a channel invite to a user. """
-        userOut = encodeOut(user)
-        channelOut = encodeOut(channel)
+        userOut = format.encodeOut(user)
+        channelOut = format.encodeOut(channel)
         self.sendLine("INVITE %s %s" % (userOut, channelOut))
         
         log.chatlog.info('[INVITE->%s] %s' % (userOut, channelOut))
@@ -99,19 +98,19 @@ class GBot(irc.IRCClient):
     def join(self, channel, key=None):
         """ Join a channel. """
         if key:
-            keyOut = encodeOut(key)
+            keyOut = format.encodeOut(key)
             irc.IRCClient.join(channelOut, keyOut)
         else:
             irc.IRCClient.join(channelOut)
 
     def actout(self,channel, msg):
         """ Send an action (/me) to a channel. """
-        msgOut = encodeOut(msg)
-        channelOut = encodeOut(channel)
+        msgOut = format.encodeOut(msg)
+        channelOut = format.encodeOut(channel)
         self.me(channel=channelOut, action=msgOut)
 
         # strip color codes
-        log.chatlog.info('[ACT->%s]%s' % (channelOut, stripcolors(msgOut)))
+        log.chatlog.info('[ACT->%s]%s' % (channelOut, format.stripFormat(msgOut)))
 
     def modestring(self, target, modestring):
         """ Set a mode string on a user or channel. """
@@ -122,18 +121,18 @@ class GBot(irc.IRCClient):
     def cprivmsg(self, channel, user, message):
         """ Send a CPRIVMSG. This allows channel ops to bypass server flood
         limits when messaging users in their channel. """
-        msgOut = encodeOut(msg)
-        userOut = encodeOut(user)
-        channelOut = encodeOut(channel)
+        msgOut = format.encodeOut(msg)
+        userOut = format.encodeOut(user)
+        channelOut = format.encodeOut(channel)
         fmt = "CPRIVMSG %s %s :%%s" % (userOut, channelOut)
         self.sendLine(fmt % (message,))
 
     def cnotice(self, channel, user, message):
         """ Send a CNOTICE. This allows channel ops to bypass server flood
         limits when sending a notice to users in their channel. """
-        msgOut = encodeOut(msg)
-        userOut = encodeOut(user)
-        channelOut = encodeOut(channel)
+        msgOut = format.encodeOut(msg)
+        userOut = format.encodeOut(user)
+        channelOut = format.encodeOut(channel)
         fmt = "CNOTICE %s %s :%%s" % (userOut, channelOut)
         self.sendLine(fmt % (messageOut,))
 
@@ -345,7 +344,7 @@ class GBot(irc.IRCClient):
             self.mode(channel, False, self.minusmodes)
         
         # Call Event Handler
-        channelIn = decodeIn(channel)
+        channelIn = format.decodeIn(channel)
         self.events.bot_join(channelIn)
 
     def left(self, channel):
@@ -358,17 +357,17 @@ class GBot(irc.IRCClient):
         if channel in self.channels:
             self.channels.remove(channel)
 
-        channelIn = decodeIn(channel)
-        kickerIn = decodeIn(kicker)
-        messageIn = decodeIn(message)
+        channelIn = format.decodeIn(channel)
+        kickerIn = format.decodeIn(kicker)
+        messageIn = format.decodeIn(message)
         self.events.bot_kicked(channelIn, kickerIn, messageIn)
 
     def noticed(self, user, channel, msg):
         """ Called when the bot receives a NOTICE. """
         user = user.split('!', 1)[0]
-        userIn = decodeIn(user)
-        channelIn = decodeIn(channel)
-        msgIn = decodeIn(msg)
+        userIn = format.decodeIn(user)
+        channelIn = format.decodeIn(channel)
+        msgIn = format.decodeIn(msg)
         log.chatlog.info('[NTE<-]<%s> %s' % (user, msg))
 
         # Call Event Handler
@@ -377,9 +376,9 @@ class GBot(irc.IRCClient):
     def privmsg(self, user, channel, msg):
         """ Called when the bot receives a message (from channel or user). """
         user = user.split('!', 1)[0]
-        userIn = decodeIn(user)
-        channelIn = decodeIn(channel)
-        msgIn = decodeIn(msg)
+        userIn = format.decodeIn(user)
+        channelIn = format.decodeIn(channel)
+        msgIn = format.decodeIn(msg)
 
         # Private message to me
         if channel.upper() == self.nickname.upper():
@@ -404,9 +403,9 @@ class GBot(irc.IRCClient):
     def action(self, user, channel, msg):
         """ Called when the bot sees someone do an action (/me). """
         user = user.split('!', 1)[0]
-        userIn = decodeIn(user)
-        channelIn = decodeIn(channel)
-        msgIn = decodeIn(msg)
+        userIn = format.decodeIn(user)
+        channelIn = format.decodeIn(channel)
+        msgIn = format.decodeIn(msg)
         log.chatlog.info('* %s %s' % (user, msg))
 
         # Call Event Handler
@@ -415,9 +414,9 @@ class GBot(irc.IRCClient):
     def topicUpdated(self, user, channel, newTopic):
         """ Called when the bot sees the channel topic change. """
         user = user.split('!', 1)[0]
-        userIn = decodeIn(user)
-        channelIn = decodeIn(channel)
-        newTopicIn = decodeIn(newTopic)
+        userIn = format.decodeIn(user)
+        channelIn = format.decodeIn(channel)
+        newTopicIn = format.decodeIn(newTopic)
         log.chatlog.info('Topic for %s set by %s: %s' % (channel, user, newTopic))
 
         # Call Event Handler
@@ -426,8 +425,8 @@ class GBot(irc.IRCClient):
     def userJoined(self, user, channel):
         """Called when the bot sees a user joining a channel. """
         user = user.split('!', 1)[0]
-        userIn = decodeIn(user)
-        channelIn = decodeIn(channel)
+        userIn = format.decodeIn(user)
+        channelIn = format.decodeIn(channel)
         log.chatlog.info('%s joined %s' % (user, channel))
 
         # Call Event Handler
@@ -436,8 +435,8 @@ class GBot(irc.IRCClient):
     def userLeft(self, user, channel):
         """Called when the bot sees a user leaving a channel. """
         user = user.split('!', 1)[0]
-        userIn = decodeIn(user)
-        channelIn = decodeIn(channel)
+        userIn = format.decodeIn(user)
+        channelIn = format.decodeIn(channel)
         log.chatlog.info('%s has left %s' % (user, channel))
 
         # Call Event Handler
@@ -446,10 +445,10 @@ class GBot(irc.IRCClient):
     def userKicked(self, user, channel, kicker, message):
         """ Called when the bot sees a user get kicked. """
         user = user.split('!', 1)[0]
-        userIn = decodeIn(user)
-        channelIn = decodeIn(channel)
-        kickerIn = decodeIn(kicker)
-        messageIn = decodeIn(message)
+        userIn = format.decodeIn(user)
+        channelIn = format.decodeIn(channel)
+        kickerIn = format.decodeIn(kicker)
+        messageIn = format.decodeIn(message)
         
         log.chatlog.info('%s was kicked from %s by %s (reason: %s)' % (user, channel, kicker, message))
 
@@ -458,8 +457,8 @@ class GBot(irc.IRCClient):
     def userQuit(self, user, quitMessage):
         """ Called when the bot sees a user disconnect from the network. """
         user = user.split('!', 1)[0]
-        userIn = decodeIn(user)
-        quitMsgIn = decodeIn(quitMessage)
+        userIn = format.decodeIn(user)
+        quitMsgIn = format.decodeIn(quitMessage)
         
         log.chatlog.info("%s has quit [%s]" % (user, quitMessage))
         
@@ -469,8 +468,8 @@ class GBot(irc.IRCClient):
     def userRenamed(self, oldname, newname):
         """Called when the bot sees a user change their nickname from oldname to
         newname. """
-        oldnameIn = decodeIn(oldname)
-        newnameIn = decodeIn(newname)
+        oldnameIn = format.decodeIn(oldname)
+        newnameIn = format.decodeIn(newname)
         log.chatlog.info('%s is now known as %s' % (oldname, newname))
         # Call Event Handler
         self.events.user_nickchange(oldnameIn, newnameIn)
@@ -535,42 +534,6 @@ class GBotFactory(protocol.ClientFactory):
         log.logger.critical('connection failed: %s', (str(reason),))
         reactor.stop()
 
-def stripcolors(inmsg):
-    """ Strip color codes from a string. """
-    log.logger.warning("DEPRECATED: pyGBot.stripcolors() is deprecated. Use StringUtils.stripFormatting() to strip IRC formatting from a string.")
-    # TODO: Fix this and move this to stringutils
-    inmsg = inmsg.replace("\x02\x0301,00", '')
-    inmsg = inmsg.replace("\x02\x0302,00", '')
-    inmsg = inmsg.replace("\x02\x0303,00", '')
-    inmsg = inmsg.replace("\x02\x0304,00", '')
-    inmsg = inmsg.replace("\x0F", '')
-    return inmsg
-
-
-def encodeOut(msg):
-    """ Encode output text as a UTF-8 byte-string, replacing any invalid
-    characters with '?'. If the msg argument is not a unicode string, return
-    the argument. This allows correct output of Unicode characters. """
-    # TODO: move to string utils, add backwards-compat call here
-    if isinstance(msg, unicode):
-        encMsg = msg.encode('utf-8', 'replace')
-    else:
-        encMsg = msg
-    return encMsg
-
-def decodeIn(msg):
-    """ Decode input text as UTF-8, replacing any invalid characters with '?',
-    and return a unicode string. If the msg argument is already a unicode
-    string, return the argument. This allows plugins to correctly receive and
-    handle unicode-type strings internally. """
-    # TODO: move to string utils, add backwards-compat call here
-    if isinstance(msg, unicode):
-        decMsg = msg
-    else:
-        decMsg = msg.decode('utf-8', 'replace')
-    return decMsg
-
-
 def run():
     """ Run GBot. Called from the pyGBot bootstrap script. """
     try:
@@ -634,3 +597,25 @@ def run():
     except:
         print "Unexpected error:", sys.exc_info()[0]
         raise
+
+# Backwards compatibility
+def stripcolors(msg):
+    """ DEPRECATED. Maintained for backwards compatibility. Use
+    pyGBot.format.stripcolors() or pyGBot.format.strip(). """
+    log.logger.warning("DEPRECATED: pyGBot.core.stripcolors() is deprecated. "+\
+    "Use format.strip() to strip IRC formatting from a string.")
+    return format.stripcolors(msg)
+
+def encodeOut(msg):
+    """ DEPRECATED. Maintained for backwards compatibility. Use
+    pyGBot.format.encodeOut(). """
+    log.logger.warning("DEPRECATED: pyGBot.core.encodeOut() is deprecated. " +\
+    "Use format.encodeOut().")
+    return format.encodeOut(msg)
+
+def decodeIn(msg):
+    """ DEPRECATED. Maintained for backwards compatibility. Use
+    pyGBot.format.decodeIn(). """
+    log.logger.warning("DEPRECATED: pyGBot.core.decodeIn() is deprecated. " +\
+    "Use format.decodeIn().")
+    return format.decodeIn(msg)
