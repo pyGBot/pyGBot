@@ -302,6 +302,7 @@ class GBot(irc.IRCClient):
     def connectionLost(self, reason):
         """ Called when a connection is shut down. """
         irc.IRCClient.connectionLost(self, reason)
+            
         log.logger.info("[disconnected at %s:%s]" %\
               (time.asctime(time.localtime(time.time())), reason))
 

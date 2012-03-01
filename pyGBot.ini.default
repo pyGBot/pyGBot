@@ -109,11 +109,16 @@ flooddelay = 2
 # you are positive you know how they work. Changes to this list will not be
 # supported, and are highly discouraged.
 
+[version]
+number = 0.1.5
+name = pyGBot
+
 [Plugins]
 system.Startup =
 system.Auth =
 system.Commands =
 system.Modes =
+#system.Log2channel =
 
 # Optional features. Uncomment to enable.
 #games.ApplesToApples = 
@@ -131,6 +136,7 @@ system.Modes =
 system.Auth =
 system.Commands =
 system.Modes =
+#system.Log2channel =
 
 # More optional features.
 #probability.Decide =
@@ -156,10 +162,6 @@ usermode = UserMode
 # This one's optional.
 #statsroll = StatsRoll
 
-[version]
-number = 0.1.5
-name = pyGBot
-
 [Plugins.system.Auth]
 # Set the authtype value to nickserv to auth via NickServ.
 # Command is then simply 'auth', no user or password required.
@@ -167,3 +169,12 @@ name = pyGBot
 
 authtype = pygbot
 #authtype = nickserv
+
+# This plugin allows pyGBot to log to a channel. This can be useful, for
+# example, to allow users or ops to monitor changes that users in the main
+# channel make to a factoid database. This obeys the loglevel property, but
+# will never log debug messages to the channel even at loglevel = debug.
+#
+# channel: channel to log to. Do NOT include the # character in front.
+[Plugins.system.Log2channel]
+channel = 
