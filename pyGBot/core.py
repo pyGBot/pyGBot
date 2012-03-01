@@ -16,28 +16,30 @@
 ##    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 
+# pyGBot imports
+from contrib.configobj import ConfigObj, ConfigObjError
+
+from pyGBot import log
+from pyGBot.PluginEvents import PluginEvents
+
+# Twisted imports
 twistedversion = '1'
 try:
     from twisted import __version__ as twistedversion
 except ImportError:
     #assume a pre-2.0 version of Twisted
     from twisted.protocols import irc
-
 twistedmajor = int(twistedversion.split('.')[0])
+
+# Standard library imports
+import sys
+import time
+import threading
 
 if twistedmajor >= 2:
     from twisted.words.protocols import irc
 
 from twisted.internet import reactor, protocol, task
-
-import sys
-import time
-import threading
-
-from contrib.configobj import ConfigObj, ConfigObjError
-
-from pyGBot import log
-from pyGBot.PluginEvents import PluginEvents
 
 class GBot(irc.IRCClient):
     ''' No longer just an IRC Texas Holdem tournament dealer'''
@@ -127,7 +129,7 @@ class GBot(irc.IRCClient):
         self.sendLine(fmt % (message,))
 
     def cnotice(self, channel, user, message):
-        """ Send a CNOTICE. THis allows channel ops to bypass server flood
+        """ Send a CNOTICE. This allows channel ops to bypass server flood
         limits when sending a notice to users in their channel. """
         msgOut = encodeOut(msg)
         userOut = encodeOut(user)
@@ -313,7 +315,7 @@ class GBot(irc.IRCClient):
     # Event Callbacks
     ############################################################################
     def signedOn(self):
-        """Called when bot has succesfully signed on to the server. """
+        """ Called when the bot has succesfully signed on to the server. """
         self.regNickServ()
         
         self.modestring(self.nickname, self.usermodes)
@@ -535,7 +537,8 @@ class GBotFactory(protocol.ClientFactory):
 
 def stripcolors(inmsg):
     """ Strip color codes from a string. """
-    # TODO: Fix this
+    log.logger.warning("DEPRECATED: pyGBot.stripcolors() is deprecated. Use StringUtils.stripFormatting() to strip IRC formatting from a string.")
+    # TODO: Fix this and move this to stringutils
     inmsg = inmsg.replace("\x02\x0301,00", '')
     inmsg = inmsg.replace("\x02\x0302,00", '')
     inmsg = inmsg.replace("\x02\x0303,00", '')
@@ -543,10 +546,12 @@ def stripcolors(inmsg):
     inmsg = inmsg.replace("\x0F", '')
     return inmsg
 
+
 def encodeOut(msg):
     """ Encode output text as a UTF-8 byte-string, replacing any invalid
     characters with '?'. If the msg argument is not a unicode string, return
     the argument. This allows correct output of Unicode characters. """
+    # TODO: move to string utils, add backwards-compat call here
     if isinstance(msg, unicode):
         encMsg = msg.encode('utf-8', 'replace')
     else:
@@ -558,11 +563,13 @@ def decodeIn(msg):
     and return a unicode string. If the msg argument is already a unicode
     string, return the argument. This allows plugins to correctly receive and
     handle unicode-type strings internally. """
+    # TODO: move to string utils, add backwards-compat call here
     if isinstance(msg, unicode):
         decMsg = msg
     else:
         decMsg = msg.decode('utf-8', 'replace')
     return decMsg
+
 
 def run():
     """ Run GBot. Called from the pyGBot bootstrap script. """
