@@ -30,15 +30,16 @@ except ImportError:
     from twisted.protocols import irc
 twistedmajor = int(twistedversion.split('.')[0])
 
-# Standard library imports
-import sys
-import time
-import threading
-
 if twistedmajor >= 2:
     from twisted.words.protocols import irc
 
 from twisted.internet import reactor, protocol, task
+
+# Standard library imports
+import sys
+import time
+import threading
+import logging
 
 class GBot(irc.IRCClient):
     ''' No longer just an IRC Texas Holdem tournament dealer. '''
@@ -53,7 +54,7 @@ class GBot(irc.IRCClient):
         self.say(channel=channelOut, message=msgOut)
         
         # strip color codes
-        log.chatlog.info('[PUB->%s]%s' % (channelOut, format.stripFormat(msgOut)))
+        log.chatlog.info('[PUB->%s]%s' % (channelOut, format.strip(msgOut)))
 
     def privout(self, user, msg):
         """ Send a message to a user. """
@@ -62,7 +63,7 @@ class GBot(irc.IRCClient):
         self.msg(user=userOut, message=msgOut)
         
         # strip color codes
-        log.chatlog.info('[PRV->%s]%s' % (userOut, format.stripFormat(msgOut)))
+        log.chatlog.info('[PRV->%s]%s' % (userOut, format.strip(msgOut)))
 
     def replyout(self, channel, user, msg):
         """ Send a reply. If channel is None, the reply is sent to the user;
@@ -85,7 +86,7 @@ class GBot(irc.IRCClient):
         self.notice(user=userOut, message=msgOut)
 
         # strip color codes
-        log.chatlog.info('[NTE->%s]%s' % (userOut, format.stripFormat(msgOut)))
+        log.chatlog.info('[NTE->%s]%s' % (userOut, format.strip(msgOut)))
         
     def invite(self, user, channel):
         """ Send a channel invite to a user. """
@@ -97,11 +98,12 @@ class GBot(irc.IRCClient):
         
     def join(self, channel, key=None):
         """ Join a channel. """
+        channelOut = format.encodeOut(channel)
         if key:
             keyOut = format.encodeOut(key)
-            irc.IRCClient.join(channelOut, keyOut)
+            irc.IRCClient.join(self, channelOut, keyOut)
         else:
-            irc.IRCClient.join(channelOut)
+            irc.IRCClient.join(self, channelOut)
 
     def actout(self,channel, msg):
         """ Send an action (/me command) to a channel. """
@@ -110,7 +112,7 @@ class GBot(irc.IRCClient):
         self.me(channel=channelOut, action=msgOut)
 
         # strip color codes
-        log.chatlog.info('[ACT->%s]%s' % (channelOut, format.stripFormat(msgOut)))
+        log.chatlog.info('[ACT->%s]%s' % (channelOut, format.strip(msgOut)))
 
     def modestring(self, target, modestring):
         """ Set a mode string on a user or channel. """
@@ -161,7 +163,7 @@ class GBot(irc.IRCClient):
             options = []
 
         # imports and returns the Plugins.{pluginmodule}.{pluginname} module object
-        plugins_modobj = __import__('Plugins.{0}.{1}'.format(pluginmodule, pluginname),
+        plugin_modobj = __import__('pyGBot.Plugins.{0}.{1}'.format(pluginmodule, pluginname),
                                     fromlist=[pluginname])
         # get the class object and then instantiate it
         plugin_class = getattr(plugin_modobj, pluginname)
@@ -506,7 +508,7 @@ class GBotFactory(protocol.ClientFactory):
         try:
             if conf['IRC']['loglevel'].lower() == 'debug':
                 log.logger.setLevel(logging.DEBUG)
-            else if conf['IRC']['loglevel'].lower() == 'warning':
+            elif conf['IRC']['loglevel'].lower() == 'warning':
                 log.logger.setLevel(logging.WARNING)
             # otherwise use the default level of INFO
         except KeyError:

@@ -22,11 +22,12 @@ import logging
 
 class Log2channel(BasePlugin):
     def __init__(self, bot, options):
-        BasePlugin.__init__(bot, options)
+        BasePlugin.__init__(self, bot, options)
         
         try:
             self.channel = options['channel']
         except KeyError:
+            self.channel = None
             log.logger.error("Log2channel: No log channel specified")
         
         self.format = logging.Formatter('%(asctime)s: %(levelname)s %(message)s')
@@ -37,9 +38,11 @@ class Log2channel(BasePlugin):
     def activate(self, channel=None):
         """ Called when the plugin is activated. Adds a channel handler to the
         logger. """
-        self.active = True
-        self.bot.join(self.channel)
-        return True
+        if self.channel:
+            self.active = True
+            return True
+        else:
+            return False
 
     def deactivate(self, channel=None):
         """ Called when the plugin is deactivated. Removes the channel handler
@@ -100,19 +103,19 @@ class Log2channel(BasePlugin):
             log.logger.removeHandler(self.handler)
             self.handler = None
 
-class ChannelStream
+class ChannelStream:
     """ A minimalistic file-like class for use with logging.StreamHandler for
     logging to an IRC channel. """
     
-    def __init__(self, bot, channel)
+    def __init__(self, bot, channel):
         """ Store the bot object and channel name. """
         self.client = bot
         self.channel = channel
         
-    def write(self, msg)
+    def write(self, msg):
         """ Write a string to the stream. This outputs to the channel. """
         self.client.pubout(self.channel, msg)
     
-    def flush(self)
+    def flush(self):
         """ Flush buffer. For ChannelStream, this has no effect. """
         pass

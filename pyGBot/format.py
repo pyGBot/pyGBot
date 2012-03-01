@@ -31,7 +31,7 @@ RE_COLOR  = re.compile(r'\x03(\d{1,2}(,\d{1,2})?)?')
 # Formatting except color (matches the clear byte 0x0f)
 RE_FORMAT = re.compile('|'.join([BOLD, COLOR, ITALIC, UNDER, CLEAR]))
 
-def strip(msg)
+def strip(msg):
     """ Strips all IRC formatting from a string. """
     stripmsg = msg
     stripmsg = RE_FORMAT.sub('', stripmsg)
@@ -42,7 +42,7 @@ def stripcolors(msg):
     """ Strip IRC color codes from a string. """
     return RE_COLOR.sub('', msg)
 
-def color(fg=None, bg=None)
+def color(fg=None, bg=None):
     """ Return an IRC color code string. If no arguments are given, returns the
     color-reset code.
     
@@ -59,9 +59,9 @@ def color(fg=None, bg=None)
     fmtpieces = [COLOR, '{:0=2d}', ',{:0=2d}']
     if fg >= 0 and fg < 100:
         if bg != None and bg >= 0 and bg < 100:
-            code = "".join(fmtpieces).format(fg, bg)
+            code = ''.join(fmtpieces).format(fg, bg)
         else:
-            code = "".join(fmtpieces[0:1].format(fg)
+            code = ''.join(fmtpieces[0:1]).format(fg)
     else:
         code = fmtpieces[0]
     return code
