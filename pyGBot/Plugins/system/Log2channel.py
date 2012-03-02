@@ -17,6 +17,7 @@
 ##
 
 from pyGBot import log
+from pyGBot.core import CHANNEL_PREFIXES
 from pyGBot.BasePlugin import BasePlugin
 import logging
 
@@ -25,8 +26,11 @@ class Log2channel(BasePlugin):
         BasePlugin.__init__(self, bot, options)
         
         try:
-            self.channel = options['channel']
-        except KeyError:
+            if options['channel'][0] not in CHANNEL_PREFIXES:
+                self.channel = '#' + options['channel']
+            else:
+                self.channel = options['channel']
+        except KeyError, IndexError:
             self.channel = None
             log.logger.error("Log2channel: No log channel specified")
         
@@ -83,7 +87,7 @@ class Log2channel(BasePlugin):
         self.removeChannelHandler()
     
     # Log handler manipulation
-    def addChannelHandler():
+    def addChannelHandler(self):
         """ Adds an IRC channel handler to the bot logging object. """
         
         if self.handler != None:
@@ -95,7 +99,7 @@ class Log2channel(BasePlugin):
         self.handler.setLevel(logging.INFO) # never log debug messages in channel
         log.logger.addHandler(self.handler)
     
-    def removeChannelHandler():
+    def removeChannelHandler(self):
         """ Removes the currently registered IRC channel handler from the bot
         logging object. """
         
