@@ -41,22 +41,14 @@ class StatsRoll(BaseCommand):
 
         rolls,stats = self.rollStats(sortdir)
 
-        if channel is None:
-            out = bot.privout
-            target = user
-        else:
-            out = bot.pubout
-            target = channel
-
         if verbose:
             if sortdir == 'asc':
                 rolls.sort(key=sum)
             elif sortdir == 'desc':
                 rolls.sort(key=sum, reverse=True)
+            bot.replyout(channel, user,str(rolls))
 
-            out(target,str(rolls))
-
-        out(target,"Stats are: %s." % ', '.join(map(str, stats)))
+        bot.replyout(channel, user,"Stats are: %s." % ', '.join(map(str, stats)))
 
 
     def rollStats(self, sortdir):

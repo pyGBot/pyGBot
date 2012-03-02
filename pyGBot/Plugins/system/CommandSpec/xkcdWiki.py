@@ -28,21 +28,14 @@ import json
 class xkcdWiki(BaseCommand):
     level = AL.User
     def __init__(self, bot, channel, user, args):
-        if channel is None:
-            out = bot.privout
-            target = user
-        else:
-            out = bot.pubout
-            target = channel
-            
         search = "".join(args)
         existurl = "http://wiki.xkcd.com/wirc/api.php?action=query&titles=%s&format=json" % search.replace(" ", "%20")
         url = "http://wiki.xkcd.com/irc/%s" % search.replace(" ", "%20")
 
         if self.check_wiki_exists(existurl):
-            out(target,"URL for XKCDWiki - %s: %s." % (search, self.tiny_url(url)))
+            bot.replyout(channel, user, "URL for XKCDWiki - %s: %s." % (search, self.tiny_url(url)))
         else:
-            out(target,"Sorry, no XKCDWiki page exists for '%s'." % search)
+            bot.replyout(channel, user, "Sorry, no XKCDWiki page exists for '%s'." % search)
 
     def check_wiki_exists(self, url):
         page = json.loads(urlopen(url).readline())
