@@ -1,4 +1,10 @@
 ##
+##    pyGBot/format.py - IRC Formatting Utilities and Constants
+##    Author: Marc-Alexandre Chan <laogeodritt@arenthil.net>
+##    Date: 29 February 2012
+##
+
+##
 ##    pyGBot - Versatile IRC Bot
 ##    Copyright (C) 2008 Morgan Lokhorst-Blight, Alex Soborov, Paul Rotering
 ##
@@ -92,8 +98,8 @@ def decodeIn(msg):
     and return a unicode string. If the msg argument is already a unicode
     string, return the argument. This allows plugins to correctly receive and
     handle unicode-type strings internally. """
-    if isinstance(msg, unicode):
-        decMsg = msg
-    else:
+    if isinstance(msg, str):
         decMsg = msg.decode('utf-8', 'replace')
+    else:
+        decMsg = msg
     return decMsg

@@ -1,4 +1,10 @@
 ##
+##    Plugins.system.Log2channel - Log-to-Channel Plugin
+##    Author: Marc-Alexandre Chan <laogeodritt@arenthil.net>
+##    Date: 1 March 2012
+##
+
+##
 ##    pyGBot - Versatile IRC Bot
 ##    Copyright (C) 2008 Morgan Lokhorst-Blight, Alex Soborov, Paul Rotering
 ##
