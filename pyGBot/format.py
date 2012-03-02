@@ -62,7 +62,9 @@ def color(fg=None, bg=None):
     
     Parameters:
     * fg int Foreground color, 0-99 (usually colours = 0-15, transparent = 99).
+      Invalid color values are ignored.
     * bg int Background color, 0-99 (usually colours = 0-15, transparent = 99).
+      Invalid color values are ignored.
     """
     
     fmtpieces = [COLOR, '{:0=2d}', ',{:0=2d}']
@@ -70,7 +72,7 @@ def color(fg=None, bg=None):
         if bg != None and bg >= 0 and bg < 100:
             code = ''.join(fmtpieces).format(fg, bg)
         else:
-            code = ''.join(fmtpieces[0:1]).format(fg)
+            code = ''.join(fmtpieces[0:2]).format(fg)
     else:
         code = fmtpieces[0]
     return code
