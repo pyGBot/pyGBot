@@ -79,7 +79,7 @@ class GBot(irc.IRCClient):
         msgOut = format.encodeOut(msg)
         userOut = format.encodeOut(user)
         channelOut = format.encodeOut(channel)
-        if (channel is None):
+        if channel is None:
             self.privout(userOut, msgOut)
         else:
             self.pubout(channelOut, msgOut)

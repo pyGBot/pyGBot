@@ -94,7 +94,7 @@ flooddelay = 2
 # chatlogfile = /opt/pygbot/chat.log
 
 # Logging level affects how much information is logged. Three modes available:
-# 'info', 'warning', 'debug'.
+# info, warning, debug.
 #
 # 'info' is the default and logs basic status messages that indicate successful
 # actions (like connecting to the server, joining a channel, a game plugin
