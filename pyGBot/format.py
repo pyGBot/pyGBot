@@ -18,11 +18,20 @@
 
 import re
 
-BOLD = "\x02"
-COLOR = "\x03"
-ITALIC = "0x16"
-UNDER = "\x1f"
-CLEAR = "\x0f"
+# Some useful bytes/characters
+NUL = chr(0)
+CR = chr(0x0D)
+NL = chr(0x0A)
+LF = NL
+CRLF = CR + LF
+SPC = chr(0x20) # space
+
+BOLD = chr(2)
+COLOR = chr(3)
+ITALIC = chr(0x16)
+REV = ITALIC # reversed colors - italic or reversed display is client-dependent
+UNDER = chr(0x1f)
+CLEAR = chr(0x0f)
 
 # REGEXES
 # Colors - does NOT match the formatting clear byte 0x0f
