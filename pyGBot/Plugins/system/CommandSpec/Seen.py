@@ -31,14 +31,14 @@ class Seen(BaseCommand):
             bot.replyout(channel, user, 'Command usage: seen <user> [channel]')
             return
 
-        username = args[0]
+        searchNick = args[0]
         try:
-            channel = args[1]
+            searchChannel = args[1]
         except IndexError:
-            channel = None
+            searchChannel = None
 
         try:
-            event = bot.plugins['features.Seen'].get_latest(username, channel)
+            event = bot.plugins['features.Seen'].get_latest(searchNick, searchChannel)
         except IndexError, e:
             bot.replyout(channel, user, e)
             return
