@@ -326,7 +326,7 @@ class GBot(irc.IRCClient):
         """ Called when the bot has succesfully signed on to the server. """
         self.regNickServ()
         self.modestring(self.nickname, self.usermodes)
-        for channel in self.factory.channel:
+        for channel in self.factory.channels:
             self.join(channel)
 
     def regNickServ(self):
@@ -490,8 +490,8 @@ class GBotFactory(protocol.ClientFactory):
     # the class of the protocol to build when new connection is made
     protocol = GBot
 
-    def __init__(self, channel, filename):
-        self.channel = channel
+    def __init__(self, channels, filename):
+        self.channels = channels
         self.filename = filename
         conf = ConfigObj('pyGBot.ini')
         
@@ -554,7 +554,7 @@ def run():
         sys.exit(1)
 
     try:
-        channel = format.decodeIn(conf['IRC']['channel']).split(" ")
+        channels = format.decodeIn(conf['IRC']['channel']).split()
         host = conf['IRC']['host']
         port = int(conf['IRC']['port'])
     except ConfigObjError:
@@ -571,7 +571,7 @@ def run():
 
     print "Initialising Factory..."
     # create factory protocol and application
-    fact = GBotFactory(channel, 'UNUSED')
+    fact = GBotFactory(channels, 'UNUSED')
     
     # SSL support
     sslconnect = None
