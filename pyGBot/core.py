@@ -124,15 +124,14 @@ class GBot(irc.IRCClient):
         self.sendLine("MODE %s %s" % (target, modestring))
 
         log.chatlog.info('[MODE] %s %s' % (target, modestring))
-
-    def cprivmsg(self, channel, user, message):
+        
+    def cprivmsg(self, channel, user, msg):
         """ Send a CPRIVMSG. This allows channel ops to bypass server flood
         limits when messaging users in their channel. """
         msgOut = format.encodeOut(msg)
         userOut = format.encodeOut(user)
         channelOut = format.encodeOut(channel)
-        fmt = "CPRIVMSG %s %s :%%s" % (userOut, channelOut)
-        self.sendLine(fmt % (message,))
+        self.sendLine("CPRIVMSG %s %s :%s" % (userOut, channelOut, msgOut,))
 
     def cnotice(self, channel, user, message):
         """ Send a CNOTICE. This allows channel ops to bypass server flood
@@ -140,8 +139,8 @@ class GBot(irc.IRCClient):
         msgOut = format.encodeOut(msg)
         userOut = format.encodeOut(user)
         channelOut = format.encodeOut(channel)
-        fmt = "CNOTICE %s %s :%%s" % (userOut, channelOut)
-        self.sendLine(fmt % (messageOut,))
+        self.sendLine("CNOTICE %s %s :%s" % (userOut, channelOut, msgOut,))
+
 
     ############################################################################
     # Plugin Handling Methods
@@ -314,6 +313,8 @@ class GBot(irc.IRCClient):
               (time.asctime(time.localtime(time.time())), reason))
 
         self.timertask.stop()
+        
+        time.sleep(2)
 
         # Call Event Handler
         self.events.bot_disconnect()
@@ -341,7 +342,6 @@ class GBot(irc.IRCClient):
     def joined(self, channel):
         """ Called when the bot joins a channel. """
         log.logger.info('[I have joined %s]' % (channel,))
-        self.channels.append(channel)
 
         # Set modes
         if hasattr(self, 'plusmodes'):
@@ -351,21 +351,22 @@ class GBot(irc.IRCClient):
         
         # Call Event Handler
         channelIn = format.decodeIn(channel)
+        self.channels.append(channelIn)
         self.events.bot_join(channelIn)
 
     def left(self, channel):
         """ Called when the bot leaves a channel. """
-        if channel in self.channels:
+        channelIn = decodeIn(channel)
+        if channelIn in self.channels:
             self.channels.remove(channel)
 
     def kickedFrom(self, channel, kicker, message):
         """ Called when the bot is kicked from a channel. """
-        if channel in self.channels:
-            self.channels.remove(channel)
-
         channelIn = format.decodeIn(channel)
         kickerIn = format.decodeIn(kicker)
         messageIn = format.decodeIn(message)
+        if channelIn in self.channels:
+            self.channels.remove(channelIn)
         self.events.bot_kicked(channelIn, kickerIn, messageIn)
 
     def noticed(self, user, channel, msg):
@@ -553,7 +554,7 @@ def run():
         sys.exit(1)
 
     try:
-        channel = conf['IRC']['channel'].split(" ")
+        channel = decodeIn(conf['IRC']['channel']).split(" ")
         host = conf['IRC']['host']
         port = int(conf['IRC']['port'])
     except ConfigObjError:
@@ -567,26 +568,24 @@ def run():
         localport = int(conf['IRC']['localport'])
     if conf['IRC'].has_key('localaddr'):
         localaddr = conf['IRC']['localaddr']
-        
-    # hacked in SSL config option
-    sslconnect = False
-    if conf['IRC'].has_key('ssl'):
-        if conf['IRC']['ssl'].lower() == "true":
-            sslconnect = True
-            from twisted.internet import ssl
 
     print "Initialising Factory..."
     # create factory protocol and application
     fact = GBotFactory(channel, 'UNUSED')
-    # "Doctor, how does SSL work?" "I HAVE NO IDEA!"
-    if sslconnect:
-        cfact = ssl.ClientContextFactory()
+    
+    # SSL support
+    sslconnect = None
+    if conf['IRC'].has_key('ssl'):
+        if conf['IRC']['ssl'].lower() == "true":
+            from twisted.internet import ssl
+            # create SSL factory
+            cfact = ssl.ClientContextFactory()
+            sslconnect = True
 
     print "Connecting..."
 
     try:
-        # connect factory to this host and port
-        # now with SSL hack!
+        # connect factory to this host and port, with SSL if enabled
         if sslconnect:
             if localaddr and localport:
                 reactor.connectSSL(host, port, fact, cfact, bindAddress=(localaddr, localport))

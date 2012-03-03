@@ -110,7 +110,7 @@ flooddelay = 2
 # supported, and are highly discouraged.
 
 [version]
-number = 0.1.5
+number = 0.3.0
 name = pyGBot
 
 [Plugins]
