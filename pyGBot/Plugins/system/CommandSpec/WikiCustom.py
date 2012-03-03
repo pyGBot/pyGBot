@@ -1,5 +1,5 @@
 ##
-##    English Wiktionary Lookup Command
+##    WikiCustom Command - Template for Custom MediaWiki Lookup Command
 ##    pyGBot.reference.Wiki - MediaWiki Lookup Plugin for pyGBot
 ##    Copyright (C) 2012 Marc-Alexandre Chan
 ##
@@ -21,14 +21,40 @@ from pyGBot import log
 from pyGBot.Plugins.system.Commands import BaseCommand
 from pyGBot.Plugins.system.Auth import AuthLevels
 
-class Wiktionary(BaseCommand):
-    """ English Wiktionary Lookup Command """
+class WikiCustom(BaseCommand):
+    """ Wikipedia Lookup Command - Outputs the URL to the searched article, if
+    it exists, and an excerpt of the beginning of the article.
+    
+    This command is a simple binding to the reference.Wiki plugin.
+    
+    You can use the code to this command as a template for making your own
+    custom MediaWiki lookup commands. This is useful if you want one bot to
+    have several commands that lookup different MediaWiki sites via 
+    pyGBot.reference.Wiki.
+    
+    To make a custom command for pyGBot.reference.Wiki, copy the 
+    WikiCustom.py file and rename it. Open this new file, and also rename 
+    the WikiCustom class. Then, inside the class, change the values 
+    wikiName, wikiUrl, wikiApi, and wikiBase for the MediaWiki site you 
+    want. (See the plugin documentation for details about these settings).
+    
+    Then, in your pyGBot.ini file, under [Plugins.system.Commands], add the
+    line:
+    
+        cmd = YourCustomCommandName
+    
+    where YourCustomCommandName is the name of the class you changed
+    earlier, and cmd is the command IRC users will use for that command.
+    
+    If you know Python, you can further customise the command by changing
+    the __init__ method. However, this is not officially supported and at
+    your own discretion."""
     
     # CUSTOM SETTINGS
-    wikiName = "XKCD Wiki"
-    wikiUrl  = "http://wiki.xkcd.com"
-    wikiApi  = "/wirc/api.php"
-    wikiBase = "/irc"
+    wikiName = "Wikipedia"
+    wikiUrl  = "http://en.wikipedia.org"
+    wikiApi  = "/w/api.php"
+    wikiBase = "/wiki"
     maxMessageSize = -1
     
     # Don't change anything below unless you know what you're doing
@@ -40,7 +66,7 @@ class Wiktionary(BaseCommand):
         
         # Get text to output
         params = {
-            'query' : ''.join(args).lower(), # wiktionary uses lowercase
+            'query' : ''.join(args),
             'name'  : self.wikiName,
             'url'   : self.wikiUrl,
             'api'   : self.wikiApi,

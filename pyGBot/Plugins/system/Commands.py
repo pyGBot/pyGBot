@@ -35,7 +35,8 @@ class Commands(BasePlugin):
     def __init__(self, bot, options):
         BasePlugin.__init__(self, bot, options)
         if self.bot.plugins.has_key('system.Auth') == False:
-            raise StandardError('Unable to load Auth plugin. Please ensure it is loaded first.')
+            raise StandardError("Unable to access auth plugin. " +\
+            "Please ensure it is loaded first.")
 
         if options.has_key('_prefix'):
             self.cmdprefix = options['_prefix']
