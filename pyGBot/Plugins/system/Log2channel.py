@@ -25,12 +25,14 @@
 from pyGBot import log
 from pyGBot.core import CHANNEL_PREFIXES
 from pyGBot.BasePlugin import BasePlugin
+from twisted.internet import reactor
 import logging
 
 class Log2channel(BasePlugin):
     def __init__(self, bot, options):
         BasePlugin.__init__(self, bot, options)
         
+        # Get channel
         try:
             if options['channel'][0] not in CHANNEL_PREFIXES:
                 self.channel = '#' + options['channel']
@@ -40,16 +42,24 @@ class Log2channel(BasePlugin):
             self.channel = None
             log.logger.error("Log2channel: No log channel specified")
         
-        self.format = logging.Formatter('%(asctime)s: %(levelname)s %(message)s')
-        self.handler = None
-        self.active = False
+        # Set log level (never more verbose than logging.INFO)
+        try:
+            if options['loglevel'].lower() == 'warning':
+                self.loglevel = logging.WARNING
+            else:
+                self.loglevel = logging.INFO
+        except KeyError:
+            self.loglevel = logging.INFO
         
-
+        self.format = logging.Formatter('%(asctime)s: %(levelname)s %(message)s')
+        self._handler = None
+        self._active = False
+        
     def activate(self, channel=None):
         """ Called when the plugin is activated. Adds a channel handler to the
         logger. """
         if self.channel:
-            self.active = True
+            self._active = True
             return True
         else:
             return False
@@ -58,32 +68,32 @@ class Log2channel(BasePlugin):
         """ Called when the plugin is deactivated. Removes the channel handler
         from the logger. """
         removeChannelHandler()
-        self.active = False
+        self._active = False
         return True
 
     # Event handlers for this bot
     def bot_connect(self):
         """ Called upon connecting to the server. Join the log channel. """
-        if self.active:
+        if self._active:
             self.bot.join(self.channel)
 
     def bot_join(self, channel):
         """ Called upon joining a channel. If joining the log channel, add a
         channel handler to the logging object. """
-        if self.active and channel == self.channel:
+        if self._active and channel == self.channel:
             self.addChannelHandler()
 
     def bot_part(self, channel):
         """ Called upon parting a channel. If parting the log channel, remove
         the channel handler from the logging object. """
-        if self.active and channel == self.channel:
+        if self._active and channel == self.channel:
             self.removeChannelHandler()
 
     def bot_kicked(self, channel, kicker="", reason=""):
         """ Called upon being kicked from a channel. If kicked from the log
         channel, remove the channel handler from the logging object and attempt
         to rejoin. """
-        if self.active and channel == self.channel:
+        if self._active and channel == self.channel:
             self.removeChannelHandler()
             self.bot.join(self.channel)
 
@@ -96,36 +106,75 @@ class Log2channel(BasePlugin):
     def addChannelHandler(self):
         """ Adds an IRC channel handler to the bot logging object. """
         
-        if self.handler != None:
+        if self._handler != None:
             self.removeChannelHandler()
         
         channelStream = ChannelStream(self.bot, self.channel)
-        self.handler = logging.StreamHandler(channelStream)
-        self.handler.setFormatter(self.format)
-        self.handler.setLevel(logging.INFO) # never log debug messages in channel
-        log.logger.addHandler(self.handler)
+        self._handler = logging.StreamHandler(channelStream)
+        self._handler.setFormatter(self.format)
+        self._handler.setLevel(self.loglevel)
+        log.logger.addHandler(self._handler)
     
     def removeChannelHandler(self):
         """ Removes the currently registered IRC channel handler from the bot
         logging object. """
         
-        if self.handler != None:
-            log.logger.removeHandler(self.handler)
-            self.handler = None
+        if self._handler != None:
+            log.logger.removeHandler(self._handler)
+            self._handler = None
 
 class ChannelStream:
     """ A minimalistic file-like class for use with logging.StreamHandler for
-    logging to an IRC channel. """
+    logging to an IRC channel. Implements queuing and delayed sending to
+    prevent proper bot messages from being delayed by a large number of log
+    messages (worst-case: bot messages will alternate with log messages). """
+    
+    # Amount of delay before the first log msg in queue (factor of bot.lineRate)
+    _initialDelayFactor = 2
+    # Amount of delay for subsequent log msg in queue (factor of bot.lineRate)
+    _serialDelayFactor = 1
     
     def __init__(self, bot, channel):
         """ Store the bot object and channel name. """
         self.client = bot
         self.channel = channel
         
+        self._queue = []
+        self._queueEmptying = False
+        self._initialDelay = self._initialDelayFactor * self.client.lineRate
+        self._serialDelay  = self._serialDelayFactor * self.client.lineRate
+        
     def write(self, msg):
         """ Write a string to the stream. This outputs to the channel. """
-        self.client.pubout(self.channel, msg)
+        if not self.client.lineRate:
+            self.client.pubout(self.channel, msg)
+        else:
+            self._queuePush(msg)
+            self._queueSchedule()
     
     def flush(self):
         """ Flush buffer. For ChannelStream, this has no effect. """
         pass
+    
+    def _queuePush(self, msg):
+        """ Pushes a message onto the queue. """
+        self._queue.append(msg)
+    
+    def _queueSchedule(self):
+        """ Schedule the next message to send from the queue. """
+        if self._queue:
+            if self._queueEmptying:
+                # schedule only if existing call has already been executed
+                if not self._queueEmptying.active:
+                    reactor.callLater(self._serialDelay, self._queueSend)
+            else:
+                reactor.callLater(self._initialDelay, self._queueSend)
+        else:
+            self._queueEmptying = None
+    
+    def _queueSend(self):
+        """ Output the next message to the channel and schedules the
+        subsequent message to send from the queue. """
+        if self._queue:
+            self.client.pubout(self.channel, self._queue.pop(0))
+        self._queueSchedule()

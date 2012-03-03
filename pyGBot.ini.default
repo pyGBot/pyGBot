@@ -176,5 +176,9 @@ authtype = pygbot
 # will never log debug messages to the channel even at loglevel = debug.
 #
 # channel: channel to log to. Do NOT include the # character in front.
+# loglevel: 'warning' or 'info', same effect as loglevel in [IRC]. If the
+#     loglevel option in [IRC] is less verbose than the one here, that one is
+#     used instead.
 [Plugins.system.Log2channel]
-channel = 
+channel = pyGBot-log
+#loglevel = info
