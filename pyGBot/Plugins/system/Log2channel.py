@@ -165,7 +165,7 @@ class ChannelStream:
         if self._queue:
             if self._queueEmptying:
                 # schedule only if existing call has already been executed
-                if not self._queueEmptying.active:
+                if not self._queueEmptying.active():
                     reactor.callLater(self._serialDelay, self._queueSend)
             else:
                 reactor.callLater(self._initialDelay, self._queueSend)
