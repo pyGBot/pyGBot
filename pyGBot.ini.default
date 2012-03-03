@@ -118,17 +118,18 @@ system.Startup =
 system.Auth =
 system.Commands =
 system.Modes =
-#system.Log2channel =
 
 # Optional features. Uncomment to enable.
+#system.Log2channel =
+#features.Seen =
+#probability.Decide =
+#reference.Wiki =
 #games.ApplesToApples = 
 #games.Mafia =
 #games.Poker =
 #games.Werewolf =
 #games.Uno =
 #games.Fluxx =
-#probability.Decide =
-#features.Seen =
 
 # Plugins to activate on connect
 
@@ -138,9 +139,11 @@ system.Commands =
 system.Modes =
 #system.Log2channel =
 
-# More optional features.
+# Optional features. Uncomment to enable.
+# Make sure they're also enabled under [Plugins]
 #probability.Decide =
 #features.Seen =
+#reference.Wiki =
 
 [Plugins.system.Commands]
 _prefix = ^
@@ -159,8 +162,11 @@ nick = ChangeNick
 seen = Seen
 usermode = UserMode
 
-# This one's optional.
+# Optional commands.
 #statsroll = StatsRoll
+#wp = Wiki
+#dict = Wiktionary
+#xkcd = xkcdWiki
 
 [Plugins.system.Auth]
 # Set the authtype value to nickserv to auth via NickServ.
@@ -182,3 +188,11 @@ authtype = pygbot
 [Plugins.system.Log2channel]
 channel = pyGBot-log
 #loglevel = info
+
+[Plugins.reference.Wiki]
+wikiName = Wikipedia
+wikiUrl = http://en.wikipedia.org
+wikiApi = /w/api.php
+wikiBase = /wiki
+maxMessageSize = 510
+shortUrl = False
