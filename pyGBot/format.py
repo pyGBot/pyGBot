@@ -1,6 +1,6 @@
 ##
 ##    pyGBot/format.py - IRC Formatting Utilities and Constants
-##    Author: Marc-Alexandre Chan <laogeodritt@arenthil.net>
+##    Author: Marc-Alexandre Chan <laogeodritt AT arenthil DOT net>
 ##    Date: 29 February 2012
 ##
 

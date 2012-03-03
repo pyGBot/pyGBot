@@ -1,6 +1,6 @@
 ##
 ##    Plugins.system.Log2channel - Log-to-Channel Plugin
-##    Author: Marc-Alexandre Chan <laogeodritt@arenthil.net>
+##    Author: Marc-Alexandre Chan <laogeodritt AT arenthil DOT net>
 ##    Date: 1 March 2012
 ##
 
