@@ -55,7 +55,7 @@ class Seen(BasePlugin):
         """
         Called when the plugin is activated.
         """
-	self.active = True
+        self.active = True
         return True
 
     def deactivate(self, channel=None):

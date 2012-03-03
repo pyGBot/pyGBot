@@ -55,11 +55,6 @@ usermodes =
 
 channel = pyGBot
 
-# These values can be changed to allow the bot to become an IRCop. Discouraged.
-
-# opernick = anircop
-# operpass = thepassword
-
 # These values can be used to identify the bot with Nickserv on servers that
 # run that particular IRC Service. The 'idnick' field should name the service
 # (usually 'Nickserv' is appropriate, but some have unstandard names), and the
@@ -68,6 +63,11 @@ channel = pyGBot
 
 # idnick = NickServ
 # idpass = Nickserv-password
+
+# These values can be changed to allow the bot to become an IRCop. Discouraged.
+
+# opernick = anircop
+# operpass = thepassword
 
 # If your server requires a password upon connection, uncomment the following
 # value and insert the password. Otherwise, leave it commented out.
@@ -93,9 +93,25 @@ flooddelay = 2
 # logfile = /opt/pygbot/pygbot.log
 # chatlogfile = /opt/pygbot/chat.log
 
+# Logging level affects how much information is logged. Three modes available:
+# info, warning, debug.
+#
+# 'info' is the default and logs basic status messages that indicate successful
+# actions (like connecting to the server, joining a channel, a game plugin
+# starting a game), along with errors that occur. 'warning' will only log errors
+# and warnings, not normal behaviour. 'debug' will log more information from
+# pyGBot and plugins that might be useful in finding bugs or technical problems.
+# MOST USERS DON'T NEED TO USE 'debug' MODE.
+
+# loglevel = debug
+
 # Unless otherwise noted, you should ignore all the following values unless
 # you are positive you know how they work. Changes to this list will not be
 # supported, and are highly discouraged.
+
+[version]
+number = 0.3.0
+name = pyGBot
 
 [Plugins]
 system.Startup =
@@ -104,14 +120,16 @@ system.Commands =
 system.Modes =
 
 # Optional features. Uncomment to enable.
+#system.Log2channel =
+#features.Seen =
+#probability.Decide =
+#reference.Wiki =
 #games.ApplesToApples = 
 #games.Mafia =
 #games.Poker =
 #games.Werewolf =
 #games.Uno =
 #games.Fluxx =
-#probability.Decide =
-#features.Seen =
 
 # Plugins to activate on connect
 
@@ -119,10 +137,13 @@ system.Modes =
 system.Auth =
 system.Commands =
 system.Modes =
+#system.Log2channel =
 
-# More optional features.
+# Optional features. Uncomment to enable.
+# Make sure they're also enabled under [Plugins]
 #probability.Decide =
 #features.Seen =
+#reference.Wiki =
 
 [Plugins.system.Commands]
 _prefix = ^
@@ -141,12 +162,11 @@ nick = ChangeNick
 seen = Seen
 usermode = UserMode
 
-# This one's optional.
+# Optional commands.
 #statsroll = StatsRoll
-
-[version]
-number = 0.3.0
-name = pyGBot
+#wp = Wiki
+#dict = Wiktionary
+#xkcd = xkcdWiki
 
 [Plugins.system.Auth]
 # Set the authtype value to nickserv to auth via NickServ.
@@ -155,3 +175,24 @@ name = pyGBot
 
 authtype = pygbot
 #authtype = nickserv
+
+# This plugin allows pyGBot to log to a channel. This can be useful, for
+# example, to allow users or ops to monitor changes that users in the main
+# channel make to a factoid database. This obeys the loglevel property, but
+# will never log debug messages to the channel even at loglevel = debug.
+#
+# channel: channel to log to. Do NOT include the # character in front.
+# loglevel: 'warning' or 'info', same effect as loglevel in [IRC]. If the
+#     loglevel option in [IRC] is less verbose than the one here, that one is
+#     used instead.
+[Plugins.system.Log2channel]
+channel = pyGBot-log
+#loglevel = info
+
+[Plugins.reference.Wiki]
+wikiName = Wikipedia
+wikiUrl = http://en.wikipedia.org
+wikiApi = /w/api.php
+wikiBase = /wiki
+maxMessageSize = 510
+shortUrl = False

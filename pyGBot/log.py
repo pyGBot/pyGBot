@@ -21,12 +21,27 @@ formatter = logging.Formatter('%(asctime)s:%(name)s[%(process)d] %(levelname)s %
 cformat = logging.Formatter('%(asctime)s:%(message)s')
 
 def addScreenHandler(logobj, format):
+    """ Add stdout as a handler for a logger. """
     hdlr = logging.StreamHandler(sys.stdout)
     hdlr.setFormatter(format)
     logobj.addHandler(hdlr)
 
 def addLogFileHandler(logobj, filename, format):
-    hdlr = logging.FileHandler(filename)
+    """ Add a file handler to a logger. """
+    try:
+        hdlr = logging.FileHandler(filename)
+    except IOError as e: # if directory not exist, try to create it
+        # necessary imports to handle this
+        import errno
+        from os import makedirs
+        from os.path import dirname, abspath
+        
+        if e.errno == errno.ENOENT: # if dir not exist
+            print dirname(abspath(filename))
+            try: makedirs(dirname(abspath(filename))) # create dir
+            except: pass # guard vs. race cond: if other process created dir
+            hdlr = logging.FileHandler(filename) # retry now
+        else: raise # pass upward for other errno
     hdlr.setFormatter(format)
     logobj.addHandler(hdlr)
 

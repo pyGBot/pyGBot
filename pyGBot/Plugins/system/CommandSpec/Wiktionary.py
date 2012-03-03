@@ -1,5 +1,5 @@
 ##
-##    Wiki Command - Wikipedia and MediaWiki Lookup Command
+##    English Wiktionary Lookup Command
 ##    pyGBot.reference.Wiki - MediaWiki Lookup Plugin for pyGBot
 ##    Copyright (C) 2012 Marc-Alexandre Chan
 ##
@@ -21,12 +21,17 @@ from pyGBot import log
 from pyGBot.Plugins.system.Commands import BaseCommand
 from pyGBot.Plugins.system.Auth import AuthLevels
 
-class Wiki(BaseCommand):
-    """ Wikipedia Lookup Command - Outputs the URL to the searched article, if
-    it exists, and an excerpt of the beginning of the article.
+class Wiktionary(BaseCommand):
+    """ English Wiktionary Lookup Command """
     
-    This command is a simple binding to the reference.Wiki plugin."""
+    # CUSTOM SETTINGS
+    wikiName = "Wiktionary"
+    wikiUrl  = "http://en.wiktionary.org"
+    wikiApi  = "/w/api.php"
+    wikiBase = "/wiki"
+    maxMessageSize = 0
     
+    # Don't change anything below unless you know what you're doing
     level = AuthLevels.User
     
     def __init__(self, bot, channel, user, args):
@@ -35,7 +40,12 @@ class Wiki(BaseCommand):
         
         # Get text to output
         params = {
-            'query' : ''.join(args)
+            'query' : ''.join(args).lower(), # wiktionary uses lowercase
+            'name'  : self.wikiName,
+            'url'   : self.wikiUrl,
+            'api'   : self.wikiApi,
+            'base'  : self.wikiBase,
+            'maxsize' : self.maxMessageSize
         }
         response = bot.plugins['reference.Wiki'].command(channel, user, params)
         if response: # can return nothing if plugin disabled
