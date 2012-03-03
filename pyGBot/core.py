@@ -356,7 +356,7 @@ class GBot(irc.IRCClient):
 
     def left(self, channel):
         """ Called when the bot leaves a channel. """
-        channelIn = decodeIn(channel)
+        channelIn = format.decodeIn(channel)
         if channelIn in self.channels:
             self.channels.remove(channel)
 
@@ -554,7 +554,7 @@ def run():
         sys.exit(1)
 
     try:
-        channel = decodeIn(conf['IRC']['channel']).split(" ")
+        channel = format.decodeIn(conf['IRC']['channel']).split(" ")
         host = conf['IRC']['host']
         port = int(conf['IRC']['port'])
     except ConfigObjError:
