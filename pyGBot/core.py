@@ -109,6 +109,12 @@ class GBot(irc.IRCClient):
             irc.IRCClient.join(self, channelOut, keyOut)
         else:
             irc.IRCClient.join(self, channelOut)
+    
+    def part(self, channel, reason=None):
+        """ Part a channel. """
+        channelOut = format.encodeOut(channel)
+        reasonOut = format.encodeOut(reason)
+        irc.IRCClient.part(self, channelOut, reasonOut)
 
     def actout(self,channel, msg):
         """ Send an action (/me command) to a channel. """
