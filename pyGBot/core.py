@@ -364,7 +364,7 @@ class GBot(irc.IRCClient):
         """ Called when the bot leaves a channel. """
         channelIn = format.decodeIn(channel)
         if channelIn in self.channels:
-            self.channels.remove(channel)
+            self.channels.remove(channelIn)
 
     def kickedFrom(self, channel, kicker, message):
         """ Called when the bot is kicked from a channel. """
