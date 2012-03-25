@@ -42,9 +42,9 @@ import threading
 import logging
 
 # Some useful IRC constants - for easy access from plugins
-CHANNEL_PREFIXES = irc.CHANNEL_PREFIXES
+CHANNEL_PREFIXES = '&#!+'
 # Max message length, as defined by RFC 2812 Section 2.3 (includes trailing CRLF)
-MAX_COMMAND_LENGTH = irc.MAX_COMMAND_LENGTH
+MAX_COMMAND_LENGTH = 512
 
 class GBot(irc.IRCClient):
     ''' No longer just an IRC Texas Holdem tournament dealer. '''
