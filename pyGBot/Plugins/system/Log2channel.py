@@ -29,6 +29,28 @@ from twisted.internet import reactor
 import logging
 
 class Log2channel(BasePlugin):
+    """ This plugin allows pyGBot to log to a channel. This can be useful, for
+    example, to allow users or ops to monitor changes that users in the main
+    channel make to a factoid database. This obeys the loglevel property, but
+    will never log debug messages to the channel even at loglevel = debug.
+    
+    Configuration options (pyGBot.ini):
+    [Plugins.system.Log2channel]
+    channel: channel to log to. Do NOT include the # character in front.
+    loglevel: 'warning' or 'info', same effect as loglevel in [IRC]. If the
+        loglevel option in [IRC] is less verbose than the one here, that one is
+        used instead.
+    logformat: The log format string. See the fmt arg of the logging.Formatter
+        constructor in the Python docs. Default: "%(asctime)s: %(levelname)s
+        %(message)s"
+    dateformat: The date/time format used for "%(asctime)s" in the logformat.
+        Uses the strftime syntax. Default: "%H:%M:%S"
+    """
+    
+    # default settings
+    logformat  = '%(asctime)s: %(levelname)s %(message)s'
+    dateformat = '%H:%M:%S'
+    
     def __init__(self, bot, options):
         BasePlugin.__init__(self, bot, options)
         
@@ -51,7 +73,13 @@ class Log2channel(BasePlugin):
         except KeyError:
             self.loglevel = logging.INFO
         
-        self.format = logging.Formatter('%(asctime)s: %(levelname)s %(message)s')
+        # Get the formatting strings from config
+        if 'logformat' in options:
+            self.logformat = options['logformat']
+        if 'dateformat' in options:
+            self.dateformat = options['dateformat']
+        
+        self.format = logging.Formatter(self.logformat, self.dateformat)
         self._handler = None
         self._active = False
         

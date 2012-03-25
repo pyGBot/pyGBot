@@ -17,6 +17,7 @@
 ##
 
 from pyGBot import log
+from pyGBot.format import encodeOut
 from pyGBot.Plugins.system.Commands import BaseCommand
 from pyGBot.Plugins.system.Auth import AuthLevels as AL
 
@@ -29,7 +30,7 @@ class PartChannel(BaseCommand):
         args = args.split(' ')
         if args[0].startswith('#'):
             if args[0] in bot.channels:
-                log.logger.info('Parting channel %s' % args[0])
+                log.logger.info(u'Parting channel %s' % args[0])
                 bot.part(args[0])
             else:
                 bot.noteout(user, 'I am not in that channel.')
