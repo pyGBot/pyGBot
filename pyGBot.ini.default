@@ -185,9 +185,16 @@ authtype = pygbot
 # loglevel: 'warning' or 'info', same effect as loglevel in [IRC]. If the
 #     loglevel option in [IRC] is less verbose than the one here, that one is
 #     used instead.
+# logformat: The log format string. See the fmt arg of the logging.Formatter
+#   constructor in the Python docs. Default: "%(asctime)s: %(levelname)s
+#   %(message)s"
+# dateformat: The date/time format used for "%(asctime)s" in the logformat.
+#    Uses the strftime syntax. Default: "%H:%M:%S"
 [Plugins.system.Log2channel]
 channel = pyGBot-log
 #loglevel = info
+#logformat = %(asctime)s: %(levelname)s %(message)s
+#dateformat = %H:%M:%S
 
 [Plugins.reference.Wiki]
 wikiName = Wikipedia

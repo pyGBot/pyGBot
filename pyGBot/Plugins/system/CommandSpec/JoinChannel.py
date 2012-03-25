@@ -17,6 +17,7 @@
 ##
 
 from pyGBot import log
+from pyGBot.format import encodeOut
 from pyGBot.Plugins.system.Commands import BaseCommand
 from pyGBot.Plugins.system.Auth import AuthLevels as AL
 
@@ -29,7 +30,7 @@ class JoinChannel(BaseCommand):
         args = args.split(' ')
         if args[0].startswith('#'):
             if args[0] not in bot.channels:
-                log.logger.info('Attempting to join channel %s' % args[0])
+                log.logger.info(u"Attempting to join channel %s" % args[0])
                 if len(args) > 1:
                     bot.join(args[0], key=args[1])
                 else:
