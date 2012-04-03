@@ -57,7 +57,7 @@ class GBot(irc.IRCClient):
         msgOut = format.encodeOut(msg)
         channelOut = format.encodeOut(channel)
         self.say(channel=channelOut, message=msgOut)
-        
+
         # strip color codes
         log.chatlog.info('[PUB->%s]%s' % (channelOut, format.strip(msgOut)))
 
@@ -66,7 +66,7 @@ class GBot(irc.IRCClient):
         msgOut = format.encodeOut(msg)
         userOut = format.encodeOut(user)
         self.msg(user=userOut, message=msgOut)
-        
+
         # strip color codes
         log.chatlog.info('[PRV->%s]%s' % (userOut, format.strip(msgOut)))
 
@@ -75,7 +75,7 @@ class GBot(irc.IRCClient):
         otherwise, it is sent to the channel. Use this in plugins or commands
         when an incoming message can be either from a channel or a user and the
         outgoing message should be resent to the source. """
-        
+
         msgOut = format.encodeOut(msg)
         userOut = format.encodeOut(user)
         channelOut = format.encodeOut(channel)
@@ -92,15 +92,15 @@ class GBot(irc.IRCClient):
 
         # strip color codes
         log.chatlog.info('[NTE->%s]%s' % (userOut, format.strip(msgOut)))
-        
+
     def invite(self, user, channel):
         """ Send a channel invite to a user. """
         userOut = format.encodeOut(user)
         channelOut = format.encodeOut(channel)
         self.sendLine("INVITE %s %s" % (userOut, channelOut))
-        
+
         log.chatlog.info('[INVITE->%s] %s' % (userOut, channelOut))
-        
+
     def join(self, channel, key=None):
         """ Join a channel. """
         channelOut = format.encodeOut(channel)
@@ -109,7 +109,7 @@ class GBot(irc.IRCClient):
             irc.IRCClient.join(self, channelOut, keyOut)
         else:
             irc.IRCClient.join(self, channelOut)
-    
+
     def part(self, channel, reason=None):
         """ Part a channel. """
         channelOut = format.encodeOut(channel)
@@ -120,7 +120,7 @@ class GBot(irc.IRCClient):
         """ Send an action (/me command) to a channel. """
         msgOut = format.encodeOut(msg)
         channelOut = format.encodeOut(channel)
-        self.me(channel=channelOut, action=msgOut)
+        self.describe(channel=channelOut, action=msgOut)
 
         # strip color codes
         log.chatlog.info('[ACT->%s]%s' % (channelOut, format.strip(msgOut)))
@@ -130,7 +130,7 @@ class GBot(irc.IRCClient):
         self.sendLine("MODE %s %s" % (target, modestring))
 
         log.chatlog.info('[MODE] %s %s' % (target, modestring))
-        
+
     def cprivmsg(self, channel, user, msg):
         """ Send a CPRIVMSG. This allows channel ops to bypass server flood
         limits when messaging users in their channel. """
@@ -207,7 +207,7 @@ class GBot(irc.IRCClient):
         """ (private) Deactivates a loaded plugin. """
         if self.plugins.has_key(pluginname) == False:
             log.logger.error('Unable to deactivate plugin ' + pluginname)
-            return        
+            return
 
         log.logger.info("Deactivating %s" % pluginname)
         plugin = self.plugins[pluginname]
@@ -286,10 +286,10 @@ class GBot(irc.IRCClient):
 
         self.plugins = {}
         self.activeplugins = []
-        
+
         log.logger.info("Loading plugins...")
         self.loadPlugins(conf)
-        
+
         log.logger.info("Activating startup plugins...")
         self.activatePlugin('system.Startup')
 
@@ -314,12 +314,12 @@ class GBot(irc.IRCClient):
     def connectionLost(self, reason):
         """ Called when a connection is shut down. """
         irc.IRCClient.connectionLost(self, reason)
-            
+
         log.logger.info("[disconnected at %s:%s]" %\
               (time.asctime(time.localtime(time.time())), reason))
 
         self.timertask.stop()
-        
+
         time.sleep(2)
 
         # Call Event Handler
@@ -339,7 +339,7 @@ class GBot(irc.IRCClient):
         """ (private) Identify with NickServ from the configuration info. """
         if hasattr(self, 'opernick') and hasattr(self, 'operpass'):
             self.sendLine('OPER %s %s' % (self.opernick, self.operpass))
-        
+
         # Identify to nickserv
         if hasattr(self, 'idnick') and hasattr(self, 'idpass'):
             self.privout('%s' % (self.idnick,), 'identify %s' % (self.idpass,))
@@ -354,7 +354,7 @@ class GBot(irc.IRCClient):
             self.mode(channel, True, self.plusmodes)
         if hasattr(self, 'minusmodes'):
             self.mode(channel, False, self.minusmodes)
-        
+
         # Call Event Handler
         channelIn = format.decodeIn(channel)
         self.channels.append(channelIn)
@@ -462,7 +462,7 @@ class GBot(irc.IRCClient):
         channelIn = format.decodeIn(channel)
         kickerIn = format.decodeIn(kicker)
         messageIn = format.decodeIn(message)
-        
+
         log.chatlog.info('%s was kicked from %s by %s (reason: %s)' % (user, channel, kicker, message))
 
         self.events.user_kicked(channelIn, userIn, kickerIn, messageIn)
@@ -472,9 +472,9 @@ class GBot(irc.IRCClient):
         user = user.split('!', 1)[0]
         userIn = format.decodeIn(user)
         quitMsgIn = format.decodeIn(quitMessage)
-        
+
         log.chatlog.info("%s has quit [%s]" % (user, quitMessage))
-        
+
         # Call Event Handler
         self.events.user_quit(userIn, quitMsgIn)
 
@@ -500,7 +500,7 @@ class GBotFactory(protocol.ClientFactory):
         self.channels = channels
         self.filename = filename
         conf = ConfigObj('pyGBot.ini')
-        
+
         # Open GBot log
         try:
             print "Opening pyGBot log file..."
@@ -513,7 +513,7 @@ class GBotFactory(protocol.ClientFactory):
         except KeyError:
             print "No log file specified in config. Defaulting to 'pyGBot.log'."
             log.addLogFileHandler(log.logger,'pyGBot.log', log.formatter)
-        
+
         # set logging level
         try:
             if conf['IRC']['loglevel'].lower() == 'debug':
@@ -523,7 +523,7 @@ class GBotFactory(protocol.ClientFactory):
             # otherwise use the default level of INFO
         except KeyError:
             pass # no 'loglevel' key? use default level of INFO
-        
+
         # open chat log
         try:
             print "Opening chat log file..."
@@ -578,7 +578,7 @@ def run():
     print "Initialising Factory..."
     # create factory protocol and application
     fact = GBotFactory(channels, 'UNUSED')
-    
+
     # SSL support
     sslconnect = None
     if conf['IRC'].has_key('ssl'):
