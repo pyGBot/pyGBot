@@ -120,7 +120,7 @@ class GBot(irc.IRCClient):
         """ Send an action (/me command) to a channel. """
         msgOut = format.encodeOut(msg)
         channelOut = format.encodeOut(channel)
-        self.me(channel=channelOut, action=msgOut)
+        self.describe(channel=channelOut, action=msgOut)
 
         # strip color codes
         log.chatlog.info('[ACT->%s]%s' % (channelOut, format.strip(msgOut)))
