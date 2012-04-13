@@ -16,6 +16,7 @@
 ##    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 import collections, math, operator, re, string
+from inspect import getmembers, isfunction, isbuiltin
 from random import randint
 from sys import exc_info
 from pyGBot.Plugins.system.Commands import BaseCommand
@@ -36,7 +37,7 @@ class Token(object):
     @property
     def is_unary(self):
         return self.kind in ['-']
-    
+
     @property
     def is_roll(self):
         return self.kind in ['d']
@@ -197,7 +198,7 @@ class Parser(object):
 
     def unchew(self):
         self.current -= 1
-    
+
 
     def expects_any(self, kinds):
         got = self.chew()
@@ -251,7 +252,7 @@ class Parser(object):
             return UnaryOp(tok, self.unary_expression())
         else:
             return self.atom()
-        
+
     def roll_expression(self):
         expr = self.unary_expression()
         while self.peek().is_roll:
@@ -296,76 +297,86 @@ class Calc(BaseCommand):
             '^': operator.pow,
             'd': self.roll,
         }
-        
+
         self.UNARY_OPERATORS = {
             '-': operator.neg,
         }
-        
+
         self.CONSTANTS = {
-            'pi': math.pi, 
-            'e': math.e, 
+            'pi': math.pi,
+            'e': math.e,
             'F': -1 # Fudge dice
         }
-        
+
         self.FUNCTIONS = {
             # Selected Python functions
             'abs': abs,
-            'round': round,
-            # Math functions
-            'ceil': math.ceil,
-            'copysign': math.copysign,
-            'fabs': math.fabs,
-            'factorial': math.factorial,
-            'floor': math.floor,
-            'fmod': math.fmod,
-            'frexp': math.frexp,
-            'fsum': math.fsum,
-            #'isfinite': math.isfinite, # requires Python 3.2
-            'isinf': math.isinf,
-            'isnan': math.isnan,
-            'ldexp': math.ldexp,
-            'modf': math.modf,
-            'trunc': math.trunc,
-            'exp': math.exp,
-            'expm1': math.expm1,
-            'log': math.log,
-            'log1p': math.log1p,
-            #'log2': math.log2, # requires Python 3.2
-            'log10': math.log10,
-            'pow': math.pow,
-            'sqrt': math.sqrt,
-            'acos': math.acos,
-            'asin': math.asin,
-            'atan': math.atan,
-            'atan2': math.atan2,
-            'cos': math.cos,
-            'hypot': math.hypot,
-            'sin': math.sin,
-            'tan': math.sin,
-            'degrees': math.degrees,
-            'radians': math.radians,
-            'acosh': math.acosh,
-            'asinh': math.asinh,
-            'atanh': math.atanh,
-            'cosh': math.cosh,
-            'sinh': math.sinh,
-            'tanh': math.tanh,
-            'erf': math.erf,
-            'erfc': math.erfc,
-            'gamma': math.gamma,
-            'lgamma': math.lgamma,
+            'round': round
         }
-        
+
+        # Get all math functions
+        self.FUNCTIONS.update(getmembers(math, isbuiltin))
+        self.FUNCTIONS.update(getmembers(math, isfunction))
+
+##        self.FUNCTIONS = {
+##            # Selected Python functions
+##            'abs': abs,
+##            'round': round,
+##            # Math functions
+##            'ceil': math.ceil,
+##            'copysign': math.copys@ign,
+##            'fabs': math.fabs,
+##            'factorial': math.factorial,
+##            'floor': math.floor,
+##            'fmod': math.fmod,
+##            'frexp': math.frexp,
+##            'fsum': math.fsum,
+##            #'isfinite': math.isfinite, # requires Python 3.2
+##            'isinf': math.isinf,
+##            'isnan': math.isnan,
+##            'ldexp': math.ldexp,
+##            'modf': math.modf,
+##            'trunc': math.trunc,
+##            'exp': math.exp,
+##            'expm1': math.expm1,
+##            'log': math.log,
+##            'log1p': math.log1p,
+##            #'log2': math.log2, # requires Python 3.2
+##            'log10': math.log10,
+##            'pow': math.pow,
+##            'sqrt': math.sqrt,
+##            'acos': math.acos,
+##            'asin': math.asin,
+##            'atan': math.atan,
+##            'atan2': math.atan2,
+##            'cos': math.cos,
+##            'hypot': math.hypot,
+##            'sin': math.sin,
+##            'tan': math.sin,
+##            'degrees': math.degrees,
+##            'radians': math.radians,
+##            'acosh': math.acosh,
+##            'asinh': math.asinh,
+##            'atanh': math.atanh,
+##            'cosh': math.cosh,
+##            'sinh': math.sinh,
+##            'tanh': math.tanh,
+##            'erf': math.erf,
+##            'erfc': math.erfc,
+##            'gamma': math.gamma,
+##            'lgamma': math.lgamma,
+##        }
+
         l = Lexer("".join(args))
         p = Parser(list(l))
-        
+
         try:
             bot.replyout(channel, user, "%g" % self.eval_node(p.toplevel()))
         except KeyError:
             bot.replyout(channel, user, "Unknown constant or function: %s" % exc_info()[1][0])
         except:
             bot.replyout(channel, user, "Error")
-        
+
     def eval_node(self, node):
         if isinstance(node, Token):
             return node.value
@@ -382,17 +393,17 @@ class Calc(BaseCommand):
             func = self.FUNCTIONS[node.name.value]
             return func(*args)
         raise SyntaxError
-        
+
     def roll(self, dice, sides):
         if dice < 1 or sides < -1 or sides == 0:
             raise SyntaxError
-        
+
         sum = 0
-        
+
         for die in range(0, dice):
             if sides == -1:
                 sum = sum + randint(-1, 1) # Fudge dice!
             else:
                 sum = sum + randint(1, sides)
-            
+
         return sum
