@@ -539,13 +539,15 @@ class GBotFactory(protocol.ClientFactory):
     def clientConnectionLost(self, connector, reason):
         """ Called when a client's connection is shut down. Attempts to
         reconnect to the server. """
-
+        log.logger.error('connection lost: %s', (str(reason),))
+        time.sleep(5)
         connector.connect()
 
     def clientConnectionFailed(self, connector, reason):
         """ Called when a client's connection fails. Log the error and exit. """
         log.logger.critical('connection failed: %s', (str(reason),))
-        reactor.stop()
+        time.sleep(5)
+        connector.connect()
 
 def run():
     """ Run GBot. Called from the pyGBot bootstrap script. """
