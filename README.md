@@ -20,16 +20,16 @@ Licence, copyright and attribution
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-Based on pyTBot, (c) 2007 Paul Rotering
-http://www.ircpoker.com
+Based on [pyTBot](http://www.ircpoker.com),
+(c) 2007 Paul Rotering
 Licensed under GPLv2
 
-Uses ConfigObj, (c) 2008 Michael Foord and Nicola Larosa
-http://www.voidspace.org.uk/python/configobj.html
+Uses [ConfigObj](http://www.voidspace.org.uk/python/configobj.html),
+(c) 2008 Michael Foord and Nicola Larosa
 Licensed under modified (3 clause) BSD License
 
-Uses "C# Events in Python", (c) 2005 Zoran Isailovski
-http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/410686
+Uses ["C# Events in Python"](http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/410686),
+(c) 2005 Zoran Isailovski
 Licensed under MIT License
 
 Simple Disclaimer:
@@ -39,7 +39,7 @@ If it breaks your computer, it's not our fault.
 Requirements
 ------------
 * Python >= 2.5
-* Twisted >= 2.0 (including twisted.words)
+* Twisted >= 10.0 (including twisted.words)
 * pyOpenSSL (only when enabling SSL)
 
 Getting Started
