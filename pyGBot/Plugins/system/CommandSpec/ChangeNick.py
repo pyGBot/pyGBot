@@ -24,5 +24,4 @@ class ChangeNick(BaseCommand):
             bot.noteout(user, 'Please specify a new nick.')
 
         args = args.split(' ',1)
-        bot.setNick(args[0])
-
+        bot.changenick(args[0])

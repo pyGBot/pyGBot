@@ -131,6 +131,10 @@ class GBot(irc.IRCClient):
 
         log.chatlog.info('[MODE] %s %s' % (target, modestring))
         
+    def changenick(self, newnick):
+        newnickOut = format.encodeOut(newnick)
+        self.setNick(newnickOut)
+        
     def cprivmsg(self, channel, user, msg):
         """ Send a CPRIVMSG. This allows channel ops to bypass server flood
         limits when messaging users in their channel. """
