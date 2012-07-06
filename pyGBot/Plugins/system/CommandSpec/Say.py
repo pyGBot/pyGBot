@@ -23,11 +23,10 @@ from pyGBot.Plugins.system.Auth import AuthLevels as AL
 class Say(BaseCommand):
     level = AL.Admin
     def __init__(self, bot, channel, user, args):
-        if args == '':
-            bot.noteout(user, 'Please specify a channel to speak in.')
-
         args = args.split(' ',1)
-        if args[0].startswith('#'):
+        if args == ['']:
+            bot.noteout(user, 'Please specify a channel to speak in.')
+        elif args[0].startswith('#'):
             if args[0] in bot.channels:
                 bot.pubout(args[0],args[1])
             else:
