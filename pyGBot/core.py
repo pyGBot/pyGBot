@@ -57,7 +57,7 @@ class GBot(irc.IRCClient):
         msgOut = format.encodeOut(msg)
         channelOut = format.encodeOut(channel)
         self.say(channel=channelOut, message=msgOut)
-        
+
         # strip color codes
         log.chatlog.info('[PUB->%s]%s' % (channelOut, format.strip(msgOut)))
 
@@ -66,7 +66,7 @@ class GBot(irc.IRCClient):
         msgOut = format.encodeOut(msg)
         userOut = format.encodeOut(user)
         self.msg(user=userOut, message=msgOut)
-        
+
         # strip color codes
         log.chatlog.info('[PRV->%s]%s' % (userOut, format.strip(msgOut)))
 
@@ -75,7 +75,7 @@ class GBot(irc.IRCClient):
         otherwise, it is sent to the channel. Use this in plugins or commands
         when an incoming message can be either from a channel or a user and the
         outgoing message should be resent to the source. """
-        
+
         msgOut = format.encodeOut(msg)
         userOut = format.encodeOut(user)
         channelOut = format.encodeOut(channel)
@@ -92,15 +92,15 @@ class GBot(irc.IRCClient):
 
         # strip color codes
         log.chatlog.info('[NTE->%s]%s' % (userOut, format.strip(msgOut)))
-        
+
     def invite(self, user, channel):
         """ Send a channel invite to a user. """
         userOut = format.encodeOut(user)
         channelOut = format.encodeOut(channel)
         self.sendLine("INVITE %s %s" % (userOut, channelOut))
-        
+
         log.chatlog.info('[INVITE->%s] %s' % (userOut, channelOut))
-        
+
     def join(self, channel, key=None):
         """ Join a channel. """
         channelOut = format.encodeOut(channel)
@@ -512,7 +512,10 @@ class GBot(irc.IRCClient):
         self.events.user_nickchange(oldnameIn, newnameIn)
 
 class GBotFactory(protocol.ClientFactory):
-    """A factory for gbots. """
+    """A factory for tbots.
+
+    A new protocol instance is created each time we connect to the server.
+    """
 
     # the class of the protocol to build when new connection is made
     protocol = GBot
