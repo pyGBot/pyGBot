@@ -143,13 +143,11 @@ class WikiLeadExtractor(HTMLParser):
 
         # if closing a top-level paragraph and text was captured, store it
         if tag == 'p' and not self.__open_tags and self.__cur_par:
-            self.__text.append(self.__clean_paragraph("".join(self.__cur_par)))
-            self.__cur_par = []
-            self.__enforce_paragraph_limit()
+            self.__store_cur_par()
 
     def handle_data(self, data):
         """ Called to process arbitrary data (e.g. text nodes and the contents
-        of <script> and <style> elements. """
+        of <script> and <style> elements). """
         if self.__is_capturing():
             self.__cur_par.append(data)
 
@@ -179,6 +177,24 @@ class WikiLeadExtractor(HTMLParser):
             # don't capture inside elements in STRIP_TAG or children thereof
             and not [tag for tag in self.__open_tags if tag in self.STRIP_TAGS]
         )
+
+    def __store_cur_par(self):
+        """ Finalise and store the currently processing paragraph. If the
+        currently processing paragraph is non-empty after whitespace cleanup,
+        ignores the currently processing paragraph. """
+        par_text = self.__clean_paragraph(''.join(self.__cur_par))
+
+        # if paragraph non-empty
+        if len(par_text) != 0:
+            self.__text.append(par_text)
+            self.__cur_par = []
+            self.__enforce_paragraph_limit()
+            return
+        else:
+            # some MediaWiki pages have paragraphs which are empty except for
+            # an empty span element. Ignore these.
+            self.__cur_par = []
+            return
 
     def __enforce_paragraph_limit(self):
         """ Abort parsing and truncate extra captured data once the paragraph
@@ -259,7 +275,7 @@ class Wiki(BasePlugin):
                 wikiUrl = http://en.wikipedia.org
                 wikiApi = /w/api.php
                 wikiBase = /wiki
-                maxMessageSize = 510
+                maxMessageSize = 510 (obsolete, no longer used)
                 shortUrl = False
         3) Change the values to your liking. All of these settings are optional,
            and will default to the values shown in step 2) if not specified.
@@ -272,9 +288,8 @@ class Wiki(BasePlugin):
                 wikiBase: URI to access the articles on the wiki website. This
                     and the article title are appended to wikiUrl to get each
                     article's URL. Only some websites need this changed.
-                maxMessageSize: Maximum message length that can be sent over
-                    IRC. The IRC spec is 510, but some networks have a lower
-                    maximum.
+                maxMessageSize: Obsolete, no longer used. Maximum message length
+                    that can be sent over IRC.
                 shortUrl: Whether to shorten URLs sent over IRC using TinyURL
                     is.gd. Should be either "True" or "False".
 
@@ -303,7 +318,7 @@ class Wiki(BasePlugin):
 
         # default options
         self.useShortUrl    = False
-        self.maxMessageSize = 510
+        #self.maxMessageSize = 510
         self.wikiName       = 'Wikipedia'
         self.wikiUrl        = 'http://en.wikipedia.org'
         self.wikiApi        = '/w/api.php'
@@ -318,9 +333,9 @@ class Wiki(BasePlugin):
         # retrieve options from configuration
         if 'shortUrl' in options:
             self.useShortUrl = (options['shortUrl'][0].upper()!='F')
-        if 'maxMessageSize' in options:
-            self.maxMessageSize = min(self.maxMessageSize,
-                                      int(options['maxMessageSize']))
+        #if 'maxMessageSize' in options:
+        #    self.maxMessageSize = min(self.maxMessageSize,
+        #                              int(options['maxMessageSize']))
         if 'wikiName' in options:
             self.wikiName = options['wikiName'].strip()
         if 'wikiUrl' in options:
@@ -360,15 +375,7 @@ class Wiki(BasePlugin):
         required, but the latter arguments are optional and override the
         configuration settings for Wiki name, URL, etc. if present."""
 
-        # if plugin inactive, exit
-        if not self.active:
-            return ""
-
-        # for logging purposes
-        if not channel:
-            source = 'msg'
-        else:
-            source = channel
+        source = (channel if channel else 'msg')
 
         # Set wiki settings if provided
         self.pushWiki()
@@ -383,62 +390,32 @@ class Wiki(BasePlugin):
 
         # Start processing the command
         query = args['query'].strip()
-        outputList = [] # [wikiname, articlename, (previewText), url]
+        output= ""
 
         isFound = self.articleExists(query)
-
         if isFound:
-            invalidArticle = False # for logging purposes
-            resolvedTitle = self.getResolvedTitle(query)
-            outputList.append( "".join([self.wikiName, " -"]) )
-            outputList.append( "".join(["\x02", resolvedTitle, "\x02:"]) )
-
-            if self.useShortUrl:
-                outputList.append( self.getShortUrl(resolvedTitle) )
-            else:
-                outputList.append( self.getUrl(resolvedTitle) )
-
-            # Preview length = max length - current length (all as bytes)
-            # (+ 1 for additional " " needed to insert preview text)
-            previewLen = min(510, self.maxMessageSize)\
-                             - (len(format.encodeOut(u' '.join(outputList)))+1)
-            # use query, not redirectTitle, to make use of cache and not redownload
-            previewText = self.getPreview(query, previewLen)
-
-            # if getPreview received malformed data, assume an invalid page
-            if previewText is None:
-                outputList = ["Sorry, I can't look that up on %s." % self.wikiName]
-                log.logger.warning("reference.Wiki: Attempted lookup of " +\
-                    "non-article '%s' by %s in %s on %s <%s>",\
-                    format.encodeOut(query), user, source,\
-                    format.encodeOut(self.wikiName), self.wikiUrl)
-                invalidArticle = True # for logging purposes
-            # if getPreview returned text, add to output
-            elif len(previewText) > 0:
-                outputList.insert(2, previewText)
-
-            # If we didn't fall under the "I can't look that up" case, log a successful lookup
-            if not invalidArticle:
-                log.logger.info("reference.Wiki: Found article '%s' for " +\
-                    "query '%s' by %s in %s on %s <%s>",\
-                    format.encodeOut(resolvedTitle), format.encodeOut(query),\
-                    user, source, format.encodeOut(self.wikiName), self.wikiUrl)
-
+            output = self.getQueryResponse(channel, user, query)
         elif isFound == False:
-            outputList.append( u"Sorry, no %s page exists for '%s'."\
-                               % (self.wikiName, query) )
+            output = u"Sorry, no %s page exists for '%s'."\
+                               % (self.wikiName, query)
             log.logger.info("reference.Wiki: No article found for query " +\
                             "'%s' by %s in %s on %s <%s>",\
                             format.encodeOut(query), user, source,\
                             format.encodeOut(self.wikiName), self.wikiUrl)
         else: # None, meaning an error occurred
-            outputList.append(u"Sorry, an error occurred searching for %s page '%s'."\
+            outputList = []
+            outputList.append(
+                u"Sorry, an error occurred searching for %s page '%s'."\
                 % (self.wikiName, format.encodeOut(query)))
             outputList.append(u"Maybe it works for you:")
+
             if self.useShortUrl:
                 outputList.append( self.getShortUrl(query) )
             else:
                 outputList.append( self.getUrl(query) )
+
+            output = u' '.join(outputList)
+
             log.logger.error("reference.Wiki: An error occurred retrieving " +\
                              "or parsing the API response for query '%s' by " +\
                              "%s in %s on %s <%s>",\
@@ -448,7 +425,64 @@ class Wiki(BasePlugin):
         # Restore options set in bot configuration
         self.popWiki()
 
+        return output
+
+    def getQueryResponse(self, channel, user, query):
+        """ Return the full text of the reply message for a given query. This
+        sends the query to the MediaWiki site, processes the reply for the
+        preview text, and builds the bot's response string. """
+
+        source = (channel if channel else 'msg') # for logging purposes
+
+        outputList = []
+        resolvedTitle = self.getResolvedTitle(query)
+        outputList.append( u"".join([self.wikiName, u" -"]) )
+        outputList.append( u"".join([u"\x02", resolvedTitle, u"\x02:"]) )
+
+        if self.useShortUrl:
+            outputList.append( self.getShortUrl(resolvedTitle) )
+        else:
+            outputList.append( self.getUrl(resolvedTitle) )
+
+        # Preview length = max length - current length (all as bytes)
+        # -1 is for the space to insert before preview
+        currentText = format.encodeOut(u' '.join(outputList))
+        previewLen = self.__getMaxPreviewLength(channel, user, currentText)
+        del currentText
+
+        # uses query, not resolvedTitle
+        # to use cached data from getResolvedTitle() call
+        previewText = self.getPreview(query, previewLen)
+
+        # if preview retrieved, add it (if not blank) and log successful lookup
+        if previewText is not None:
+            if len(previewText) > 0:
+                outputList.insert(2, previewText)
+            log.logger.info("reference.Wiki: Found article '%s' for " +\
+                "query '%s' by %s in %s on %s <%s>",\
+                format.encodeOut(resolvedTitle), format.encodeOut(query),\
+                user, source, format.encodeOut(self.wikiName), self.wikiUrl)
+        else: # if getPreview received malformed data, assume an error
+            outputList = [u"Sorry, I can't look that up on %s." % self.wikiName]
+            log.logger.warning("reference.Wiki: Attempted lookup of " +\
+                "non-article '%s' by %s in %s on %s <%s>",\
+                format.encodeOut(query), user, source,\
+                format.encodeOut(self.wikiName), self.wikiUrl)
+
         return u' '.join(outputList)
+
+
+    def __getMaxPreviewLength(self, channel, user, message, command='PRIVMSG'):
+        """ Calculate the length of the raw IRC message. The recipient is
+        assumed channel if not None/blank, else user. All args should be byte-
+        string, not unicode. """
+        recipient = (channel if channel else user)
+        cmdtext = ''.join([command, ' ', recipient, ' :', message])
+
+        # Twisted counts this part of the command a second time in bot.msg()
+        cmdtext = ''.join([cmdtext, command, ' ', recipient, ' :\r\n'])
+
+        return self.bot._safeMaximumLineLength(cmdtext)
 
     def loadWiki(self, options):
         """ Load wiki settings from a dict. options should have the keys
@@ -464,8 +498,8 @@ class Wiki(BasePlugin):
             self.wikiApi  = options['api']
         if 'base' in options and options['base']:
             self.wikiBase = options['base']
-        if 'maxsize' in options and int(options['maxsize']) >= 0:
-            self.maxMessageSize = int(options['maxsize'])
+        #if 'maxsize' in options and int(options['maxsize']) >= 0:
+        #    self.maxMessageSize = int(options['maxsize'])
 
         # clear cache
         self.lastResponse = {}
@@ -481,7 +515,7 @@ class Wiki(BasePlugin):
         self.wikiSave['url']  = self.wikiUrl
         self.wikiSave['api']  = self.wikiApi
         self.wikiSave['base'] = self.wikiBase
-        self.wikiSave['maxsize'] = self.maxMessageSize
+        #self.wikiSave['maxsize'] = self.maxMessageSize
 
         # clear cache
         self.lastResponse = {}
