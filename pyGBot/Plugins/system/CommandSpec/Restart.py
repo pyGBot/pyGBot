@@ -20,7 +20,7 @@ from pyGBot import log
 from pyGBot.Plugins.system.Commands import BaseCommand
 from pyGBot.Plugins.system.Auth import AuthLevels as AL
 
-class Quit(BaseCommand):
+class Restart(BaseCommand):
     level = AL.Admin
     def __init__(self, bot, channel, user, args):
         log.logger.info("Shutdown requested")
