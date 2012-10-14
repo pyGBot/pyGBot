@@ -40,7 +40,7 @@ class Seen(BaseCommand):
         try:
             event = bot.plugins['features.Seen'].get_latest(searchNick, searchChannel)
         except IndexError, e:
-            bot.replyout(channel, user, e)
+            bot.replyout(channel, user, str(e))
             return
 
         outmessage = "The user, %s, was last seen " % event.user

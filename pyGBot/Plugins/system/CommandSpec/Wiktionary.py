@@ -23,21 +23,21 @@ from pyGBot.Plugins.system.Auth import AuthLevels
 
 class Wiktionary(BaseCommand):
     """ English Wiktionary Lookup Command """
-    
+
     # CUSTOM SETTINGS
     wikiName = "Wiktionary"
     wikiUrl  = "http://en.wiktionary.org"
     wikiApi  = "/w/api.php"
     wikiBase = "/wiki"
     maxMessageSize = 0
-    
+
     # Don't change anything below unless you know what you're doing
     level = AuthLevels.User
-    
+
     def __init__(self, bot, channel, user, args):
         """ Query the Wiki plugin for an article lookup and output the returned
         text. """
-        
+
         # Get text to output
         params = {
             'query' : ''.join(args).lower(), # wiktionary uses lowercase
@@ -47,6 +47,10 @@ class Wiktionary(BaseCommand):
             'base'  : self.wikiBase,
             'maxsize' : self.maxMessageSize
         }
-        response = bot.plugins['reference.Wiki'].command(channel, user, params)
-        if response: # can return nothing if plugin disabled
+        try:
+            wikiplugin = bot.plugins['reference.Wiki']
+        except KeyError:
+            return
+        else:
+            response = wikiplugin.command(channel, user, params)
             bot.replyout(channel, user, response)

@@ -161,6 +161,8 @@ help = Help
 nick = ChangeNick
 seen = Seen
 usermode = UserMode
+quit = Quit
+restart = Restart
 
 # Optional commands.
 #statsroll = StatsRoll

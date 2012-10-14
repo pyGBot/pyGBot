@@ -1,4 +1,7 @@
-
+##
+##    pyGBot - Versatile IRC Bot
+##    Copyright (C) 2008 Morgan Lokhorst-Blight, Alex Soborov
+##
 ##    This program is free software: you can redistribute it and/or modify
 ##    it under the terms of the GNU General Public License as published by
 ##    the Free Software Foundation, either version 3 of the License, or
@@ -17,11 +20,8 @@ from pyGBot import log
 from pyGBot.Plugins.system.Commands import BaseCommand
 from pyGBot.Plugins.system.Auth import AuthLevels as AL
 
-class ChangeNick(BaseCommand):
+class Quit(BaseCommand):
     level = AL.Admin
     def __init__(self, bot, channel, user, args):
-        if args == '':
-            bot.noteout(user, 'Please specify a new nick.')
-
-        args = args.split(' ',1)
-        bot.changenick(args[0])
+        log.logger.info("Shutdown requested")
+        bot.restart()

@@ -25,7 +25,9 @@ class Msg(BaseCommand):
     def __init__(self, bot, channel, user, args):
         if args == '':
             bot.noteout(user, 'Please specify a username to send a message to.')
-
-        args = args.split(' ',1)
-        bot.privout(args[0],args[1])
-
+        else:
+            args = args.split(' ',1)
+            if len(args) > 1:
+                bot.privout(args[0],args[1])
+            else:
+                bot.noteout(user, 'Please include a message to send.')
