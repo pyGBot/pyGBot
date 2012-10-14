@@ -24,19 +24,23 @@ from pyGBot.Plugins.system.Auth import AuthLevels
 class Wiki(BaseCommand):
     """ Wikipedia Lookup Command - Outputs the URL to the searched article, if
     it exists, and an excerpt of the beginning of the article.
-    
+
     This command is a simple binding to the reference.Wiki plugin."""
-    
+
     level = AuthLevels.User
-    
+
     def __init__(self, bot, channel, user, args):
         """ Query the Wiki plugin for an article lookup and output the returned
         text. """
-        
+
         # Get text to output
         params = {
             'query' : ''.join(args)
         }
-        response = bot.plugins['reference.Wiki'].command(channel, user, params)
-        if response: # can return nothing if plugin disabled
+        try:
+            wikiplugin = bot.plugins['reference.Wiki']
+        except KeyError:
+            return
+        else:
+            response = wikiplugin.command(channel, user, params)
             bot.replyout(channel, user, response)
