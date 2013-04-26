@@ -138,7 +138,7 @@ class Auth(BasePlugin):
                             self.bot.noteout(uname, 'You do not have an account. Successfully authorized as a guest user.')
                             log.logger.info('Auth: Invalid user level for user %s. Set to default.' % uname)
                     else:
-                        self.bot.noteout('Authorization unsuccessful. Please log in to NickServ and try again.')
+                        self.bot.noteout(uname, 'Authorization unsuccessful. Please log in to NickServ and try again.')
 
     def channel_names(self, channel, nameslist):
         log.logger.info("Users on #" + channel + ": " + ', '.join(nameslist))
