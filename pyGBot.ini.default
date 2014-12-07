@@ -150,7 +150,6 @@ _prefix = ^
 play = PlayGame
 start = PlayGame
 stop = StopGame
-quit = StopGame
 list = ListGames
 join = JoinChannel
 part = PartChannel
