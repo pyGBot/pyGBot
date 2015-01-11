@@ -185,8 +185,8 @@ Website
 http://pygbot.github.com
 
 Please use the issue tracker on the homepage to report any problems with the
-software. For assistance, visit `#pyGBot` on the foonetic IRC network 
-(irc.foonetic.net).
+software. For assistance, visit `#pyGBot` on the subluminal IRC network 
+(irc.subluminal.net, port 6667, SSL port 6697).
 
 Enjoy!
 - The pyGBot team
