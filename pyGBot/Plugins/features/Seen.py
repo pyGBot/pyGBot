@@ -81,28 +81,43 @@ class Seen(BasePlugin):
     def user_join(self, channel, username):
         if self.active:
             SeenEvent(user=unicode(username), channel=unicode(channel), type=u'Join', timestamp=datetime.now())
-            session.commit()
+            try:
+                session.commit()
+            except:
+                session.rollback()
 
     def user_part(self, channel, username):
         if self.active:
             SeenEvent(user=unicode(username), channel=unicode(channel), type=u'Part', timestamp=datetime.now())
-            session.commit()
+            try:
+                session.commit()
+            except:
+                session.rollback()
 
     def user_kicked(self, channel, username, kicker, message=""):
         if self.active:
             SeenEvent(user=unicode(username), channel=unicode(channel), type=u'Kick', timestamp=datetime.now(), message=unicode(message))
-            session.commit()
+            try:
+                session.commit()
+            except:
+                session.rollback()
 
     def user_quit(self, username, reason=""):
         if self.active:
             SeenEvent(user=unicode(username), channel=u'', type=u'Quit', timestamp=datetime.now(), message=unicode(reason))
-            session.commit()
+            try:
+                session.commit()
+            except:
+                session.rollback()
 
     def user_nickchange(self, username, newname):
         if self.active:
             SeenEvent(user=unicode(username), channel=u'', type=u'NickFrom', timestamp=datetime.now(), message=u'%s -> %s' % (username, newname))
             SeenEvent(user=unicode(newname), channel=u'', type=u'NickTo', timestamp=datetime.now(), message=u'%s -> %s' % (username, newname))
-            session.commit()
+            try:
+                session.commit()
+            except:
+                session.rollback()
 
     # Event handlers for this bot
     def bot_connect(self):
@@ -125,12 +140,18 @@ class Seen(BasePlugin):
     def msg_channel(self, channel, user, message):
         if self.active:
             SeenEvent(user=unicode(user), channel=unicode(channel), type=u'Say', timestamp=datetime.now(), message=unicode(message))
-            session.commit()
+            try:
+                session.commit()
+            except:
+                session.rollback()
 
     def msg_action(self, channel, user, message):
         if self.active:
             SeenEvent(user=unicode(user), channel=unicode(channel), type=u'Do', timestamp=datetime.now(), message=unicode(message))
-            session.commit()
+            try:
+                session.commit()
+            except:
+                session.rollback()
 
     def msg_private(self, user, message):
         pass
