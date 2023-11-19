@@ -1,0 +1,13 @@
+---
+version: '3'
+services:
+  ircserv:
+    image: docker.io/inspircd/inspircd-docker:3.16.1
+    ports:
+      # also set this port in your pyGBot.ini!
+      - 6697:6697
+  pygbot:
+    build: .
+    volumes:
+      - ./pyGBot.ini:/app/pyGBot.ini:ro
+      - ./users.ini:/app/users.ini:ro
